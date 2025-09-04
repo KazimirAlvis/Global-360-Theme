@@ -215,6 +215,24 @@ if (! class_exists('_360_Global_Settings')) {
         }
 
         /**
+         * Render the Google Maps API Key input.
+         */
+        public function field_google_maps_api($args)
+        {
+            $opts = get_option(self::OPTION_KEY, []);
+            $val  = $opts[$args['label_for']] ?? '';
+            printf(
+                '<input type="text" id="%1$s" name="%2$s[%1$s]" value="%3$s" class="regular-text" placeholder="Enter your Google Maps API key" />',
+                esc_attr($args['label_for']),
+                esc_attr(self::OPTION_KEY),
+                esc_attr($val)
+            );
+            echo '<p class="description">'
+                . esc_html__('Required for map functionality and clinic geocoding. Get your API key from the Google Cloud Console.', 'cpt360')
+                . '</p>';
+        }
+
+        /**
          * Render the Header Logo input.
          */
 
@@ -273,6 +291,11 @@ if (! class_exists('_360_Global_Settings')) {
                 $output['site_name'] = sanitize_text_field($input['site_name']);
             }
             
+            // Google Maps API Key
+            if (isset($input['google_maps_api_key'])) {
+                $output['google_maps_api_key'] = sanitize_text_field($input['google_maps_api_key']);
+            }
+            
             if (isset($input['header_logo_id']) && is_numeric($input['header_logo_id'])) {
                 $output['header_logo_id'] = intval($input['header_logo_id']);
             }
@@ -311,6 +334,7 @@ if (! class_exists('_360_Global_Settings')) {
                     <nav class="nav-tab-wrapper">
                         <a href="#" class="nav-tab nav-tab-active" data-tab="fonts-colors">Fonts & Colors</a>
                         <a href="#" class="nav-tab" data-tab="header-footer">Header & Footer</a>
+                        <a href="#" class="nav-tab" data-tab="apis">APIs</a>
                         <a href="#" class="nav-tab" data-tab="assessment">Assessment ID</a>
                     </nav>
                     <form method="post" action="options.php">
@@ -388,6 +412,38 @@ if (! class_exists('_360_Global_Settings')) {
                             echo '</div>';
                             ?>
                         </div>
+                        <div id="tab-apis" class="cpt360-settings-tab" style="display:none;">
+                            <h2><?php esc_html_e('Google Maps API', 'cpt360'); ?></h2>
+                            <div style="margin-bottom: 30px;">
+                                <?php $this->field_google_maps_api(['label_for' => 'google_maps_api_key']); ?>
+                            </div>
+                            
+                            <hr style="margin: 30px 0;" />
+                            
+                            <div class="cpt360-api-info">
+                                <h3><?php esc_html_e('API Setup Instructions', 'cpt360'); ?></h3>
+                                <ol style="line-height: 1.6;">
+                                    <li><?php esc_html_e('Visit the Google Cloud Console', 'cpt360'); ?> (<a href="https://console.cloud.google.com/" target="_blank" rel="noopener">console.cloud.google.com</a>)</li>
+                                    <li><?php esc_html_e('Create a new project or select an existing one', 'cpt360'); ?></li>
+                                    <li><?php esc_html_e('Enable the following APIs:', 'cpt360'); ?>
+                                        <ul style="margin: 10px 0; padding-left: 20px; list-style-type: disc;">
+                                            <li><?php esc_html_e('Maps JavaScript API', 'cpt360'); ?></li>
+                                            <li><?php esc_html_e('Geocoding API', 'cpt360'); ?></li>
+                                            <li><?php esc_html_e('Maps Embed API', 'cpt360'); ?></li>
+                                        </ul>
+                                    </li>
+                                    <li><?php esc_html_e('Create credentials (API key)', 'cpt360'); ?></li>
+                                    <li><?php esc_html_e('Restrict the API key to your domain for security', 'cpt360'); ?></li>
+                                    <li><?php esc_html_e('Copy the API key and paste it in the field above', 'cpt360'); ?></li>
+                                </ol>
+                                <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 15px; margin-top: 20px;">
+                                    <p style="margin: 0;"><strong><?php esc_html_e('Security Note:', 'cpt360'); ?></strong> <?php esc_html_e('Always restrict your API key to specific domains in production to prevent unauthorized usage and potential billing charges.', 'cpt360'); ?></p>
+                                </div>
+                                <div style="background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; padding: 15px; margin-top: 15px;">
+                                    <p style="margin: 0;"><strong><?php esc_html_e('Required for:', 'cpt360'); ?></strong> <?php esc_html_e('Map functionality, clinic geocoding, location services, and embedded maps.', 'cpt360'); ?></p>
+                                </div>
+                            </div>
+                        </div>
                         <div id="tab-assessment" class="cpt360-settings-tab" style="display:none;">
                             <h2><?php esc_html_e('Global Assessment ID', 'cpt360'); ?></h2>
                             <?php $this->field_assessment_id(['label_for' => 'assessment_id']); ?>
@@ -452,6 +508,17 @@ if (! class_exists('_360_Global_Settings')) {
                 </style>
             </div>
 <?php
+        }
+
+        /**
+         * Get Google Maps API Key
+         */
+        public static function get_google_maps_api_key()
+        {
+            $opts = get_option(self::OPTION_KEY, []);
+            return isset($opts['google_maps_api_key']) && !empty($opts['google_maps_api_key']) 
+                ? $opts['google_maps_api_key'] 
+                : '';
         }
 
         /**

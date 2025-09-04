@@ -79,10 +79,11 @@ if ($state_abbr) {
                             $clean_address = preg_replace('/(Suite|Ste|STE|#|Unit|Apt|Apartment)\s*\d+[A-Za-z]?/i', '', $full_address);
                             $clean_address = preg_replace('/\s{2,}/', ' ', $clean_address); // Remove double spaces
                             $query = urlencode(trim($clean_address));
-                            $google_api_key = 'AIzaSyAbNsO6_Txl5OfJzlnDqm8yfS1XwMijfmE';
-                            $url = "https://maps.googleapis.com/maps/api/geocode/json?address=$query&key=$google_api_key";
-                            $response = wp_remote_get($url, [ 'timeout' => 10 ]);
-                            if (!is_wp_error($response)) {
+                            $google_api_key = _360_Global_Settings::get_google_maps_api_key();
+                            if (!empty($google_api_key)) {
+                                $url = "https://maps.googleapis.com/maps/api/geocode/json?address=$query&key=$google_api_key";
+                                $response = wp_remote_get($url, [ 'timeout' => 10 ]);
+                                if (!is_wp_error($response)) {
                                 $body = wp_remote_retrieve_body($response);
                                 $data = json_decode($body, true);
                                 if (!empty($data['results'][0]['geometry']['location']['lat']) && !empty($data['results'][0]['geometry']['location']['lng'])) {
@@ -113,6 +114,7 @@ if ($state_abbr) {
                                     }
                                 }
                             }
+                            } // End of API key check
                         }
                         if ($lat && $lng) {
                             $locations[] = [

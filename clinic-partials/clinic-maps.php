@@ -1,8 +1,8 @@
 <?php
 
-// 1) Define your API key (example: in wp-config.php)
-if (! defined('CPT360_GOOGLE_MAPS_API_KEY')) {
-    define('CPT360_GOOGLE_MAPS_API_KEY', 'AIzaSyAbNsO6_Txl5OfJzlnDqm8yfS1XwMijfmE');
+// 1) Get API key from theme settings (secure implementation)
+function cpt360_get_google_maps_api_key() {
+    return _360_Global_Settings::get_google_maps_api_key();
 }
 
 // 2) Helper to output up to 3 map embeds
@@ -28,10 +28,16 @@ function cpt360_render_clinic_maps() {
         $full_address = implode( ', ', $parts );
         $q            = rawurlencode( $full_address );
 
+        // Get API key securely
+        $api_key = cpt360_get_google_maps_api_key();
+        if (empty($api_key)) {
+            continue; // Skip this map if no API key is configured
+        }
+
         // Embed URL
         $src = sprintf(
             'https://www.google.com/maps/embed/v1/place?key=%s&q=%s',
-            esc_attr( CPT360_GOOGLE_MAPS_API_KEY ),
+            esc_attr( $api_key ),
             $q
         );
 
