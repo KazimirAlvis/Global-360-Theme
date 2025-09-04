@@ -66,11 +66,11 @@
 		<div class="column offsite_links">
 			<h4>The 360 Network</h4>
 			<ul>
-				<li><a href="https://myfibroidclinic.com/"><span></span>myfibroidclinic.com</a></li>
-				<li><a href="https://neuropathy360.com/"><span></span>neuropathy360.com</a></li>
-				<li><a href="https://kneepain360.com/"><span></span>kneepain360.com</a></li>
-				<li><a href="https://myhemorrhoidclinic.com/"><span></span>myhemorrhoidclinic.com</a></li>
-				<li><a href="https://myprostateclinic.com/"><span></span>myprostateclinic.com</a></li>
+				<li><a href="https://myfibroidclinic.com/"><span><img src="<?php echo get_template_directory_uri(); ?>/assets/icons/Fibroid_Clinic_Logomark_Version_2.svg" alt="Fibroid Clinic" /></span>myfibroidclinic.com</a></li>
+				<li><a href="https://neuropathy360.com/"><span><img src="<?php echo get_template_directory_uri(); ?>/assets/icons/neuropathy_360_logomark_v2.svg" alt="Neuropathy 360" /></span>neuropathy360.com</a></li>
+				<li><a href="https://kneepain360.com/"><span><img src="<?php echo get_template_directory_uri(); ?>/assets/icons/knee_pain_360_logomark_v2.svg" alt="Knee Pain 360" /></span>kneepain360.com</a></li>
+				<li><a href="https://myhemorrhoidclinic.com/"><span><img src="<?php echo get_template_directory_uri(); ?>/assets/icons/hemorrhoid_clinic_logomark_v2.svg" alt="Hemorrhoid Clinic" /></span>myhemorrhoidclinic.com</a></li>
+				<li><a href="https://myprostateclinic.com/"><span><img src="<?php echo get_template_directory_uri(); ?>/assets/icons/prostate_clinic_logomark_V2.svg" alt="Prostate Clinic" /></span>myprostateclinic.com</a></li>
 			</ul>
 
 		</div><!-- .offsite_links -->
@@ -88,7 +88,13 @@
 	</div><!-- .footer_inner -->
 	<div class="border max_width_content"></div>
 	<div class="legal">
-		<p>Copyright © 2025 Hemorrhoid Clinic. All Right Reserved</p>
+		<?php
+		$opts = get_option('360_global_settings', []);
+		$site_name = isset($opts['site_name']) && !empty($opts['site_name']) ? $opts['site_name'] : get_bloginfo('name');
+		$current_year = date('Y');
+		?>
+		<p>Copyright © <?php echo $current_year; ?> <?php echo esc_html($site_name); ?>. All Rights Reserved</p>
+		<p><a  href="https://www.patientreach360.com/privacy-policy/">Privacy Policy</a> | <a href="https://www.patientreach360.com/terms-of-use/">Terms of Use Agreement</a> | <a href="">Sitemap</a></p>
 	</div>
 
 </footer><!-- #colophon -->

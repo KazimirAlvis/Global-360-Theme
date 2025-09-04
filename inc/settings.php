@@ -199,6 +199,22 @@ if (! class_exists('_360_Global_Settings')) {
         }
 
         /**
+         * Render the Site Name input.
+         */
+        public function field_site_name($args)
+        {
+            $opts = get_option(self::OPTION_KEY, []);
+            $val  = $opts[$args['label_for']] ?? '';
+            printf(
+                '<input type="text" id="%1$s" name="%2$s[%1$s]" value="%3$s" class="regular-text" placeholder="%4$s" />',
+                esc_attr($args['label_for']),
+                esc_attr(self::OPTION_KEY),
+                esc_attr($val),
+                esc_attr(get_bloginfo('name'))
+            );
+        }
+
+        /**
          * Render the Header Logo input.
          */
 
@@ -251,6 +267,12 @@ if (! class_exists('_360_Global_Settings')) {
             if (isset($input['assessment_id'])) {
                 $output['assessment_id'] = sanitize_text_field($input['assessment_id']);
             }
+            
+            // Site Name
+            if (isset($input['site_name'])) {
+                $output['site_name'] = sanitize_text_field($input['site_name']);
+            }
+            
             if (isset($input['header_logo_id']) && is_numeric($input['header_logo_id'])) {
                 $output['header_logo_id'] = intval($input['header_logo_id']);
             }
@@ -320,6 +342,14 @@ if (! class_exists('_360_Global_Settings')) {
                         </div>
                         <div id="tab-header-footer" class="cpt360-settings-tab" style="display:none;">
                             <?php
+                            // Site Name field
+                            echo '<div style="margin-bottom: 20px;">';
+                            echo '<h3>Site Information</h3>';
+                            echo '<div><label for="site_name"><strong>Site Name (for footer copyright)</strong></label>';
+                            $this->field_site_name(['label_for' => 'site_name']);
+                            echo '<p class="description">Name to display in footer copyright. Defaults to site title if empty.</p></div>';
+                            echo '</div>';
+                            
                             // Output header and footer fields
                             $this->field_header_logo(['label_for' => 'header_logo_id']);
 

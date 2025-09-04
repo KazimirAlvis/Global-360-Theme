@@ -4,10 +4,6 @@
 
 :root {
 	--text-color: #1e293b;
-	//--heading-font: 'Marcellus', serif;
-	//--heading-font-rob: 'Roboto', sans-serif;
-	--body-font: 'Inter', sans-serif;
-
 	--gutter: 1.5rem;
 }
 
@@ -21,7 +17,7 @@
 	padding-right: 20px;
 }
 .clinic-content h2 {
-	font-family: var(--heading-font);
+	font-family: var(--wp--preset--font-family--heading-font);
 	text-align: center;
 	font-size: 45px;
 	font-weight: 400;
@@ -65,14 +61,14 @@
 	margin-right: 0;
 }
 .clinic_main_info .column:nth-child(1) .clinic-title {
-	font-family: var(--heading-font);
+	font-family: var(--wp--preset--font-family--heading-font);
 	font-size: 32px;
 	color: var(--text-color);
 	margin: 10px 0 0 0;
 }
 
 .clinic_main_info h4 {
-	font-family: var(--heading-font);
+	font-family: var(--wp--preset--font-family--heading-font);
 	font-size: 1.25rem;
 	color: var(--text-color);
 	margin: 10px 0 0 0;
@@ -86,7 +82,7 @@
 	margin: 20px 0 30px 0;
 }
 .clinic-addresses li {
-	font-family: var(--body-font);
+	font-family: var(--wp--preset--font-family--body-font);
 	color: var(--text-color);
 	font-size: 15px;
 	margin-bottom: 10px;
@@ -130,7 +126,7 @@
 }
 
 .clinic-bio p {
-	font-family: var(--body-font);
+	font-family: var(--wp--preset--font-family--body-font);
 	text-align: left;
 	font-size: 16px;
 	font-weight: 400;
@@ -166,13 +162,13 @@
 	color: #fff;
 }
 .map_heading h4 {
-	font-family: var(--heading-font);
+	font-family: var(--wp--preset--font-family--heading-font);
 	font-size: 24px;
 	color: #fff;
 	margin: 20px 0 10px 0;
 }
 .map_heading p {
-	font-family: var(--body-font);
+	font-family: var(--wp--preset--font-family--body-font);
 	color: #fff;
 	font-size: 18px;
 	margin-bottom: 0;
@@ -254,13 +250,13 @@
 	background-image: linear-gradient(180deg, #ffffff 65%, #e8e8e8 100%);
 }
 .clinic_info .clinic_info_title {
-	font-family: var(--heading-font);
+	font-family: var(--wp--preset--font-family--heading-font);
 	font-size: 24px;
 	color: var(--cpt360-primary);
 	margin: 10px 0 10px 0;
 }
 .clinic_info .clinic-info_description {
-	font-family: var(--body-font);
+	font-family: var(--wp--preset--font-family--body-font);
 	text-align: left;
 	font-size: 16px;
 	font-weight: 400;
@@ -323,8 +319,6 @@
 	display: block;
 	text-align: center;
 }
-.clinic-reviews-slider .review-slide {
-}
 
 /*--------------------------------------------------------------
  Clinic CTA
@@ -342,7 +336,7 @@
 	text-align: center;
 }
 .clinic_cta_wrap .clinic-cta-BG-wrap .clinic-cta-inner h3 {
-	font-family: var(--heading-font);
+	font-family: var(--wp--preset--font-family--heading-font);
 	font-size: 45px;
 	font-weight: 400;
 	color: #fff;
@@ -369,7 +363,7 @@
 	z-index: 2;
 }
 .clinic_hero .clinic-hero-BG-wrap .clinic-hero-inner h1 {
-	font-family: var(--heading-font);
+	font-family: var(--wp--preset--font-family--heading-font);
 	font-size: 56px;
 	font-weight: 400;
 	color: #fff;
@@ -426,7 +420,7 @@
 	margin: 20px 0;
 }
 .state-clinics-grid .state-clinic .clinic-title {
-	font-family: var(--heading-font);
+	font-family: var(--wp--preset--font-family--heading-font);
 	font-size: 1.25rem;
 	margin: 0.5em 0 0;
 }

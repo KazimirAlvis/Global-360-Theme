@@ -60,11 +60,54 @@
 			li {
 			}
 		}
+
+		.offsite_links {
+			ul {
+				li {
+					a {
+						display: flex;
+						align-items: center;
+						gap: 10px;
+						margin-bottom: 5px;
+
+						span {
+							display: flex;
+							align-items: center;
+							flex-shrink: 0;
+
+							img {
+								width: 20px;
+								height: 20px;
+								object-fit: contain;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	.border {
 		display: block;
 		height: 1px;
 		width: 100%;
 		background-color: #fff;
+	}
+
+	.legal {
+		text-align: center;
+		p,
+		p a {
+			font-family: var(--wp--preset--font-family--body-font);
+			color: #fff;
+			font-weight: 400;
+			color: #fff;
+			font-size: 13px;
+			line-height: normal;
+			font-style: normal;
+			text-decoration: none;
+		}
+		p a:hover {
+			text-decoration: underline;
+		}
 	}
 }

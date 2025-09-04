@@ -32,7 +32,7 @@
 	font-size: 16px;
 	line-height: 1.6;
 	margin-bottom: 1.5em;
-	font-family: var(--body-font);
+	font-family: var(--wp--preset--font-family--body-font);
 }
 
 .main-heading-con {
@@ -58,7 +58,7 @@
 
 .main-list-con ul,
 .main-list-con ol {
-	font-family: var(--body-font);
+	font-family: var(--wp--preset--font-family--body-font);
 	font-size: 16px;
 	padding-left: 0;
 	margin-bottom: 1.5em;

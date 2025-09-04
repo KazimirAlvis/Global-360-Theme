@@ -938,7 +938,7 @@ textarea {
 --------------------------------------------------------------*/
 .btn {
   font-size: 18px;
-  font-family: var(--body-font);
+  font-family: var(--wp--preset--font-family--body-font);
   font-weight: 500;
   border-radius: 27px;
   padding: 15px 30px;
@@ -1118,11 +1118,45 @@ textarea {
   display: flex;
   gap: 20px;
 }
+.site-footer .footer_inner .offsite_links ul li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+.site-footer .footer_inner .offsite_links ul li a span {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.site-footer .footer_inner .offsite_links ul li a span img {
+  width: 20px;
+  height: 20px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
 .site-footer .border {
   display: block;
   height: 1px;
   width: 100%;
   background-color: #fff;
+}
+.site-footer .legal {
+  text-align: center;
+}
+.site-footer .legal p,
+.site-footer .legal p a {
+  font-family: var(--wp--preset--font-family--body-font);
+  color: #fff;
+  font-weight: 400;
+  color: #fff;
+  font-size: 13px;
+  line-height: normal;
+  font-style: normal;
+  text-decoration: none;
+}
+.site-footer .legal p a:hover {
+  text-decoration: underline;
 }
 
 /*--------------------------------------------------------------
@@ -1145,7 +1179,7 @@ textarea {
   font-size: 16px;
   line-height: 1.6;
   margin-bottom: 1.5em;
-  font-family: var(--body-font);
+  font-family: var(--wp--preset--font-family--body-font);
 }
 
 .main-heading-con h1,
@@ -1169,7 +1203,7 @@ textarea {
 
 .main-list-con ul,
 .main-list-con ol {
-  font-family: var(--body-font);
+  font-family: var(--wp--preset--font-family--body-font);
   font-size: 16px;
   padding-left: 0;
   margin-bottom: 1.5em;
@@ -1213,7 +1247,6 @@ textarea {
 --------------------------------------------------------------*/
 :root {
   --text-color: #1e293b;
-  --body-font: "Inter", sans-serif;
   --gutter: 1.5rem;
 }
 
@@ -1228,7 +1261,7 @@ textarea {
 }
 
 .clinic-content h2 {
-  font-family: var(--heading-font);
+  font-family: var(--wp--preset--font-family--heading-font);
   text-align: center;
   font-size: 45px;
   font-weight: 400;
@@ -1278,14 +1311,14 @@ textarea {
 }
 
 .clinic_main_info .column:nth-child(1) .clinic-title {
-  font-family: var(--heading-font);
+  font-family: var(--wp--preset--font-family--heading-font);
   font-size: 32px;
   color: var(--text-color);
   margin: 10px 0 0 0;
 }
 
 .clinic_main_info h4 {
-  font-family: var(--heading-font);
+  font-family: var(--wp--preset--font-family--heading-font);
   font-size: 1.25rem;
   color: var(--text-color);
   margin: 10px 0 0 0;
@@ -1302,7 +1335,7 @@ textarea {
 }
 
 .clinic-addresses li {
-  font-family: var(--body-font);
+  font-family: var(--wp--preset--font-family--body-font);
   color: var(--text-color);
   font-size: 15px;
   margin-bottom: 10px;
@@ -1347,7 +1380,7 @@ textarea {
 }
 
 .clinic-bio p {
-  font-family: var(--body-font);
+  font-family: var(--wp--preset--font-family--body-font);
   text-align: left;
   font-size: 16px;
   font-weight: 400;
@@ -1387,14 +1420,14 @@ textarea {
 }
 
 .map_heading h4 {
-  font-family: var(--heading-font);
+  font-family: var(--wp--preset--font-family--heading-font);
   font-size: 24px;
   color: #fff;
   margin: 20px 0 10px 0;
 }
 
 .map_heading p {
-  font-family: var(--body-font);
+  font-family: var(--wp--preset--font-family--body-font);
   color: #fff;
   font-size: 18px;
   margin-bottom: 0;
@@ -1489,14 +1522,14 @@ textarea {
 }
 
 .clinic_info .clinic_info_title {
-  font-family: var(--heading-font);
+  font-family: var(--wp--preset--font-family--heading-font);
   font-size: 24px;
   color: var(--cpt360-primary);
   margin: 10px 0 10px 0;
 }
 
 .clinic_info .clinic-info_description {
-  font-family: var(--body-font);
+  font-family: var(--wp--preset--font-family--body-font);
   text-align: left;
   font-size: 16px;
   font-weight: 400;
@@ -1581,7 +1614,7 @@ textarea {
 }
 
 .clinic_cta_wrap .clinic-cta-BG-wrap .clinic-cta-inner h3 {
-  font-family: var(--heading-font);
+  font-family: var(--wp--preset--font-family--heading-font);
   font-size: 45px;
   font-weight: 400;
   color: #fff;
@@ -1610,7 +1643,7 @@ textarea {
 }
 
 .clinic_hero .clinic-hero-BG-wrap .clinic-hero-inner h1 {
-  font-family: var(--heading-font);
+  font-family: var(--wp--preset--font-family--heading-font);
   font-size: 56px;
   font-weight: 400;
   color: #fff;
@@ -1674,7 +1707,7 @@ textarea {
 }
 
 .state-clinics-grid .state-clinic .clinic-title {
-  font-family: var(--heading-font);
+  font-family: var(--wp--preset--font-family--heading-font);
   font-size: 1.25rem;
   margin: 0.5em 0 0;
 }
