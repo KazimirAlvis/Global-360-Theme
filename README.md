@@ -1,70 +1,237 @@
-[![Build Status](https://travis-ci.org/Automattic/_s.svg?branch=master)](https://travis-ci.org/Automattic/_s)
+# Global 360 Theme
 
-_s
-===
+A comprehensive WordPress theme designed for Patient 360 medical websites, featuring dynamic clinic finder functionality, interactive maps, and complete practice management capabilities.
 
-Hi. I'm a starter theme called `_s`, or `underscores`, if you like. I'm a theme meant for hacking so don't use me as a Parent Theme. Instead try turning me into the next, most awesome, WordPress theme out there. That's what I'm here for.
+## 🌟 Features
 
-My ultra-minimal CSS might make me look like theme tartare but that means less stuff to get in your way when you're designing your awesome theme. Here are some of the other more interesting things you'll find here:
+### Core Functionality
+- **Custom Post Types**: Clinics and Doctors with comprehensive meta fields
+- **Dynamic State Pages**: Interactive clinic finder with `/find-a-doctor/{state}` routing
+- **Interactive Maps**: Leaflet integration with Google Maps geocoding
+- **Global Settings**: Comprehensive admin interface for theme customization
+- **Social Media Integration**: Font Awesome icons with dynamic social links
+- **SASS Architecture**: Modular styling with automatic compilation
+- **Gutenberg Support**: Full block editor compatibility
 
-* A modern workflow with a pre-made command-line interface to turn your project into a more pleasant experience.
-* A just right amount of lean, well-commented, modern, HTML5 templates.
-* A custom header implementation in `inc/custom-header.php`. Just add the code snippet found in the comments of `inc/custom-header.php` to your `header.php` template.
-* Custom template tags in `inc/template-tags.php` that keep your templates clean and neat and prevent code duplication.
-* Some small tweaks in `inc/template-functions.php` that can improve your theming experience.
-* A script at `js/navigation.js` that makes your menu a toggled dropdown on small screens (like your phone), ready for CSS artistry. It's enqueued in `functions.php`.
-* 2 sample layouts in `sass/layouts/` made using CSS Grid for a sidebar on either side of your content. Just uncomment the layout of your choice in `sass/style.scss`.
-Note: `.no-sidebar` styles are automatically loaded.
-* Smartly organized starter CSS in `style.css` that will help you to quickly get your design off the ground.
-* Full support for `WooCommerce plugin` integration with hooks in `inc/woocommerce.php`, styling override woocommerce.css with product gallery features (zoom, swipe, lightbox) enabled.
-* Licensed under GPLv2 or later. :) Use it to make something cool.
+### Custom Post Types
 
-Installation
----------------
+#### Clinics
+- Complete address information with geocoding
+- Custom logos and thumbnail images
+- Phone numbers and website links
+- Detailed clinic descriptions and bios
+- Associated doctors management
+
+#### Doctors
+- Professional headshots and thumbnails
+- Detailed biographical information
+- Specialty and practice details
+- Clinic associations
+
+### Dynamic Features
+- **State-based Clinic Finder**: Interactive US map with state-specific clinic listings
+- **Google Maps Integration**: Automatic geocoding for precise clinic locations
+- **Map Filtering**: Dynamic pin filtering by selected state
+- **Responsive Design**: Mobile-optimized interface for all devices
+
+## 🚀 Installation
 
 ### Requirements
+- WordPress 5.0 or higher
+- PHP 7.4 or higher
+- Google Maps API key (for geocoding)
 
-`_s` requires the following dependencies:
+### Quick Installation
 
-- [Node.js](https://nodejs.org/)
-- [Composer](https://getcomposer.org/)
+1. **Download or Clone**:
+   ```bash
+   git clone https://github.com/KazimirAlvis/Global-360-Theme.git
+   cd Global-360-Theme
+   ```
 
-### Quick Start
+2. **Upload to WordPress**:
+   - Upload the theme folder to `/wp-content/themes/`
+   - Activate via WordPress admin
 
-Clone or download this repository, change its name to something else (like, say, `megatherium-is-awesome`), and then you'll need to do a six-step find and replace on the name in all the templates.
+3. **Configure API Keys**:
+   - Navigate to **Appearance > Theme Settings > Assessment**
+   - Add your Google Maps API key
 
-1. Search for `'_s'` (inside single quotations) to capture the text domain and replace with: `'megatherium-is-awesome'`.
-2. Search for `_s_` to capture all the functions names and replace with: `megatherium_is_awesome_`.
-3. Search for `Text Domain: _s` in `style.css` and replace with: `Text Domain: megatherium-is-awesome`.
-4. Search for <code>&nbsp;_s</code> (with a space before it) to capture DocBlocks and replace with: <code>&nbsp;Megatherium_is_Awesome</code>.
-5. Search for `_s-` to capture prefixed handles and replace with: `megatherium-is-awesome-`.
-6. Search for `_S_` (in uppercase) to capture constants and replace with: `MEGATHERIUM_IS_AWESOME_`.
+## ⚙️ Configuration
 
-Then, update the stylesheet header in `style.css`, the links in `footer.php` with your own information and rename `_s.pot` from `languages` folder to use the theme's slug. Next, update or delete this readme.
+### Theme Settings
+Access comprehensive theme settings via **Appearance > Theme Settings**:
 
-### Setup
+#### Colors & Fonts Tab
+- Primary and secondary color schemes
+- Custom typography settings
+- Font family selections
 
-To start using all the tools that come with `_s`  you need to install the necessary Node.js and Composer dependencies :
+#### Header & Footer Tab
+- Custom logo upload
+- Header styling options
+- Footer content management
+- Social media links with Font Awesome icons
 
-```sh
-$ composer install
-$ npm install
+#### Assessment Tab
+- Google Maps API key configuration
+- Assessment tool integration settings
+
+### Google Maps Setup
+1. Obtain a Google Maps API key from [Google Cloud Console](https://console.cloud.google.com/)
+2. Enable the following APIs:
+   - Maps JavaScript API
+   - Geocoding API
+3. Add the API key in **Theme Settings > Assessment**
+
+## 📁 File Structure
+
+```
+global-360-theme/
+├── assets/                     # Images and media assets
+│   ├── clinic-images/         # Clinic logos and images
+│   ├── doctor-images/         # Doctor photos
+│   └── state_svg/             # US state SVG files
+├── clinic-partials/           # Clinic template components
+├── inc/                       # Theme includes
+│   ├── meta-boxes/           # Custom meta box configurations
+│   │   ├── clinic-meta.php   # Clinic custom fields
+│   │   ├── doctors-meta.php  # Doctor custom fields
+│   │   └── clinic-doctors.php # Clinic-doctor associations
+│   ├── settings.php          # Admin settings interface
+│   └── template-*.php        # Template helper functions
+├── sass/                      # SASS source files
+│   ├── base/                 # Base styles and variables
+│   ├── components/           # UI components
+│   ├── layout/               # Layout styles
+│   ├── pages/                # Page-specific styles
+│   └── themes/               # Color and font themes
+├── template-parts/           # Template partials
+├── functions.php             # Core theme functionality
+├── page-find-a-doctor.php    # State grid page template
+├── template-find-a-doctor-state.php # Dynamic state pages
+├── single-clinic.php         # Individual clinic pages
+└── front-page.php           # Homepage template
 ```
 
-### Available CLI commands
+## 🎨 SASS Development
 
-`_s` comes packed with CLI commands tailored for WordPress theme development :
+### Live Compilation
+The theme includes VS Code Live Sass Compiler configuration:
 
-- `composer lint:wpcs` : checks all PHP files against [PHP Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/).
-- `composer lint:php` : checks all PHP files for syntax errors.
-- `composer make-pot` : generates a .pot file in the `languages/` directory.
-- `npm run compile:css` : compiles SASS files to css.
-- `npm run compile:rtl` : generates an RTL stylesheet.
-- `npm run watch` : watches all SASS files and recompiles them to css when they change.
-- `npm run lint:scss` : checks all SASS files against [CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/).
-- `npm run lint:js` : checks all JavaScript files against [JavaScript Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/).
-- `npm run bundle` : generates a .zip archive for distribution, excluding development and system files.
+1. Install the **Live Sass Compiler** extension in VS Code
+2. Open the theme folder in VS Code
+3. Click "Watch Sass" in the status bar
+4. SASS files will automatically compile to CSS on save
 
-Now you're ready to go! The next step is easy to say, but harder to do: make an awesome WordPress theme. :)
+### SASS Architecture
+- **Base**: Variables, mixins, reset styles
+- **Components**: Buttons, cards, forms, modals
+- **Layout**: Grid, header, footer, global layout
+- **Pages**: Page-specific styling
+- **Themes**: Color schemes and typography
 
-Good luck!
+## 🗺️ Dynamic Routing
+
+### State Pages
+The theme automatically creates dynamic routes for state-based clinic listings:
+- `/find-a-doctor/texas` - Texas clinics
+- `/find-a-doctor/california` - California clinics
+- `/find-a-doctor/florida` - Florida clinics
+
+### Rewrite Rules
+Custom rewrite rules handle state-based URLs and fallback to default clinic page for states without clinics.
+
+## 📱 Responsive Design
+
+- **Mobile-first approach** with responsive breakpoints
+- **Touch-friendly interfaces** for mobile devices
+- **Optimized map interactions** for all screen sizes
+- **Accessible navigation** with keyboard support
+
+## 🔌 API Integration
+
+### Google Maps Geocoding
+- Automatic address geocoding for clinic locations
+- Fallback handling for failed geocoding attempts
+- Optimized API usage with caching
+
+### Social Media
+- Dynamic social link management
+- Font Awesome icon integration
+- Customizable social platforms
+
+## 🛠️ Development Commands
+
+### SASS Compilation
+```bash
+# Manual compilation (if needed)
+sass sass/main.scss style.css --watch
+```
+
+### Code Quality
+```bash
+# PHP Code Standards
+composer lint:wpcs
+
+# JavaScript Linting
+npm run lint:js
+
+# SASS Linting
+npm run lint:scss
+```
+
+## 📝 Content Management
+
+### Adding Clinics
+1. Navigate to **Clinics > Add New**
+2. Fill in all required fields:
+   - Clinic name and description
+   - Complete address information
+   - Contact details
+   - Logo/thumbnail images
+3. Associate doctors if applicable
+4. Publish to make available on maps
+
+### Adding Doctors
+1. Navigate to **Doctors > Add New**
+2. Complete doctor profile:
+   - Professional photo
+   - Biographical information
+   - Specialties and credentials
+3. Associate with relevant clinics
+
+### State Page Management
+State pages are automatically generated based on clinic locations. No manual page creation required.
+
+## 🎯 Customization
+
+### Adding New States
+1. Add state SVG file to `assets/state_svg/`
+2. Update state mapping in `page-find-a-doctor.php`
+3. Clinics in new states will automatically appear
+
+### Custom Styling
+- Modify SASS files in the `sass/` directory
+- Use theme settings for colors and fonts
+- Override specific components in `sass/components/`
+
+### Template Customization
+- Override templates by copying to child theme
+- Modify clinic partials in `clinic-partials/` directory
+- Customize meta boxes in `inc/meta-boxes/`
+
+## 🔒 Security Features
+
+- **Nonce verification** for all form submissions
+- **Capability checks** for admin functions
+- **Input sanitization** for all user data
+- **SQL injection prevention** with prepared statements
+
+## 📞 Support
+
+For technical support or customization requests, please contact the development team or create an issue in the GitHub repository.
+
+## 📄 License
+
+Licensed under GPLv2 or later. Use it to create amazing medical practice websites!
