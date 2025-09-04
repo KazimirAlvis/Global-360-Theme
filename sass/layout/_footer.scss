@@ -1,0 +1,70 @@
+/*--------------------------------------------------------------
+ Footer
+--------------------------------------------------------------*/
+.site-footer {
+	background-color: #292626;
+	padding: 50px 0;
+	.footer_inner {
+		display: flex;
+		justify-content: space-between;
+		padding-bottom: 20px;
+		.column {
+			a {
+				color: #fff;
+				text-decoration: none;
+				font-size: 15px;
+				font-weight: 400;
+				line-height: 1.75rem;
+				&:hover {
+					color: var(--cpt360-primary);
+				}
+			}
+			h4 {
+				font-size: 16px;
+				font-weight: 700;
+				color: var(--cpt360-primary);
+				text-transform: uppercase;
+				line-height: 1.75rem;
+				padding: 0;
+				margin: 0 0 10px 0;
+			}
+			ul {
+				margin: 0;
+				padding: 0;
+				list-style-type: none;
+				li {
+					text-decoration: none;
+				}
+			}
+		}
+		.contact_links {
+			span {
+				display: block;
+				color: #fff;
+				text-decoration: none;
+				font-size: 14px;
+				font-weight: 700;
+				line-height: 1.75rem;
+			}
+		}
+
+		.footer_logo {
+			h4 {
+				padding-left: 12px;
+			}
+			ul {
+				padding-left: 12px;
+				display: flex;
+				gap: 20px;
+			}
+			li {
+			}
+		}
+	}
+	.border {
+		display: block;
+		height: 1px;
+		width: 100%;
+		background-color: #fff;
+	}
+}

@@ -1,0 +1,71 @@
+/*--------------------------------------------------------------
+ Buttons
+--------------------------------------------------------------*/
+
+.btn {
+	font-size: 18px;
+	font-family: var(--body-font);
+	font-weight: 500;
+	border-radius: 27px;
+	padding: 15px 30px;
+	cursor: pointer;
+	width: 100%;
+	max-width: 312px;
+	height: 54px;
+	min-height: auto;
+	text-align: center;
+	white-space: nowrap;
+	transition: transform 0.2s ease, background-color 0.2s ease;
+	display: block;
+	margin: 0;
+	line-height: 22px;
+	text-decoration: none;
+	display: inline-block;
+}
+.btn_green {
+	background-color: var(--cpt360-primary);
+	color: #ffffff;
+	border: 1px solid var(--cpt360-primary);
+}
+
+.btn_green:hover {
+	background-color: transparent !important;
+	color: #282e24 !important;
+	border: 1px solid #282e24 !important;
+}
+.btn_white_ol {
+	background-color: var(--cpt360-primary);
+	color: #ffffff;
+	border: 1px solid var(--cpt360-primary);
+}
+.btn_white_ol:hover {
+	background-color: transparent !important;
+	color: #fff !important;
+	border: 1px solid #fff !important;
+}
+
+@media (max-width: 768px) {
+	.btn_green {
+		font-size: 15px;
+		padding: 15px 30px;
+	}
+}
+
+@media (max-width: 480px) {
+	.btn_green {
+		font-size: 15px;
+		padding: 15px 25px;
+	}
+}
+.btn_green_ol {
+	transition: all 0.3s;
+	background-color: transparent;
+	color: var(--cpt360-primary);
+	text-decoration: none;
+	border: 1px solid var(--cpt360-primary);
+}
+.btn_green_ol:hover {
+	background-color: var(--cpt360-primary) !important;
+	color: #fff !important;
+	border: 1px solid var(--cpt360-primary) !important;
+}
