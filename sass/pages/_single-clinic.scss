@@ -471,3 +471,144 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+/*--------------------------------------------------------------
+ Clinic by Name Shortcode Styling
+--------------------------------------------------------------*/
+.clinic-by-name-display {
+	display: flex;
+	justify-content: center;
+	margin: 20px 0;
+
+	.single-clinic {
+		background: #fff;
+		border: 1px solid #ddd;
+		border-radius: 12px;
+		padding: 30px;
+		text-align: center;
+		transition: all 0.3s ease;
+		max-width: 350px;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+
+		&:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+		}
+
+		.clinic-logo {
+			margin-bottom: 20px;
+
+			img {
+				max-width: 150px;
+				height: auto;
+				border-radius: 8px;
+			}
+		}
+
+		.clinic-title {
+			margin: 0;
+			font-size: 20px;
+			font-weight: 600;
+
+			a {
+				color: #333;
+				text-decoration: none;
+				transition: color 0.2s ease;
+
+				&:hover {
+					color: var(--cpt360-primary);
+				}
+			}
+		}
+	}
+}
+
+/*--------------------------------------------------------------
+ Multiple Clinics by Names Shortcode Styling
+--------------------------------------------------------------*/
+.clinics-by-names-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 30px;
+	margin: 30px 0;
+
+	.named-clinic {
+		background: #fff;
+		border: 1px solid #ddd;
+		border-radius: 12px;
+		padding: 25px;
+		text-align: center;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+
+		&:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+		}
+
+		.row-1 {
+			margin-bottom: 15px;
+
+			.clinic-logo {
+				img {
+					max-width: 120px;
+					height: auto;
+					border-radius: 6px;
+				}
+			}
+		}
+
+		.row-2 {
+			.clinic-title {
+				margin: 0;
+				font-size: 18px;
+				font-weight: 600;
+
+				a {
+					color: #333;
+					text-decoration: none;
+					transition: color 0.2s ease;
+
+					&:hover {
+						color: var(--cpt360-primary);
+					}
+				}
+			}
+		}
+	}
+}
+
+// Responsive adjustments for clinic name shortcodes
+@media (max-width: 768px) {
+	.clinic-by-name-display {
+		.single-clinic {
+			max-width: 300px;
+			padding: 25px;
+
+			.clinic-logo img {
+				max-width: 120px;
+			}
+
+			.clinic-title {
+				font-size: 18px;
+			}
+		}
+	}
+
+	.clinics-by-names-grid {
+		grid-template-columns: 1fr;
+		gap: 20px;
+
+		.named-clinic {
+			padding: 20px;
+
+			.row-1 .clinic-logo img {
+				max-width: 100px;
+			}
+
+			.row-2 .clinic-title {
+				font-size: 16px;
+			}
+		}
+	}
+}

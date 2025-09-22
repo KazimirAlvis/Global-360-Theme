@@ -1105,3 +1105,129 @@ add_shortcode('cpt360_state_clinics', function($atts) {
     echo '</div>';
     return ob_get_clean();
 });
+
+/**
+ * Shortcode: [cpt360_clinic_by_name name="Clinic Name"]
+ * Displays a specific clinic by its exact name.
+ * 
+ * Usage examples:
+ * [cpt360_clinic_by_name name="New York Clinic"]
+ * [cpt360_clinic_by_name name="Main Street Medical Center"]
+ */
+add_shortcode('cpt360_clinic_by_name', function($atts) {
+    $atts = shortcode_atts([
+        'name' => '',
+    ], $atts, 'cpt360_clinic_by_name');
+
+    $clinic_name = trim($atts['name']);
+    if (!$clinic_name) return '<p>Please specify a clinic name.</p>';
+
+    // Search for clinic by exact title match
+    $clinics = get_posts([
+        'post_type'      => 'clinic',
+        'posts_per_page' => 1,
+        'title'          => $clinic_name,
+        'post_status'    => 'publish',
+    ]);
+
+    // If exact match not found, try partial match
+    if (!$clinics) {
+        $clinics = get_posts([
+            'post_type'      => 'clinic',
+            'posts_per_page' => 1,
+            's'              => $clinic_name,
+            'post_status'    => 'publish',
+        ]);
+    }
+
+    if (!$clinics) {
+        return '<p>No clinic found with the name "' . esc_html($clinic_name) . '".</p>';
+    }
+
+    $clinic = $clinics[0];
+    $logo_url = function_exists('cpt360_get_clinic_logo_url')
+        ? cpt360_get_clinic_logo_url($clinic->ID)
+        : '';
+    $title = get_the_title($clinic->ID);
+    $link  = get_permalink($clinic->ID);
+
+    ob_start();
+    echo '<div class="clinic-by-name-display">';
+    echo '<div class="single-clinic">';
+    if ($logo_url) {
+        echo '<div class="row-1"><a href="' . esc_url($link) . '"><div class="clinic-logo"><img src="' . esc_url($logo_url) . '" alt="' . esc_attr($title) . '" /></div></a></div>';
+    }
+    echo '<div class="row-2"><h3 class="clinic-title"><a href="' . esc_url($link) . '">' . esc_html($title) . '</a></h3></div>';
+    echo '</div>';
+    echo '</div>';
+    return ob_get_clean();
+});
+
+/**
+ * Shortcode: [cpt360_clinics_by_names names="Clinic 1, Clinic 2, Clinic 3"]
+ * Displays multiple clinics by their names (comma-separated).
+ * 
+ * Usage example:
+ * [cpt360_clinics_by_names names="New York Clinic, Boston Medical, Chicago Center"]
+ */
+add_shortcode('cpt360_clinics_by_names', function($atts) {
+    $atts = shortcode_atts([
+        'names' => '',
+    ], $atts, 'cpt360_clinics_by_names');
+
+    $clinic_names = trim($atts['names']);
+    if (!$clinic_names) return '<p>Please specify clinic names separated by commas.</p>';
+
+    // Split names by comma and clean them up
+    $names_array = array_map('trim', explode(',', $clinic_names));
+    $found_clinics = [];
+
+    foreach ($names_array as $clinic_name) {
+        if (empty($clinic_name)) continue;
+
+        // Search for clinic by exact title match first
+        $clinics = get_posts([
+            'post_type'      => 'clinic',
+            'posts_per_page' => 1,
+            'title'          => $clinic_name,
+            'post_status'    => 'publish',
+        ]);
+
+        // If exact match not found, try partial match
+        if (!$clinics) {
+            $clinics = get_posts([
+                'post_type'      => 'clinic',
+                'posts_per_page' => 1,
+                's'              => $clinic_name,
+                'post_status'    => 'publish',
+            ]);
+        }
+
+        if ($clinics) {
+            $found_clinics[] = $clinics[0];
+        }
+    }
+
+    if (!$found_clinics) {
+        return '<p>No clinics found with the specified names.</p>';
+    }
+
+    ob_start();
+    echo '<div class="clinics-by-names-grid">';
+    foreach ($found_clinics as $clinic) {
+        $logo_url = function_exists('cpt360_get_clinic_logo_url')
+            ? cpt360_get_clinic_logo_url($clinic->ID)
+            : '';
+        $title = get_the_title($clinic->ID);
+        $link  = get_permalink($clinic->ID);
+
+        echo '<div class="named-clinic">';
+        if ($logo_url) {
+            echo '<div class="row-1"><a href="' . esc_url($link) . '"><div class="clinic-logo"><img src="' . esc_url($logo_url) . '" alt="' . esc_attr($title) . '" /></div></a></div>';
+        }
+        echo '<div class="row-2"><h3 class="clinic-title"><a href="' . esc_url($link) . '">' . esc_html($title) . '</a></h3></div>';
+        echo '</div>';
+    }
+    echo '</div>';
+    return ob_get_clean();
+});

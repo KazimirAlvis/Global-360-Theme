@@ -44,6 +44,37 @@ $font_map = [
 echo '<style>
   body { font-family: ' . (isset($font_map[$body_font]) ? $font_map[$body_font] : $font_map['system-font']) . '; }
   h1, h2, h3, h4, h5, h6 { font-family: ' . (isset($font_map[$heading_font]) ? $font_map[$heading_font] : $font_map['system-font']) . '; }
+  
+  /* Critical CSS to prevent FOUC in navigation */
+  .main-navigation ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+  }
+  .main-navigation li {
+    position: relative;
+  }
+  .main-navigation a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 10px 15px;
+  }
+  .menu-toggle {
+    display: none;
+  }
+  @media screen and (max-width: 37.5em) {
+    .menu-toggle {
+      display: block;
+    }
+    .main-navigation ul {
+      display: none;
+    }
+    .main-navigation.toggled ul {
+      display: block;
+    }
+  }
 </style>';
 ?>
 </head>

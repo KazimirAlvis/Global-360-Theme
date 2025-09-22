@@ -17,6 +17,165 @@ if ( ! defined( '_S_VERSION' ) ) {
 }
 
 /**
+ * Enable theme updates from WordPress admin
+ */
+add_filter( 'auto_update_theme', '__return_true' );
+
+/**
+ * Theme Update Checker
+ * This enables the theme to be updated via WordPress admin
+ */
+class Global_360_Theme_Updater {
+	
+	private $theme_slug;
+	private $theme_version;
+	private $update_path;
+	private $github_username;
+	private $github_repo;
+	
+	function __construct() {
+		$this->theme_slug = get_option( 'template' );
+		$this->theme_version = _S_VERSION;
+		$this->github_username = 'KazimirAlvis';
+		$this->github_repo = 'Global-360-Theme';
+		$this->update_path = 'https://api.github.com/repos/' . $this->github_username . '/' . $this->github_repo . '/releases/latest';
+		
+		add_filter( 'pre_set_site_transient_update_themes', array( $this, 'check_for_update' ) );
+		add_action( 'admin_notices', array( $this, 'update_notice' ) );
+	}
+	
+	public function check_for_update( $transient ) {
+		if ( empty( $transient->checked ) ) {
+			return $transient;
+		}
+		
+		$remote_version = $this->get_remote_version();
+		
+		if ( $remote_version && version_compare( $this->theme_version, $remote_version, '<' ) ) {
+			$transient->response[ $this->theme_slug ] = array(
+				'theme' => $this->theme_slug,
+				'new_version' => $remote_version,
+				'url' => 'https://github.com/' . $this->github_username . '/' . $this->github_repo,
+				'package' => $this->get_download_url()
+			);
+		}
+		
+		return $transient;
+	}
+	
+	private function get_remote_version() {
+		$request = wp_remote_get( $this->update_path );
+		
+		if ( ! is_wp_error( $request ) && wp_remote_retrieve_response_code( $request ) === 200 ) {
+			$body = wp_remote_retrieve_body( $request );
+			$data = json_decode( $body, true );
+			
+			if ( isset( $data['tag_name'] ) ) {
+				return ltrim( $data['tag_name'], 'v' );
+			}
+		}
+		
+		return false;
+	}
+	
+	private function get_download_url() {
+		return 'https://github.com/' . $this->github_username . '/' . $this->github_repo . '/archive/refs/heads/main.zip';
+	}
+	
+	public function get_remote_version_public() {
+		return $this->get_remote_version();
+	}
+	
+	public function update_notice() {
+		$screen = get_current_screen();
+		if ( $screen->id !== 'themes' ) {
+			return;
+		}
+		
+		$remote_version = $this->get_remote_version();
+		
+		if ( $remote_version && version_compare( $this->theme_version, $remote_version, '<' ) ) {
+			echo '<div class="notice notice-warning is-dismissible">';
+			echo '<p><strong>Global 360 Theme Update Available!</strong> Version ' . esc_html( $remote_version ) . ' is now available. You are currently using version ' . esc_html( $this->theme_version ) . '.</p>';
+			echo '<p><a href="' . admin_url( 'themes.php' ) . '" class="button button-primary">Update Theme</a></p>';
+			echo '</div>';
+		}
+	}
+}
+
+// Initialize the updater
+new Global_360_Theme_Updater();
+
+/**
+ * Add theme update menu to admin
+ */
+add_action( 'admin_menu', function() {
+	add_theme_page(
+		'Theme Updates',
+		'Theme Updates',
+		'update_themes',
+		'global-360-theme-updates',
+		'global_360_theme_updates_page'
+	);
+});
+
+/**
+ * Theme updates admin page
+ */
+function global_360_theme_updates_page() {
+	$current_version = _S_VERSION;
+	$updater = new Global_360_Theme_Updater();
+	
+	echo '<div class="wrap">';
+	echo '<h1>Global 360 Theme Updates</h1>';
+	
+	// Force check for updates
+	if ( isset( $_POST['check_updates'] ) ) {
+		delete_transient( 'update_themes' );
+		wp_update_themes();
+		echo '<div class="notice notice-success"><p>Update check completed!</p></div>';
+	}
+	
+	echo '<div class="card">';
+	echo '<h2>Current Theme Version</h2>';
+	echo '<p><strong>Installed Version:</strong> ' . esc_html( $current_version ) . '</p>';
+	
+	$remote_version = $updater->get_remote_version_public();
+	if ( $remote_version ) {
+		echo '<p><strong>Latest Available:</strong> ' . esc_html( $remote_version ) . '</p>';
+		
+		if ( version_compare( $current_version, $remote_version, '<' ) ) {
+			echo '<p style="color: #d63638;"><strong>Update Available!</strong> A new version is ready to install.</p>';
+			echo '<a href="' . admin_url( 'themes.php' ) . '" class="button button-primary">Go to Themes Page to Update</a>';
+		} else {
+			echo '<p style="color: #00a32a;"><strong>Up to Date!</strong> You have the latest version installed.</p>';
+		}
+	} else {
+		echo '<p>Unable to check for updates at this time.</p>';
+	}
+	
+	echo '</div>';
+	
+	echo '<div class="card" style="margin-top: 20px;">';
+	echo '<h2>Manual Update Check</h2>';
+	echo '<p>Click the button below to manually check for theme updates.</p>';
+	echo '<form method="post">';
+	echo '<input type="hidden" name="check_updates" value="1">';
+	submit_button( 'Check for Updates', 'secondary', 'submit', false );
+	echo '</form>';
+	echo '</div>';
+	
+	echo '<div class="card" style="margin-top: 20px;">';
+	echo '<h2>Update Information</h2>';
+	echo '<p><strong>Repository:</strong> <a href="https://github.com/KazimirAlvis/Global-360-Theme" target="_blank">GitHub Repository</a></p>';
+	echo '<p><strong>Automatic Updates:</strong> Enabled - WordPress will automatically check for and install theme updates.</p>';
+	echo '<p><strong>Update Source:</strong> GitHub Releases</p>';
+	echo '</div>';
+	
+	echo '</div>';
+}
+
+/**
  * Sets up theme defaults and registers support for various WordPress features.
  *
  * Note that this function is hooked into the after_setup_theme hook, which
@@ -142,16 +301,28 @@ add_action( 'widgets_init', 'global_360_theme_widgets_init' );
  * Enqueue scripts and styles.
  */
 function global_360_theme_scripts() {
-	wp_enqueue_style( 'global-360-theme-style', get_stylesheet_uri(), array(), _S_VERSION );
+	// Enqueue main stylesheet with high priority
+	wp_enqueue_style( 'global-360-theme-style', get_stylesheet_uri(), array(), _S_VERSION, 'all' );
 	wp_style_add_data( 'global-360-theme-style', 'rtl', 'replace' );
-
+	
+	// Add preload for stylesheet to improve loading
 	wp_enqueue_script( 'global-360-theme-navigation', get_template_directory_uri() . '/js/navigation.js', array(), _S_VERSION, true );
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
 }
-add_action( 'wp_enqueue_scripts', 'global_360_theme_scripts' );
+add_action( 'wp_enqueue_scripts', 'global_360_theme_scripts', 5 ); // Higher priority
+
+/**
+ * Add preload link for main stylesheet to prevent FOUC
+ */
+function global_360_theme_preload_styles() {
+    $stylesheet_uri = get_stylesheet_uri();
+    echo '<link rel="preload" href="' . esc_url($stylesheet_uri) . '" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">' . "\n";
+    echo '<noscript><link rel="stylesheet" href="' . esc_url($stylesheet_uri) . '"></noscript>' . "\n";
+}
+add_action( 'wp_head', 'global_360_theme_preload_styles', 1 );
 
 /**
  * Implement the Custom Header feature.
