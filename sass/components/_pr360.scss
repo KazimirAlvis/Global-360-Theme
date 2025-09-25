@@ -1,0 +1,49 @@
+/* PR360 Begin Button Styles (for floating assessment and all PR360 buttons) */
+
+.single-clinic pr360-questionnaire::part(begin-button) {
+	background-color: var(--cpt360-primary, #007cba) !important;
+	border: 1px solid var(--cpt360-primary, #007cba) !important;
+	border-radius: 27px !important;
+	box-sizing: border-box !important;
+	color: #fff !important;
+	cursor: pointer !important;
+	display: inline-block !important;
+	font-family: var(--body-font, Arial, sans-serif) !important;
+	font-size: 18px !important;
+	font-weight: 500 !important;
+	height: 54px !important;
+	line-height: 22px !important;
+	margin: 0 0 30px !important;
+	max-width: 312px !important;
+	min-height: auto !important;
+	padding: 15px 30px !important;
+	text-align: center !important;
+	text-decoration: none !important;
+	transition: transform 0.2s ease, background-color 0.2s ease !important;
+	white-space: nowrap !important;
+	width: 100% !important;
+}
+
+#floating-assessment-button pr360-questionnaire::part(begin-button) {
+	background-color: var(--cpt360-primary, #007cba) !important;
+	border: 1px solid var(--cpt360-primary, #007cba) !important;
+	border-radius: 27px !important;
+	box-sizing: border-box !important;
+	color: #fff !important;
+	cursor: pointer !important;
+	display: inline-block !important;
+	font-family: var(--body-font, Arial, sans-serif) !important;
+	font-size: 18px !important;
+	font-weight: 500 !important;
+	height: 54px !important;
+	line-height: 22px !important;
+	margin: 0 0 30px !important;
+	max-width: 312px !important;
+	min-height: auto !important;
+	padding: 15px 30px !important;
+	text-align: center !important;
+	text-decoration: none !important;
+	transition: transform 0.2s ease, background-color 0.2s ease !important;
+	white-space: nowrap !important;
+	width: 100% !important;
+}

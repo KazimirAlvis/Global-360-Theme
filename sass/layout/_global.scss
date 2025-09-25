@@ -1,0 +1,41 @@
+/*--------------------------------------------------------------
+ Global
+--------------------------------------------------------------*/
+.max_width_content {
+	width: 100%;
+	max-width: 1140px;
+	margin: 0 auto;
+}
+
+.max_width_content_body {
+	width: 100%;
+	max-width: 1140px;
+	margin: 0 auto;
+	padding-top: 58px;
+	padding-bottom: 40px;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.body_heading {
+	text-align: center;
+	margin: 100px 0 20px 0;
+	h2 {
+		font-size: 42px;
+		font-weight: 400;
+	}
+}
+
+.sm_hero {
+	background-color: #656565;
+	color: white;
+	padding: 80px 20px;
+	text-align: center;
+	margin: 0;
+}
+
+.sm_hero h1 {
+	font-size: 40px;
+	margin: 0;
+	line-height: 1.2;
+}
