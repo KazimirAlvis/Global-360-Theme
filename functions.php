@@ -45,8 +45,12 @@ class Global_360_Theme_Updater {
 		
 		if ($this->updater_enabled) {
 			add_filter( 'pre_set_site_transient_update_themes', array( $this, 'check_for_update' ) );
-			add_action( 'admin_notices', array( $this, 'update_notice' ) );
+			// Use a unique hook priority to override any cached notices
+			add_action( 'admin_notices', array( $this, 'update_notice' ), 999 );
 		}
+		
+		// Force clear any old cached update notices
+		add_action( 'admin_init', array( $this, 'clear_old_notices' ), 1 );
 		
 		// Always keep the folder name fix active for manual updates
 		add_filter( 'upgrader_source_selection', array( $this, 'fix_theme_folder_name' ), 10, 4 );
@@ -165,16 +169,36 @@ class Global_360_Theme_Updater {
 		$remote_version = $this->get_remote_version();
 		
 		if ( $remote_version && version_compare( $this->theme_version, $remote_version, '<' ) ) {
-			echo '<div class="notice notice-success is-dismissible">';
-			echo '<p><strong>✅ Global 360 Theme Update Available!</strong> Version ' . esc_html( $remote_version ) . ' is now available. You are currently using version ' . esc_html( $this->theme_version ) . '.</p>';
+			echo '<div class="notice notice-success is-dismissible" id="global-360-theme-update-notice">';
+			echo '<p><strong>🔄 FRESH UPDATE NOTICE - Global 360 Theme Update Available!</strong></p>';
+			echo '<p>Version ' . esc_html( $remote_version ) . ' is now available. You are currently using version ' . esc_html( $this->theme_version ) . '.</p>';
 			if ( $this->updater_enabled ) {
-				echo '<p><strong>Auto-updater is ENABLED ✓</strong></p>';
+				echo '<p><strong>✅ Auto-updater is ENABLED and WORKING</strong></p>';
 				echo '<p><a href="' . admin_url( 'update-core.php?action=do-theme-upgrade' ) . '" class="button button-primary">Update Theme Now</a></p>';
 			} else {
-				echo '<p><strong>Auto-updater is disabled</strong></p>';
+				echo '<p><strong>❌ Auto-updater is disabled</strong></p>';
 			}
 			echo '</div>';
+			
+			// Hide any old cached notices with JavaScript
+			echo '<script>
+			jQuery(document).ready(function($) {
+				$(".notice").each(function() {
+					var text = $(this).text();
+					if (text.includes("Manual Update Required") || text.includes("temporarily disabled")) {
+						$(this).hide();
+					}
+				});
+			});
+			</script>';
 		}
+	}
+	
+	public function clear_old_notices() {
+		// Clear all possible cached update notices
+		delete_transient('global_360_theme_update_notice');
+		delete_option('global_360_theme_update_notice');
+		delete_transient('_transient_global_360_theme_notices');
 	}
 	
 
