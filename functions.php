@@ -287,6 +287,34 @@ class Global_360_Theme_Updater {
 new Global_360_Theme_Updater();
 
 /**
+ * Sync style.css version with _S_VERSION constant
+ */
+add_action('init', function() {
+	$style_css_path = get_template_directory() . '/style.css';
+	
+	if (file_exists($style_css_path)) {
+		$style_content = file_get_contents($style_css_path);
+		
+		// Check if version in style.css matches _S_VERSION
+		if (preg_match('/Version:\s*(.+)/i', $style_content, $matches)) {
+			$style_version = trim($matches[1]);
+			
+			if ($style_version !== _S_VERSION) {
+				// Update style.css version to match _S_VERSION
+				$updated_content = preg_replace(
+					'/Version:\s*(.+)/i', 
+					'Version: ' . _S_VERSION, 
+					$style_content
+				);
+				
+				file_put_contents($style_css_path, $updated_content);
+				error_log('Auto-synced style.css version to: ' . _S_VERSION);
+			}
+		}
+	}
+}, 1);
+
+/**
  * Aggressive cache clearing to fix persistent old notices
  */
 add_action('init', function() {
