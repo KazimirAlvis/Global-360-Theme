@@ -165,9 +165,14 @@ class Global_360_Theme_Updater {
 		$remote_version = $this->get_remote_version();
 		
 		if ( $remote_version && version_compare( $this->theme_version, $remote_version, '<' ) ) {
-			echo '<div class="notice notice-warning is-dismissible">';
-			echo '<p><strong>Global 360 Theme Update Available!</strong> Version ' . esc_html( $remote_version ) . ' is now available. You are currently using version ' . esc_html( $this->theme_version ) . '.</p>';
-			echo '<p><a href="' . admin_url( 'themes.php' ) . '" class="button button-primary">Update Theme</a></p>';
+			echo '<div class="notice notice-success is-dismissible">';
+			echo '<p><strong>✅ Global 360 Theme Update Available!</strong> Version ' . esc_html( $remote_version ) . ' is now available. You are currently using version ' . esc_html( $this->theme_version ) . '.</p>';
+			if ( $this->updater_enabled ) {
+				echo '<p><strong>Auto-updater is ENABLED ✓</strong></p>';
+				echo '<p><a href="' . admin_url( 'update-core.php?action=do-theme-upgrade' ) . '" class="button button-primary">Update Theme Now</a></p>';
+			} else {
+				echo '<p><strong>Auto-updater is disabled</strong></p>';
+			}
 			echo '</div>';
 		}
 	}
@@ -179,22 +184,36 @@ class Global_360_Theme_Updater {
 new Global_360_Theme_Updater();
 
 /**
- * Function to clear all theme caches and force version refresh
+ * Aggressive cache clearing to fix persistent old notices
  */
-add_action('admin_init', function() {
-    // Clear all theme-related caches on each admin load to ensure fresh data
+add_action('init', function() {
+    // Clear ALL WordPress caches related to themes and updates
     delete_site_transient('update_themes');
     delete_transient('update_themes');
     delete_option('_site_transient_update_themes');
+    delete_option('_site_transient_timeout_update_themes');
+    delete_transient('update_themes');
     
-    // Clear theme cache
+    // Clear theme-specific caches
     wp_clean_themes_cache();
     
-    // Force WordPress to re-read theme data
-    wp_get_theme(get_option('template'), get_option('template'));
-    
-    // Clear any admin notices cache
+    // Clear all admin notices and update notices
     delete_transient('global_360_theme_notices');
+    delete_transient('global_360_theme_update_notice');
+    delete_option('global_360_theme_update_notice');
+    
+    // Force WordPress to re-read theme data
+    if (function_exists('wp_get_theme')) {
+        wp_get_theme(get_option('template'), get_option('template'));
+    }
+}, 1); // Run early
+
+// Additional cache clearing for admin pages
+add_action('admin_init', function() {
+    // Force refresh theme data on admin pages
+    if (function_exists('wp_clean_themes_cache')) {
+        wp_clean_themes_cache();
+    }
 });
 
 /**
