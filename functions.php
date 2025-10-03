@@ -179,26 +179,22 @@ class Global_360_Theme_Updater {
 new Global_360_Theme_Updater();
 
 /**
- * Temporary function to clear all theme caches and force version refresh
- * Add this to functions.php temporarily, then remove after version is fixed
+ * Function to clear all theme caches and force version refresh
  */
 add_action('admin_init', function() {
-    // Only run this once per session to avoid performance issues
-    if (!get_transient('360_theme_cache_cleared')) {
-        // Clear all theme-related caches
-        delete_site_transient('update_themes');
-        delete_transient('update_themes');
-        delete_option('_site_transient_update_themes');
-        
-        // Clear theme cache
-        wp_clean_themes_cache();
-        
-        // Set a transient so this only runs once
-        set_transient('360_theme_cache_cleared', true, HOUR_IN_SECONDS);
-        
-        // Force WordPress to re-read theme data
-        wp_get_theme(get_option('template'), get_option('template'));
-    }
+    // Clear all theme-related caches on each admin load to ensure fresh data
+    delete_site_transient('update_themes');
+    delete_transient('update_themes');
+    delete_option('_site_transient_update_themes');
+    
+    // Clear theme cache
+    wp_clean_themes_cache();
+    
+    // Force WordPress to re-read theme data
+    wp_get_theme(get_option('template'), get_option('template'));
+    
+    // Clear any admin notices cache
+    delete_transient('global_360_theme_notices');
 });
 
 /**
