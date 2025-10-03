@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20251003' );
+	define( '_S_VERSION', '1.0.20251003b' );
 }
 
 /**
@@ -285,6 +285,33 @@ class Global_360_Theme_Updater {
 
 // Initialize the updater
 new Global_360_Theme_Updater();
+
+/**
+ * FORCE CLEAR ALL CACHES - Manual update recovery
+ */
+add_action('after_setup_theme', function() {
+    // Nuclear option - clear everything theme related
+    global $wp_object_cache;
+    if ($wp_object_cache) {
+        $wp_object_cache->flush();
+    }
+    
+    // Clear all transients
+    delete_site_transient('update_themes');
+    delete_transient('update_themes');
+    delete_option('_site_transient_update_themes');
+    delete_option('_site_transient_timeout_update_themes');
+    
+    // Force WordPress to forget the old version
+    wp_clean_themes_cache();
+    
+    // Clear theme data cache
+    wp_cache_delete('themes', 'themes');
+    wp_cache_delete(get_option('stylesheet'), 'themes');
+    wp_cache_delete(get_option('template'), 'themes');
+    
+    error_log('NUCLEAR CACHE CLEAR - Version: ' . _S_VERSION);
+}, 1);
 
 /**
  * Sync style.css version with _S_VERSION constant
