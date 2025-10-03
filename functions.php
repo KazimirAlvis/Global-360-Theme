@@ -54,6 +54,9 @@ class Global_360_Theme_Updater {
 		
 		// Always keep the folder name fix active for manual updates
 		add_filter( 'upgrader_source_selection', array( $this, 'fix_theme_folder_name' ), 10, 4 );
+		
+		// Additional hook to catch theme installations
+		add_filter( 'wp_update_themes', array( $this, 'ensure_correct_folder_name' ), 999 );
 	}
 	
 	/**
@@ -61,30 +64,106 @@ class Global_360_Theme_Updater {
 	 * GitHub adds -main to the folder name, but WordPress expects the original theme folder name
 	 */
 	public function fix_theme_folder_name( $source, $remote_source, $upgrader, $extra ) {
-		// Only run for theme updates
-		if ( ! isset( $extra['theme'] ) ) {
+		// Log for debugging
+		error_log('Theme Folder Fix - Source: ' . $source);
+		error_log('Theme Folder Fix - Extra: ' . print_r($extra, true));
+		
+		// Always run for any theme that looks like our theme
+		$source_basename = basename( $source );
+		
+		// Check if this is our theme (look for Global-360-Theme variations)
+		if ( strpos( $source_basename, 'Global-360-Theme' ) === false ) {
 			return $source;
 		}
 		
-		// Only run for our theme
-		if ( $extra['theme'] !== $this->theme_slug ) {
-			return $source;
-		}
+		// Force rename to exactly 'Global-360-Theme'
+		$correct_name = 'Global-360-Theme';
+		$correct_source = dirname( $source ) . '/' . $correct_name;
 		
-		// Check if the source folder has -main suffix
-		$desired_name = basename( $source );
-		if ( strpos( $desired_name, '-main' ) !== false ) {
-			// Remove -main from the folder name
-			$corrected_name = str_replace( '-main', '', $desired_name );
-			$corrected_source = dirname( $source ) . '/' . $corrected_name;
+		// Only rename if the name is different
+		if ( $source_basename !== $correct_name ) {
+			error_log('Theme Folder Fix - Renaming from: ' . $source_basename . ' to: ' . $correct_name);
+			
+			// Remove existing target if it exists
+			if ( file_exists( $correct_source ) && $correct_source !== $source ) {
+				$this->recursive_delete( $correct_source );
+			}
 			
 			// Rename the folder
-			if ( rename( $source, $corrected_source ) ) {
-				return $corrected_source;
+			if ( rename( $source, $correct_source ) ) {
+				error_log('Theme Folder Fix - Rename successful');
+				return $correct_source;
+			} else {
+				error_log('Theme Folder Fix - Rename failed');
 			}
 		}
 		
 		return $source;
+	}
+	
+	/**
+	 * Recursively delete a directory
+	 */
+	private function recursive_delete( $dir ) {
+		if ( ! is_dir( $dir ) ) {
+			return false;
+		}
+		
+		$files = array_diff( scandir( $dir ), array( '.', '..' ) );
+		foreach ( $files as $file ) {
+			$path = $dir . '/' . $file;
+			is_dir( $path ) ? $this->recursive_delete( $path ) : unlink( $path );
+		}
+		
+		return rmdir( $dir );
+	}
+	
+	/**
+	 * Ensure the theme folder name is always correct after updates
+	 */
+	public function ensure_correct_folder_name() {
+		$themes_dir = get_theme_root();
+		$target_name = 'Global-360-Theme';
+		
+		// Look for any folder that might be our theme with wrong name
+		$folders = scandir( $themes_dir );
+		foreach ( $folders as $folder ) {
+			if ( $folder === '.' || $folder === '..' || $folder === $target_name ) {
+				continue;
+			}
+			
+			$folder_path = $themes_dir . '/' . $folder;
+			if ( ! is_dir( $folder_path ) ) {
+				continue;
+			}
+			
+			// Check if this folder contains our theme (look for style.css with our theme name)
+			$style_css = $folder_path . '/style.css';
+			if ( file_exists( $style_css ) ) {
+				$style_content = file_get_contents( $style_css );
+				if ( strpos( $style_content, 'Theme Name: Global 360 Theme' ) !== false ) {
+					// This is our theme with wrong folder name - rename it
+					$correct_path = $themes_dir . '/' . $target_name;
+					
+					if ( $folder_path !== $correct_path ) {
+						error_log( 'Post-update folder fix: Renaming ' . $folder . ' to ' . $target_name );
+						
+						// Remove target if exists
+						if ( file_exists( $correct_path ) ) {
+							$this->recursive_delete( $correct_path );
+						}
+						
+						// Rename to correct name
+						if ( rename( $folder_path, $correct_path ) ) {
+							error_log( 'Post-update folder fix: Successfully renamed theme folder' );
+						} else {
+							error_log( 'Post-update folder fix: Failed to rename theme folder' );
+						}
+					}
+					break;
+				}
+			}
+		}
 	}
 	
 	public function check_for_update( $transient ) {
