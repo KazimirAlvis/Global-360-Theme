@@ -40,15 +40,12 @@ class Global_360_Theme_Updater {
 		$this->github_username = 'KazimirAlvis';
 		$this->github_repo = 'Global-360-Theme';
 		
-		// Disable auto-updater but keep folder name fix for manual updates
-		$this->updater_enabled = false; // Set to false to disable automatic updates
+		// Enable auto-updater with folder name protection
+		$this->updater_enabled = true; // Re-enabled with folder name fix
 		
 		if ($this->updater_enabled) {
 			add_filter( 'pre_set_site_transient_update_themes', array( $this, 'check_for_update' ) );
 			add_action( 'admin_notices', array( $this, 'update_notice' ) );
-		} else {
-			// Just show admin notice about manual updates
-			add_action( 'admin_notices', array( $this, 'manual_update_notice' ) );
 		}
 		
 		// Always keep the folder name fix active for manual updates
@@ -175,19 +172,7 @@ class Global_360_Theme_Updater {
 		}
 	}
 	
-	public function manual_update_notice() {
-		$screen = get_current_screen();
-		if ( $screen && $screen->id === 'themes' ) {
-			$remote_version = $this->get_remote_version();
-			
-			if ( $remote_version && version_compare( $this->theme_version, $remote_version, '<' ) ) {
-				echo '<div class="notice notice-info is-dismissible">';
-				echo '<p><strong>Global 360 Theme Update Available!</strong> Version ' . esc_html( $remote_version ) . ' is now available. You are currently using version ' . esc_html( $this->theme_version ) . '.</p>';
-				echo '<p><strong>Manual Update Required:</strong> Auto-updater is temporarily disabled. Please download the latest theme from <a href="https://github.com/KazimirAlvis/Global-360-Theme" target="_blank">GitHub</a> and upload manually.</p>';
-				echo '</div>';
-			}
-		}
-	}
+
 }
 
 // Initialize the updater
