@@ -1,0 +1,21 @@
+{
+	"liveSassCompile.settings.formats": [
+		{
+			"format": "expanded",
+			"extensionName": ".css",
+			"savePath": "/"
+		}
+	],
+	"liveSassCompile.settings.includeItems": ["/sass/style.scss"],
+	"liveSassCompile.settings.excludeList": [
+		"/**/node_modules/**",
+		"/.vscode/**",
+		"/sass/main.scss",
+		"/sass/modals.scss",
+		"/sass/find-a-doctor.scss",
+		"/sass/posts.scss"
+	],
+	"liveSassCompile.settings.generateMap": true,
+	"liveSassCompile.settings.autoprefix": ["> 1%", "last 2 versions"],
+	"liveSassCompile.settings.showAnnouncements": false
+}

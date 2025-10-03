@@ -1,0 +1,134 @@
+/*--------------------------------------------------------------
+ Buttons
+--------------------------------------------------------------*/
+
+.btn {
+	font-size: 18px;
+	font-family: var(--wp--preset--font-family--body-font);
+	font-weight: 500;
+	border-radius: 27px;
+	padding: 15px 30px;
+	cursor: pointer;
+	width: 100%;
+	max-width: 312px;
+	height: 54px;
+	min-height: auto;
+	text-align: center;
+	white-space: nowrap;
+	transition: transform 0.2s ease, background-color 0.2s ease;
+	display: block;
+	margin: 0;
+	line-height: 22px;
+	text-decoration: none;
+	display: inline-block;
+}
+.btn_green {
+	background-color: var(--cpt360-primary);
+	color: #ffffff;
+	border: 1px solid var(--cpt360-primary);
+}
+
+.btn_green:hover {
+	background-color: transparent !important;
+	color: #282e24 !important;
+	border: 1px solid #282e24 !important;
+}
+.btn_white_ol {
+	background-color: var(--cpt360-primary);
+	color: #ffffff;
+	border: 1px solid var(--cpt360-primary);
+}
+.btn_white_ol:hover {
+	background-color: transparent !important;
+	color: #fff !important;
+	border: 1px solid #fff !important;
+}
+
+@media (max-width: 768px) {
+	.btn_green {
+		font-size: 15px;
+		padding: 15px 30px;
+	}
+}
+
+@media (max-width: 480px) {
+	.btn_green {
+		font-size: 15px;
+		padding: 15px 25px;
+	}
+}
+.btn_green_ol {
+	transition: all 0.3s;
+	background-color: transparent;
+	color: var(--cpt360-primary);
+	text-decoration: none;
+	border: 1px solid var(--cpt360-primary);
+}
+.btn_green_ol:hover {
+	background-color: var(--cpt360-primary) !important;
+	color: #fff !important;
+	border: 1px solid var(--cpt360-primary) !important;
+}
+
+.btn-secondary {
+	display: inline-block;
+	border-radius: 27px;
+	padding: 8px 30px !important;
+	min-height: unset !important;
+	height: unset !important;
+	cursor: pointer;
+	background-color: var(--cpt360-primary);
+	color: #ffffff;
+	border: 1px solid var(--cpt360-primary);
+	text-decoration: none;
+	font-weight: 500;
+	line-height: normal !important;
+	transition: transform 0.2s ease, background-color 0.2s ease;
+
+	&:hover {
+		background-color: transparent;
+		border: 1px solid #fff;
+		color: #ffffff !important;
+		text-decoration: none;
+	}
+}
+
+/* PR360 Questionnaire Button Styling */
+.button--begin {
+	font-size: 18px !important;
+	font-family: var(--wp--preset--font-family--body-font) !important;
+	font-weight: 500 !important;
+	border-radius: 27px !important;
+	padding: 15px 30px !important;
+	cursor: pointer !important;
+	width: 100% !important;
+	max-width: 312px !important;
+	height: 54px !important;
+	min-height: auto !important;
+	text-align: center !important;
+	white-space: nowrap !important;
+	transition: transform 0.2s ease, background-color 0.2s ease !important;
+	display: inline-block !important;
+	margin: 0 !important;
+	line-height: 22px !important;
+	text-decoration: none !important;
+	background-color: var(--cpt360-primary) !important;
+	color: #ffffff !important;
+	border: 1px solid var(--cpt360-primary) !important;
+
+	&:hover {
+		background-color: transparent !important;
+		color: #282e24 !important;
+		border: 1px solid #282e24 !important;
+	}
+
+	@media (max-width: 768px) {
+		font-size: 15px !important;
+		padding: 15px 30px !important;
+	}
+
+	@media (max-width: 480px) {
+		font-size: 15px !important;
+		padding: 15px 25px !important;
+	}
+}
