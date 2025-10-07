@@ -80,20 +80,11 @@ function get_clinic_google_reviews($place_id) {
     }
     
     if (empty($api_key)) {
-        $debug_msg = 'Neither Google Places API key nor Google Maps API key is configured';
-        error_log($debug_msg);
-        if (current_user_can('edit_posts')) {
-            echo '<div class="google-reviews-error">DEBUG: ' . $debug_msg . '</div>';
-            echo '<div class="google-reviews-error">Available keys: ' . implode(', ', array_keys($options)) . '</div>';
-            echo '<div class="google-reviews-error">Raw options: ' . json_encode($options) . '</div>';
-        }
+        error_log('Google Places/Maps API key not configured');
         return false;
     }
     
-    // Debug: Show API key status for admins
-    if (current_user_can('edit_posts')) {
-        echo '<div class="google-reviews-setup">DEBUG: API Key found (length: ' . strlen($api_key) . ')</div>';
-    }
+
     
     // Call Google Places API
     $url = "https://maps.googleapis.com/maps/api/place/details/json";
@@ -105,21 +96,14 @@ function get_clinic_google_reviews($place_id) {
     
     $request_url = $url . '?' . http_build_query($params);
     
-    // Debug: Show the API call for admins
-    if (current_user_can('edit_posts')) {
-        echo '<div class="google-reviews-setup">DEBUG: Calling API with Place ID: ' . $place_id . '</div>';
-    }
+
     
     $response = wp_remote_get($request_url, [
         'timeout' => 10
     ]);
     
     if (is_wp_error($response)) {
-        $error_msg = 'Google Places API error: ' . $response->get_error_message();
-        error_log($error_msg);
-        if (current_user_can('edit_posts')) {
-            echo '<div class="google-reviews-error">DEBUG: ' . $error_msg . '</div>';
-        }
+        error_log('Google Places API error: ' . $response->get_error_message());
         return false;
     }
     
@@ -133,10 +117,7 @@ function get_clinic_google_reviews($place_id) {
         }
         error_log($error_msg);
         
-        // Show detailed error for admins
-        if (current_user_can('edit_posts')) {
-            echo '<div class="google-reviews-error">DEBUG: ' . esc_html($error_msg) . '</div>';
-        }
+
         return false;
     }
     
