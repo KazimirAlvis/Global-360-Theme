@@ -63,7 +63,8 @@ $place_url = isset($reviews_data['url']) ? $reviews_data['url'] : "https://www.g
  */
 function get_clinic_google_reviews($place_id) {
     // Check cache first (cache for 6 hours to avoid API limits)
-    $cache_key = 'google_reviews_' . md5($place_id);
+    // Added v2 to cache key to force refresh after debug removal
+    $cache_key = 'google_reviews_v2_' . md5($place_id);
     $cached_data = get_transient($cache_key);
     
     if ($cached_data !== false) {
