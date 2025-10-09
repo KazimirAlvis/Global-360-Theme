@@ -33,12 +33,20 @@ class Global_360_Theme_Updater {
 	private $github_username;
 	private $github_repo;
 	private $updater_enabled;
+	private $latest_remote_version;
+	private $remote_version_cache_key;
 	
 	function __construct() {
 		$this->theme_slug = get_option( 'template' );
 		$this->theme_version = _S_VERSION;
 		$this->github_username = 'KazimirAlvis';
 		$this->github_repo = 'Global-360-Theme';
+		$this->latest_remote_version = null;
+		$this->remote_version_cache_key = 'global_360_theme_latest_remote_version';
+		$cached_remote_version = get_transient( $this->remote_version_cache_key );
+		if ( $cached_remote_version ) {
+			$this->latest_remote_version = $cached_remote_version;
+		}
 		
 		// Enable auto-updater with folder name protection
 		$this->updater_enabled = true; // Re-enabled with folder name fix
@@ -92,12 +100,14 @@ class Global_360_Theme_Updater {
 			// Rename the folder
 			if ( rename( $source, $correct_source ) ) {
 				error_log('Theme Folder Fix - Rename successful');
+				$this->sync_package_version( $correct_source );
 				return $correct_source;
 			} else {
 				error_log('Theme Folder Fix - Rename failed');
 			}
 		}
 		
+		$this->sync_package_version( $source );
 		return $source;
 	}
 	
@@ -116,6 +126,52 @@ class Global_360_Theme_Updater {
 		}
 		
 		return rmdir( $dir );
+	}
+
+	private function sync_package_version( $package_root ) {
+		if ( empty( $package_root ) || ! is_dir( $package_root ) ) {
+			return;
+		}
+
+		$target_version = $this->latest_remote_version;
+		if ( empty( $target_version ) ) {
+			$cached_version = get_transient( $this->remote_version_cache_key );
+			if ( $cached_version ) {
+				$target_version = $cached_version;
+			}
+		}
+		if ( empty( $target_version ) ) {
+			return;
+		}
+
+		$package_root = rtrim( $package_root, '/\\' );
+		$style_file = $package_root . '/style.css';
+		$functions_file = $package_root . '/functions.php';
+
+		if ( file_exists( $style_file ) && is_readable( $style_file ) && is_writable( $style_file ) ) {
+			$style_contents = file_get_contents( $style_file );
+			if ( $style_contents !== false ) {
+				$updated_style = preg_replace( '/^Version:\s*.*$/mi', 'Version: ' . $target_version, $style_contents, 1 );
+				if ( $updated_style && $updated_style !== $style_contents ) {
+					file_put_contents( $style_file, $updated_style );
+				}
+			}
+		}
+
+		if ( file_exists( $functions_file ) && is_readable( $functions_file ) && is_writable( $functions_file ) ) {
+			$functions_contents = file_get_contents( $functions_file );
+			if ( $functions_contents !== false ) {
+				$updated_functions = preg_replace(
+					"/define\(\s*'_S_VERSION'\s*,\s*'[^']*'\s*\);/",
+					"define( '_S_VERSION', '" . $target_version . "' );",
+					$functions_contents,
+					1
+				);
+				if ( $updated_functions && $updated_functions !== $functions_contents ) {
+					file_put_contents( $functions_file, $updated_functions );
+				}
+			}
+		}
 	}
 	
 	/**
@@ -207,7 +263,10 @@ class Global_360_Theme_Updater {
 					
 					// Generate version like 1.0.20250922
 					$base_version = '1.0';
-					return $base_version . '.' . $formatted_date;
+					$this->latest_remote_version = $base_version . '.' . $formatted_date;
+					$cache_ttl = defined( 'HOUR_IN_SECONDS' ) ? HOUR_IN_SECONDS : 3600;
+					set_transient( $this->remote_version_cache_key, $this->latest_remote_version, $cache_ttl );
+					return $this->latest_remote_version;
 				} catch ( Exception $e ) {
 					// Log error if needed
 					error_log( 'Theme updater date parsing error: ' . $e->getMessage() );
@@ -223,6 +282,16 @@ class Global_360_Theme_Updater {
 			}
 		}
 		
+		if ( $this->latest_remote_version ) {
+			return $this->latest_remote_version;
+		}
+		
+		$cached_version = get_transient( $this->remote_version_cache_key );
+		if ( $cached_version ) {
+			$this->latest_remote_version = $cached_version;
+			return $cached_version;
+		}
+		
 		return false;
 	}
 	
@@ -236,7 +305,11 @@ class Global_360_Theme_Updater {
 	}
 	
 	public function get_remote_version_public() {
-		return $this->get_remote_version();
+		$version = $this->get_remote_version();
+		if ( ! $version && $this->latest_remote_version ) {
+			return $this->latest_remote_version;
+		}
+		return $version;
 	}
 	
 	public function update_notice() {
