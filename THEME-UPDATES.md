@@ -32,8 +32,8 @@ The Global 360 Theme now includes automatic update functionality that integrates
 4. WordPress will detect the update within 24 hours
 
 ### Version Format
-- Use semantic versioning (e.g., 1.0.0, 1.0.1, 1.1.0, 2.0.0)
-- GitHub release tags should include 'v' prefix (e.g., `v1.0.1`)
+- Automatic versions generated as `1.0.YYYYMMDDHHMMSS` (date + time) so every commit is unique
+- If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ## Update Sources
 - **Repository**: https://github.com/KazimirAlvis/Global-360-Theme

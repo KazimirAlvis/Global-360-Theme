@@ -259,11 +259,11 @@ class Global_360_Theme_Updater {
 				
 				try {
 					$date = new DateTime( $commit_date );
-					$formatted_date = $date->format( 'Ymd' );
+					$formatted_datetime = $date->format( 'YmdHis' );
 					
-					// Generate version like 1.0.20250922
+					// Generate version like 1.0.20250922153045 (date + time for uniqueness per commit)
 					$base_version = '1.0';
-					$this->latest_remote_version = $base_version . '.' . $formatted_date;
+					$this->latest_remote_version = $base_version . '.' . $formatted_datetime;
 					$cache_ttl = defined( 'HOUR_IN_SECONDS' ) ? HOUR_IN_SECONDS : 3600;
 					set_transient( $this->remote_version_cache_key, $this->latest_remote_version, $cache_ttl );
 					return $this->latest_remote_version;
