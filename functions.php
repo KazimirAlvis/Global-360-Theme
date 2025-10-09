@@ -101,14 +101,14 @@ class Global_360_Theme_Updater {
 			if ( rename( $source, $correct_source ) ) {
 				error_log('Theme Folder Fix - Rename successful');
 				$this->sync_package_version( $correct_source );
-				return $correct_source;
+				return trailingslashit( $correct_source );
 			} else {
 				error_log('Theme Folder Fix - Rename failed');
 			}
 		}
 		
 		$this->sync_package_version( $source );
-		return $source;
+		return trailingslashit( $source );
 	}
 	
 	/**
