@@ -124,11 +124,25 @@ echo '<style>
 			<div class="site-branding">
 				<?php
 				$opts = get_option('360_global_settings', []);
-				$logo_id = isset($opts['header_logo_id']) ? $opts['header_logo_id'] : '';
+				$logo_id = isset($opts['header_logo_id']) ? (int) $opts['header_logo_id'] : 0;
 				if ($logo_id) {
-					$logo_url = wp_get_attachment_image_url($logo_id, 'medium');
-					if ($logo_url) {
-						echo '<a href="/"><img src="' . esc_url($logo_url) . '" alt="Header Logo" class="site-header-logo" /></a>';
+					$logo_alt = get_post_meta($logo_id, '_wp_attachment_image_alt', true);
+					if (!$logo_alt) {
+						$logo_alt = get_bloginfo('name');
+					}
+					$logo_alt = sanitize_text_field($logo_alt);
+					$logo_html = wp_get_attachment_image(
+						$logo_id,
+						'full',
+						false,
+						[
+							'class'   => 'site-header-logo',
+							'alt'     => $logo_alt,
+							'loading' => 'eager',
+						]
+					);
+					if ($logo_html) {
+						echo '<a href="/" class="site-header-logo-link">' . $logo_html . '</a>';
 					}
 				}
 				?>
