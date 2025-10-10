@@ -29,7 +29,7 @@
 					'full',
 					false,
 					[
-						'class'   => 'site-header-logo',
+						'class'   => 'footer-logo-image',
 						'alt'     => $logo_alt,
 						'loading' => 'lazy',
 					]

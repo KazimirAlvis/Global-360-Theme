@@ -4,7 +4,7 @@ Theme URI: https://github.com/KazimirAlvis/Global-360-Theme
 Author: Kazimir Alvis
 Author URI: https://github.com/KazimirAlvis
 Description: WordPress theme for 360 medical sites with dynamic doctor pages, clinic management, and auto-updater functionality
-Version: 1.0.20251010120000
+Version: 1.0.20251010123000
 Tested up to: 6.4
 Requires PHP: 7.4
 License: GNU General Public License v2 or later
@@ -1339,6 +1339,12 @@ textarea {
 .site-footer .footer_inner .footer_logo h4 {
   padding-left: 12px;
 }
+.site-footer .footer_inner .footer_logo .footer-logo-image {
+  max-width: 250px;
+  width: 100%;
+  height: auto;
+  display: block;
+}
 .site-footer .footer_inner .footer_logo ul {
   padding-left: 12px;
   display: -webkit-box;
@@ -1940,7 +1946,8 @@ textarea {
 }
 
 .doctor-bio {
-  /* Removed display: none to allow doctor bios to show on individual doctor pages */
+  /* Ensure doctor bios display on individual doctor pages */
+  display: block;
 }
 
 /*--------------------------------------------------------------
@@ -3699,7 +3706,9 @@ textarea {
 }
 
 .practice-location {
-    /* No styling - clean appearance */
+  /* Minimal spacing for clean appearance */
+  padding: 0;
+  margin: 0;
 }
 
 .practice-location h3 {
