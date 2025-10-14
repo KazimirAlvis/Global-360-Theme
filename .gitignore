@@ -1,0 +1,23 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
+
+# PHP Composer (if used later)
+vendor/
+
+# Build artifacts and maps (optional keep maps if desired)
+*.map
+*.log
+
+# Env files
+.env
+.env.*
