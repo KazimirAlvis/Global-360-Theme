@@ -1,0 +1,263 @@
+/*--------------------------------------------------------------
+# Individual Doctor Page Layout
+--------------------------------------------------------------*/
+
+.doctor-info-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.doctor-details {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+    align-items: start;
+}
+
+.doctor-details .doctor-photo {
+    justify-self: center;
+}
+
+.doctor-details .doctor-photo img {
+    width: 250px;
+    height: 250px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.doctor-details .doctor-content {
+    padding-top: 0;
+}
+
+.doctor-info-container .doctor-title {
+    font-size: 18px;
+    color: #000000;
+    margin: 0 0 0.75em;
+    font-weight: 300;
+    text-align: left;
+}
+
+.doctor-bio h2 {
+    color: #000000;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.bio-content {
+    line-height: 1.6;
+    color: var(--text-color, #333);
+}
+
+.doctor-clinics {
+    margin-bottom: 3rem;
+}
+
+.doctor-clinics h2 {
+    color: var(--cpt360-primary, #528224);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.clinics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.doctor-info-container .clinic-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+    background: white;
+}
+
+.doctor-info-container .clinic-card:hover {
+    border-color: var(--cpt360-primary, #528224);
+}
+
+.clinic-card h3 {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.clinic-card h3 a {
+    color: var(--cpt360-primary, #528224);
+    text-decoration: none;
+}
+
+.clinic-card h3 a:hover {
+    text-decoration: underline;
+}
+
+.clinic-address {
+    margin-bottom: 0.5rem;
+}
+
+.clinic-phone, .clinic-website {
+    margin-top: 1rem;
+}
+
+.clinic-phone a, .clinic-website a {
+    color: var(--cpt360-primary, #528224);
+    text-decoration: none;
+}
+
+.clinic-phone a:hover, .clinic-website a:hover {
+    text-decoration: underline;
+}
+
+.doctor-navigation {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.back-button {
+    background-color: var(--cpt360-primary, #007cba) !important;
+    border: 1px solid var(--cpt360-primary, #007cba) !important;
+    border-radius: 27px !important;
+    box-sizing: border-box !important;
+    color: #fff !important;
+    cursor: pointer !important;
+    display: inline-block !important;
+    font-family: var(--body-font, Arial, sans-serif) !important;
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    height: 54px !important;
+    line-height: 22px !important;
+    margin: 0 !important;
+    max-width: 312px !important;
+    min-height: auto !important;
+    padding: 15px 30px !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    transition: transform 0.2s ease, background-color 0.2s ease !important;
+    white-space: nowrap !important;
+}
+
+.back-button:hover {
+    background-color: white !important;
+    color: #282e24 !important;
+    border: 1px solid #282e24 !important;
+}
+
+/* Doctor page responsive */
+@media (max-width: 768px) {
+    .doctor-details {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+    
+    .doctor-details .doctor-content {
+        text-align: left;
+    }
+    
+    .doctor-info-container .doctor-title {
+        text-align: center;
+    }
+}
+
+/* Updated Doctor Page Layout */
+.doctor-left-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.doctor-photo {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid #dddddd;
+}
+
+.doctor-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.doctor-title-section {
+    text-align: center;
+    width: 100%;
+}
+
+.doctor-right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.doctor-practice-locations {
+    margin-top: 1rem;
+}
+
+.doctor-practice-locations h2 {
+    color: #000000;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.5rem;
+}
+
+.practice-locations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.practice-location {
+  /* Minimal spacing for clean appearance */
+  padding: 0;
+  margin: 0;
+}
+
+.practice-location h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+}
+
+.practice-location h3 a {
+    color: var(--cpt360-primary, #528224);
+    text-decoration: none;
+}
+
+.practice-location h3 a:hover {
+    text-decoration: underline;
+}
+
+.clinic-address {
+    margin-bottom: 0.5rem;
+}
+
+.clinic-address a {
+    color: #000000;
+    text-decoration: none;
+    transition: text-decoration 0.2s ease;
+}
+
+.clinic-address a:hover {
+    text-decoration: underline;
+}
+
+.clinic-phone,
+.clinic-website {
+    margin-top: 0.5rem;
+}
+
+.clinic-phone a,
+.clinic-website a {
+    color: var(--cpt360-primary, #528224);
+    text-decoration: none;
+}
+
+.clinic-phone a:hover,
+.clinic-website a:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,69 @@
+/*--------------------------------------------------------------
+ Gut block styling
+--------------------------------------------------------------*/
+
+/*--------------------------------------------------------------
+ small hero
+--------------------------------------------------------------*/
+// .sm_hero {
+// 	background-color: #575757;
+// 	height: 250px;
+// 	display: flex;
+// 	justify-content: center;
+// 	align-items: center;
+// 	h1 {
+// 		margin: 0;
+// 		font-size: 56px;
+// 		font-weight: 400;
+// 		color: #fff;
+// 	}
+// }
+
+/*--------------------------------------------------------------
+ Stadard WP text
+--------------------------------------------------------------*/
+/* In your theme's style.css */
+.main-paragraph-con,
+.main-heading-con,
+.main-list-con {
+	padding: 0 20px;
+}
+.main-paragraph-con p {
+	font-size: 16px;
+	line-height: 1.6;
+	margin-bottom: 1.5em;
+	font-family: var(--wp--preset--font-family--body-font);
+}
+
+.main-heading-con {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-weight: 600;
+		line-height: 1.2;
+		margin-bottom: 20px;
+	}
+	h2 {
+		font-size: 2.5rem;
+		font-weight: 600;
+	}
+	h3 {
+		font-weight: 500;
+		font-size: 2rem;
+	}
+}
+
+.main-list-con ul,
+.main-list-con ol {
+	font-family: var(--wp--preset--font-family--body-font);
+	font-size: 16px;
+	padding-left: 0;
+	margin-bottom: 1.5em;
+	margin-left: 40px;
+	li {
+		margin-bottom: 10px;
+	}
+}

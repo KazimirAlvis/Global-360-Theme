@@ -1,0 +1,293 @@
+/*--------------------------------------------------------------
+ Footer
+--------------------------------------------------------------*/
+.site-footer {
+	background-color: #292626;
+	padding: 25px 0 0px 0;
+	.footer_inner {
+		display: flex;
+		justify-content: space-between;
+		padding-bottom: 20px;
+		.column {
+			a {
+				color: #fff;
+				text-decoration: none;
+				font-size: 15px;
+				font-weight: 400;
+				line-height: 1.75rem;
+				&:hover {
+					color: var(--cpt360-primary);
+				}
+			}
+			h4 {
+				font-size: 16px;
+				font-weight: 700;
+				color: var(--cpt360-primary);
+				text-transform: uppercase;
+				line-height: 1.75rem;
+				padding: 0;
+				margin: 0 0 10px 0;
+			}
+			ul {
+				margin: 0;
+				padding: 0;
+				list-style-type: none;
+				li {
+					text-decoration: none;
+				}
+			}
+		}
+		.contact_links {
+			span {
+				display: block;
+				color: #fff;
+				text-decoration: none;
+				font-size: 14px;
+				font-weight: 700;
+				line-height: 1.75rem;
+			}
+		}
+
+		.footer_logo {
+			h4 {
+				padding-left: 12px;
+			}
+			ul {
+				padding-left: 12px;
+				display: flex;
+				gap: 20px;
+			}
+
+			/* Ensure footer logo image does not exceed desired width */
+			.footer-logo-image {
+				max-width: 250px;
+				height: auto;
+			}
+		}
+
+		.offsite_links {
+			ul {
+				li {
+					a {
+						display: flex;
+						align-items: center;
+						gap: 10px;
+						margin-bottom: 5px;
+
+						span {
+							display: flex;
+							align-items: center;
+							flex-shrink: 0;
+
+							img {
+								width: 20px;
+								height: 20px;
+								object-fit: contain;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	.border {
+		display: block;
+		height: 1px;
+		width: 100%;
+		background-color: #7c7c7e;
+	}
+	.lower_footer {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 15px 0;
+	}
+
+	.legal {
+		text-align: left;
+		p,
+		p a {
+			font-family: var(--wp--preset--font-family--body-font);
+			color: #7c7c7e;
+			font-weight: 400;
+			font-size: 13px;
+			line-height: normal;
+			font-style: normal;
+			text-decoration: none;
+			margin-bottom: 5px;
+			margin-top: 0;
+		}
+		p:nth-child(2) {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+		p a:hover {
+			text-decoration: underline;
+		}
+	}
+	.footer_form_pu {
+		span {
+			font-family: var(--wp--preset--font-family--body-font);
+			color: #7c7c7e;
+			font-weight: 400;
+			font-size: 13px;
+			line-height: normal;
+			border-radius: 27px;
+			padding: 8px 30px;
+			border: 1px solid #7c7c7e;
+			display: block;
+			&:hover {
+				cursor: pointer;
+				background-color: var(--cpt360-primary);
+				border-color: var(--cpt360-primary);
+				color: #fff;
+			}
+		}
+	}
+}
+
+/*--------------------------------------------------------------
+ Do Not Sell Modal
+--------------------------------------------------------------*/
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.7);
+	z-index: 9999;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	opacity: 0;
+	visibility: hidden;
+	transition: all 0.3s ease;
+
+	&.modal-open {
+		opacity: 1;
+		visibility: visible;
+	}
+}
+
+.modal-content {
+	background: white;
+	border-radius: 12px;
+	max-width: 600px;
+	width: 90%;
+	max-height: 80vh;
+	overflow-y: auto;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+	transform: translateY(-50px);
+	transition: transform 0.3s ease;
+
+	.modal-open & {
+		transform: translateY(0);
+	}
+}
+
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 25px 30px;
+	border-bottom: 1px solid #eee;
+
+	h3 {
+		margin: 0;
+		font-size: 24px;
+		font-weight: 600;
+		color: #333;
+	}
+
+	.modal-close {
+		background: none;
+		border: none;
+		font-size: 28px;
+		color: #999;
+		cursor: pointer;
+		line-height: 1;
+		transition: color 0.2s ease;
+
+		&:hover {
+			color: #333;
+		}
+	}
+}
+
+.modal-body {
+	padding: 30px;
+
+	// Contact Form 7 styling within modal
+	.wpcf7-form {
+		.wpcf7-form-control-wrap {
+			display: block;
+			margin-bottom: 20px;
+		}
+
+		input[type='text'],
+		input[type='email'],
+		input[type='tel'],
+		textarea {
+			width: 100%;
+			padding: 12px 15px;
+			border: 1px solid #ddd;
+			border-radius: 6px;
+			font-size: 16px;
+			transition: border-color 0.2s ease;
+
+			&:focus {
+				outline: none;
+				border-color: var(--cpt360-primary);
+			}
+		}
+
+		textarea {
+			min-height: 120px;
+			resize: vertical;
+		}
+
+		.wpcf7-submit {
+			background-color: var(--cpt360-primary);
+			color: white;
+			border: none;
+			padding: 12px 30px;
+			border-radius: 6px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s ease;
+
+			&:hover {
+				background-color: #333;
+				transform: translateY(-1px);
+			}
+		}
+
+		.wpcf7-response-output {
+			margin-top: 15px;
+			padding: 10px 15px;
+			border-radius: 6px;
+		}
+	}
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+	.modal-content {
+		width: 95%;
+		margin: 10px;
+	}
+
+	.modal-header {
+		padding: 20px;
+
+		h3 {
+			font-size: 20px;
+		}
+	}
+
+	.modal-body {
+		padding: 20px;
+	}
+}
