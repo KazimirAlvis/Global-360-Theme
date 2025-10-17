@@ -21,7 +21,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 ### Current Version Management
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20251017094500`)
+- Current version: matches `_S_VERSION` (currently `1.0.20251017114500`)
 
 ### Release Process
 1. Update version number in both:
@@ -36,6 +36,9 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251017114500 (2025-10-17)
+- Ensure the Anton typeface appears in the admin font dropdown and front-end critical CSS, and load it via Google Fonts.
 
 #### v1.0.20251017094500 (2025-10-17)
 - Integrated the Anton typeface across the theme font settings and front-end mapping so heading selections render immediately.

@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20251017094500' );
+	define( '_S_VERSION', '1.0.20251017114500' );
 }
 
 /**
@@ -856,6 +856,7 @@ function global_360_theme_enqueue_google_fonts()
 	if (!wp_style_is('google-fonts', 'enqueued') && !wp_style_is('myclinic-google-fonts', 'enqueued')) {
 		$font_url = 'https://fonts.googleapis.com/css2'
 			. '?family=Roboto:ital,wght@0,400;0,700'
+			. '&family=Anton'
 			. '&family=Marcellus'
 			. '&family=Inter:ital,wght@0,400;0,700'
 			. '&family=Arvo'

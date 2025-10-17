@@ -67,6 +67,7 @@ $heading_font = isset($opts['heading_font']) ? $opts['heading_font'] : 'system-f
 
 $font_map = [
     'system-font'  => 'system-ui, Arial, sans-serif',
+	'anton'        => "'Anton', sans-serif",
     'arvo'         => "'Arvo', serif",
     'bodoni-moda'  => "'Bodoni Moda', serif",
     'cabin'        => "'Cabin', sans-serif",

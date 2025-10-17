@@ -180,6 +180,7 @@ if (! class_exists('_360_Global_Settings')) {
         {
             $fonts = [
                 'system-font'  => 'System Font',
+                'anton'        => 'Anton',
                 'arvo'         => 'Arvo',
                 'bodoni-moda'  => 'Bodoni Moda',
                 'cabin'        => 'Cabin',
@@ -713,6 +714,7 @@ if (! class_exists('_360_Global_Settings')) {
         {
             $font_stacks = [
                 'system-font' => '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif',
+                'anton' => '"Anton", sans-serif',
                 'arvo' => '"Arvo", serif',
                 'bodoni-moda' => '"Bodoni Moda", serif', 
                 'cabin' => '"Cabin", sans-serif',
