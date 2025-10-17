@@ -21,7 +21,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 ### Current Version Management
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20251013120000`)
+- Current version: matches `_S_VERSION` (currently `1.0.20251017094500`)
 
 ### Release Process
 1. Update version number in both:
@@ -34,6 +34,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 ### Version Format
 - Automatic versions generated as `1.0.YYYYMMDDHHMMSS` (date + time) so every commit is unique
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
+
+### Release History
+
+#### v1.0.20251017094500 (2025-10-17)
+- Integrated the Anton typeface across the theme font settings and front-end mapping so heading selections render immediately.
 
 ## Update Sources
 - **Repository**: https://github.com/KazimirAlvis/Global-360-Theme
