@@ -18,6 +18,23 @@ if (!$place_id) {
 // Get Google reviews data (cached for performance)
 $reviews_data = get_clinic_google_reviews($place_id);
 
+if (is_wp_error($reviews_data)) {
+    if (current_user_can('edit_posts')) {
+        $error_message = $reviews_data->get_error_message();
+        $error_data    = $reviews_data->get_error_data();
+        $status_code   = is_array($error_data) && isset($error_data['status']) ? $error_data['status'] : '';
+        echo '<div class="google-reviews-error">❌ <em>Could not load Google reviews. Check API key and Place ID.</em>';
+        if ($error_message) {
+            echo '<br /><small><strong>Debug:</strong> ' . esc_html($error_message) . '</small>';
+        }
+        if ($status_code) {
+            echo '<br /><small><strong>Status:</strong> ' . esc_html($status_code) . '</small>';
+        }
+        echo '</div>';
+    }
+    return;
+}
+
 if (!$reviews_data || !isset($reviews_data['rating'])) {
     if (current_user_can('edit_posts')) {
         echo '<div class="google-reviews-error">❌ <em>Could not load Google reviews. Check API key and Place ID.</em></div>';
@@ -81,8 +98,9 @@ function get_clinic_google_reviews($place_id) {
     }
     
     if (empty($api_key)) {
-        error_log('Google Places/Maps API key not configured');
-        return false;
+        $message = 'Google Places/Maps API key not configured';
+        error_log($message);
+        return new WP_Error('google_reviews_missing_key', $message);
     }
     
 
@@ -104,22 +122,31 @@ function get_clinic_google_reviews($place_id) {
     ]);
     
     if (is_wp_error($response)) {
-        error_log('Google Places API error: ' . $response->get_error_message());
-        return false;
+        $message = 'Google Places API request failed: ' . $response->get_error_message();
+        error_log($message);
+        return new WP_Error('google_reviews_http_error', $message);
     }
     
     $body = wp_remote_retrieve_body($response);
     $data = json_decode($body, true);
     
-    if (!$data || $data['status'] !== 'OK') {
-        $error_msg = 'Google Places API Error: ' . ($data['status'] ?? 'Unknown');
-        if (isset($data['error_message'])) {
-            $error_msg .= ' - ' . $data['error_message'];
+    if (!$data || ($data['status'] ?? '') !== 'OK') {
+        $status    = $data['status'] ?? 'Unknown';
+        $api_error = $data['error_message'] ?? '';
+        $error_msg = 'Google Places API Error: ' . $status;
+        if ($api_error) {
+            $error_msg .= ' - ' . $api_error;
         }
         error_log($error_msg);
-        
 
-        return false;
+        return new WP_Error(
+            'google_reviews_api_error',
+            $error_msg,
+            [
+                'status' => $status,
+                'error_message' => $api_error,
+            ]
+        );
     }
     
     $result = $data['result'];

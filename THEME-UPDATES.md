@@ -21,7 +21,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 ### Current Version Management
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20251017114500`)
+- Current version: matches `_S_VERSION` (currently `1.0.20251021104500`)
 
 ### Release Process
 1. Update version number in both:
@@ -36,6 +36,9 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251021104500 (2025-10-21)
+- Added a dedicated Google Places API key field, updated admin guidance, and improved error reporting for clinic reviews so server-side Place Details requests succeed with restricted keys.
 
 #### v1.0.20251017114500 (2025-10-17)
 - Ensure the Anton typeface appears in the admin font dropdown and front-end critical CSS, and load it via Google Fonts.
