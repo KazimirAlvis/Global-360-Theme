@@ -149,7 +149,22 @@ function get_clinic_google_reviews($place_id) {
         );
     }
     
-    $result = $data['result'];
+    $result = $data['result'] ?? [];
+
+    if (empty($result) || ! isset($result['rating'])) {
+        $error_msg = 'Google Places API returned no rating information';
+        error_log($error_msg . ' for Place ID ' . $place_id . ' | Result keys: ' . implode(',', array_keys($result)));
+
+        return new WP_Error(
+            'google_reviews_missing_rating',
+            $error_msg,
+            [
+                'status'   => 'NO_RATING',
+                'place_id' => $place_id,
+                'keys'     => array_keys($result),
+            ]
+        );
+    }
     
     // Cache the result for 6 hours
     set_transient($cache_key, $result, 6 * HOUR_IN_SECONDS);
