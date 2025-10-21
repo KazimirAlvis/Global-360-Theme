@@ -44,6 +44,16 @@
 	li {
 		a {
 			color: #fff;
+			transition: color 0.2s ease;
+		}
+		&:not(:last-of-type) {
+			a {
+				&:hover,
+				&:focus,
+				&:focus-visible {
+					color: var(--cpt360-primary);
+				}
+			}
 		}
 		&:last-of-type a {
 			border-radius: 27px;

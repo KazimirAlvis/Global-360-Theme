@@ -50,7 +50,7 @@ Theme URI: http://underscores.me/
 Author: Underscores.me
 Author URI: http://underscores.me/
 Description: Description
-Version: 1.0.20251021234500
+Version: 1.0.20251021241001
 Tested up to: 5.4
 Requires PHP: 5.6
 License: GNU General Public License v2 or later
@@ -773,7 +773,7 @@ textarea {
 
 .post,
 .page {
-  margin: 0 0 1.5em;
+  margin: 0;
 }
 
 .updated:not(.published) {
@@ -1205,6 +1205,12 @@ textarea {
 }
 .nav-menu li a {
   color: #fff;
+  transition: color 0.2s ease;
+}
+.nav-menu li:not(:last-of-type) a:hover,
+.nav-menu li:not(:last-of-type) a:focus,
+.nav-menu li:not(:last-of-type) a:focus-visible {
+  color: var(--cpt360-primary);
 }
 .nav-menu li:last-of-type a {
   border-radius: 27px;
@@ -1842,6 +1848,7 @@ textarea {
 
 .doctor-bio {
   /* Removed display: none to allow doctor bios to show on individual doctor pages */
+  display: block;
 }
 
 /*--------------------------------------------------------------
