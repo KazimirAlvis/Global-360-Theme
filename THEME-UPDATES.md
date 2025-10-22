@@ -21,7 +21,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 ### Current Version Management
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20251021241001`)
+- Current version: matches `_S_VERSION` (currently `1.0.20251022114500`)
 
 ### Release Process
 1. Update version number in both:
@@ -36,6 +36,9 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251022114500 (2025-10-22)
+- Rebuilt the mobile navigation with an accessible hamburger toggle, full-screen overlay menu, and scroll locking on open, plus improved hover/focus handling across breakpoints.
 
 #### v1.0.20251021241001 (2025-10-21)
 - Updated primary navigation hover/focus states to use the brand green while keeping the CTA button styling intact, and reset default `.post`/`.page` margins to zero for tighter layouts.

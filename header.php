@@ -78,39 +78,96 @@ $font_map = [
 ];
 
 echo '<style>
-  body { font-family: ' . (isset($font_map[$body_font]) ? $font_map[$body_font] : $font_map['system-font']) . '; }
-  h1, h2, h3, h4, h5, h6 { font-family: ' . (isset($font_map[$heading_font]) ? $font_map[$heading_font] : $font_map['system-font']) . '; }
+	body { font-family: ' . (isset($font_map[$body_font]) ? $font_map[$body_font] : $font_map['system-font']) . '; }
+	h1, h2, h3, h4, h5, h6 { font-family: ' . (isset($font_map[$heading_font]) ? $font_map[$heading_font] : $font_map['system-font']) . '; }
   
-  /* Critical CSS to prevent FOUC in navigation */
-  .main-navigation ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-  }
-  .main-navigation li {
-    position: relative;
-  }
-  .main-navigation a {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    padding: 10px 15px;
-  }
-  .menu-toggle {
-    display: none;
-  }
-  @media screen and (max-width: 37.5em) {
-    .menu-toggle {
-      display: block;
-    }
-    .main-navigation ul {
-      display: none;
-    }
-    .main-navigation.toggled ul {
-      display: block;
-    }
-  }
+	/* Critical CSS to prevent FOUC in navigation */
+	.main-navigation {
+		position: relative;
+	}
+	.main-navigation ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		gap: 20px;
+	}
+	.main-navigation li {
+		position: relative;
+	}
+	.main-navigation a {
+		display: block;
+		text-decoration: none;
+		color: inherit;
+		padding: 10px 15px;
+	}
+	.menu-toggle {
+		display: none;
+		background: transparent;
+		border: 0;
+		padding: 0;
+		cursor: pointer;
+		align-items: center;
+		justify-content: center;
+	}
+	.menu-toggle-box {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+	}
+	.menu-toggle-bar {
+		width: 24px;
+		height: 2px;
+		background: #ffffff;
+		transition: transform 0.3s ease, opacity 0.3s ease;
+	}
+	.menu-toggle.is-active .menu-toggle-bar:nth-child(1) {
+		transform: translateY(8px) rotate(45deg);
+	}
+	.menu-toggle.is-active .menu-toggle-bar:nth-child(2) {
+		opacity: 0;
+	}
+	.menu-toggle.is-active .menu-toggle-bar:nth-child(3) {
+		transform: translateY(-8px) rotate(-45deg);
+	}
+	body.mobile-menu-open {
+		overflow: hidden;
+	}
+	@media screen and (max-width: 64em) {
+		.menu-toggle {
+			display: flex;
+			width: 48px;
+			height: 48px;
+			border: 1px solid rgba(255, 255, 255, 0.6);
+			border-radius: 8px;
+			z-index: 1001;
+		}
+		.main-navigation ul {
+			display: none;
+			position: fixed;
+			inset: 0;
+			padding: 110px 24px 32px;
+			background-color: #292626;
+			flex-direction: column;
+			gap: 24px;
+			align-items: flex-start;
+			overflow-y: auto;
+			z-index: 1000;
+		}
+		.main-navigation ul li {
+			width: 100%;
+		}
+		.main-navigation ul li a {
+			width: 100%;
+			font-size: 1.125rem;
+			padding: 12px 0;
+		}
+		.main-navigation.toggled ul {
+			display: flex;
+		}
+	}
 </style>';
 ?>
 </head>
@@ -148,8 +205,15 @@ echo '<style>
 				}
 				?>
 			</div><!-- .site-branding -->
-			<nav id="site-navigation" class="main-navigation">
-				<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false"><?php esc_html_e('Primary Menu', 'global-360-theme'); ?></button>
+			<nav id="site-navigation" class="main-navigation" aria-label="Primary">
+				<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false" aria-label="Toggle primary navigation">
+					<span class="menu-toggle-box" aria-hidden="true">
+						<span class="menu-toggle-bar"></span>
+						<span class="menu-toggle-bar"></span>
+						<span class="menu-toggle-bar"></span>
+					</span>
+					<span class="screen-reader-text">Menu</span>
+				</button>
 				<?php
 				wp_nav_menu(
 					array(

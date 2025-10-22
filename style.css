@@ -50,7 +50,7 @@ Theme URI: http://underscores.me/
 Author: Underscores.me
 Author URI: http://underscores.me/
 Description: Description
-Version: 1.0.20251021241001
+Version: 1.0.20251022114500
 Tested up to: 5.4
 Requires PHP: 5.6
 License: GNU General Public License v2 or later
@@ -72,6 +72,48 @@ Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
 ----------------------------------------------------------------
 # Generic
 	- Normalize
+.menu-toggle {
+  display: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  z-index: 1001;
+}
+.menu-toggle .menu-toggle-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.menu-toggle .menu-toggle-bar {
+  width: 24px;
+  height: 2px;
+  background-color: #ffffff;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.menu-toggle:hover,
+.menu-toggle:focus,
+.menu-toggle:focus-visible {
+  border-color: var(--cpt360-primary);
+}
+.menu-toggle.is-active .menu-toggle-bar:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+.menu-toggle.is-active .menu-toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle.is-active .menu-toggle-bar:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
 	- Box sizing
 # Base
 	- Typography
@@ -95,6 +137,48 @@ Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
 
 --------------------------------------------------------------*/
 /*--------------------------------------------------------------
+
+body.mobile-menu-open {
+  overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .site-header .header_inner {
+    padding: 0 20px;
+  }
+  .menu-toggle {
+    display: flex;
+  }
+  .nav-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 110px 24px 32px;
+    background-color: #292626;
+    flex-direction: column;
+    gap: 24px;
+    align-items: flex-start;
+    z-index: 1000;
+    overflow-y: auto;
+  }
+  .nav-menu li {
+    width: 100%;
+  }
+  .nav-menu li a {
+    width: 100%;
+    font-size: 1.125rem;
+    padding: 12px 0;
+  }
+  .nav-menu li:last-of-type a {
+    text-align: center;
+  }
+  .main-navigation.toggled .nav-menu {
+    display: flex;
+  }
+}
 # Generic
 --------------------------------------------------------------*/
 /* Normalize
@@ -274,6 +358,7 @@ button,
 [type=reset],
 [type=submit] {
   -webkit-appearance: button;
+  appearance: button;
 }
 
 /**
@@ -357,6 +442,7 @@ textarea {
  */
 [type=search] {
   -webkit-appearance: textfield;
+  appearance: textfield;
   outline-offset: -2px;
 }
 

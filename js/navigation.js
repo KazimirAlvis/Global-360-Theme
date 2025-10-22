@@ -31,26 +31,47 @@
 		menu.classList.add( 'nav-menu' );
 	}
 
+	const setMenuState = ( isOpen ) => {
+		siteNavigation.classList.toggle( 'toggled', isOpen );
+		button.setAttribute( 'aria-expanded', isOpen ? 'true' : 'false' );
+		button.classList.toggle( 'is-active', isOpen );
+		document.body.classList.toggle( 'mobile-menu-open', isOpen );
+	};
+
 	// Toggle the .toggled class and the aria-expanded value each time the button is clicked.
 	button.addEventListener( 'click', function() {
-		siteNavigation.classList.toggle( 'toggled' );
-
-		if ( button.getAttribute( 'aria-expanded' ) === 'true' ) {
-			button.setAttribute( 'aria-expanded', 'false' );
-		} else {
-			button.setAttribute( 'aria-expanded', 'true' );
-		}
+		const isExpanded = button.getAttribute( 'aria-expanded' ) === 'true';
+		setMenuState( ! isExpanded );
 	} );
 
 	// Remove the .toggled class and set aria-expanded to false when the user clicks outside the navigation.
 	document.addEventListener( 'click', function( event ) {
-		const isClickInside = siteNavigation.contains( event.target );
+		const isClickInside = siteNavigation.contains( event.target ) || button.contains( event.target );
 
 		if ( ! isClickInside ) {
-			siteNavigation.classList.remove( 'toggled' );
-			button.setAttribute( 'aria-expanded', 'false' );
+			setMenuState( false );
 		}
 	} );
+
+	// Close on ESC key.
+	document.addEventListener( 'keyup', function( event ) {
+		if ( event.key === 'Escape' ) {
+			setMenuState( false );
+		}
+	} );
+
+	// Ensure menu closes on viewport expansion to desktop.
+	const viewportBreakpoint = window.matchMedia( '(min-width: 1025px)' );
+	const handleViewportChange = ( mq ) => {
+		if ( mq.matches ) {
+			setMenuState( false );
+		}
+	};
+	if ( typeof viewportBreakpoint.addEventListener === 'function' ) {
+		viewportBreakpoint.addEventListener( 'change', handleViewportChange );
+	} else if ( typeof viewportBreakpoint.addListener === 'function' ) {
+		viewportBreakpoint.addListener( handleViewportChange );
+	}
 
 	// Get all the link elements within the menu.
 	const links = menu.getElementsByTagName( 'a' );
@@ -62,6 +83,9 @@
 	for ( const link of links ) {
 		link.addEventListener( 'focus', toggleFocus, true );
 		link.addEventListener( 'blur', toggleFocus, true );
+		link.addEventListener( 'click', function() {
+			setMenuState( false );
+		} );
 	}
 
 	// Toggle focus each time a menu link with children receive a touch event.
