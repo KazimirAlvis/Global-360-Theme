@@ -37,6 +37,9 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20251022143000 (2025-10-22)
+- Refined the footer layout for responsive breakpoints, keeping desktop columns compact while introducing tablet/mobile wrapping with consistent padding and horizontal social links.
+
 #### v1.0.20251022114500 (2025-10-22)
 - Rebuilt the mobile navigation with an accessible hamburger toggle, full-screen overlay menu, and scroll locking on open, plus improved hover/focus handling across breakpoints.
 

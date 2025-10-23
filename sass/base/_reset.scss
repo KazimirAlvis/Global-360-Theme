@@ -659,7 +659,7 @@ textarea {
 	display: none;
 	list-style: none;
 	margin: 0;
-	padding-left: 0;
+	padding: 0;
 }
 
 .main-navigation ul ul {
@@ -706,7 +706,7 @@ textarea {
 	display: block;
 }
 
-@media screen and (min-width: 37.5em) {
+@media screen and (min-width: 64em) {
 	.menu-toggle {
 		display: none;
 	}

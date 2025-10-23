@@ -1,30 +1,42 @@
 /*--------------------------------------------------------------
  Header
 --------------------------------------------------------------*/
-
 .site-header {
 	background-color: #292626;
 	height: 71px;
 	border-top: 2px solid var(--cpt360-primary);
+
 	.header_inner {
 		display: flex;
 		justify-content: space-between;
-		height: 100%;
+		align-items: center;
+		gap: 24px;
+		height: 71px;
 		max-width: 100%;
 		margin: 0 auto;
 		padding: 0 50px;
+
 		.site-branding {
 			display: flex;
 			align-items: center;
+
 			a {
+				display: block;
+
 				img {
-					margin: 0;
 					display: block;
+					margin: 0;
 					max-width: 240px;
 				}
 			}
 		}
+
 		.main-navigation {
+			display: flex;
+			align-items: center;
+			gap: 0;
+			margin-left: auto;
+			flex: 0 0 auto;
 			width: auto;
 		}
 	}
@@ -43,10 +55,8 @@
 	justify-content: center;
 	width: 48px;
 	height: 48px;
-	border: 1px solid rgba(255, 255, 255, 0.6);
-	border-radius: 8px;
-	transition: border-color 0.2s ease, background-color 0.2s ease;
 	z-index: 1001;
+
 	.menu-toggle-box {
 		display: flex;
 		flex-direction: column;
@@ -54,25 +64,24 @@
 		justify-content: center;
 		gap: 6px;
 	}
+
 	.menu-toggle-bar {
 		width: 24px;
 		height: 2px;
 		background-color: #ffffff;
 		transition: transform 0.3s ease, opacity 0.3s ease;
 	}
-	&:hover,
-	&:focus,
-	&:focus-visible {
-		border-color: var(--cpt360-primary);
-	}
+
 	&.is-active {
 		.menu-toggle-bar {
 			&:nth-child(1) {
 				transform: translateY(8px) rotate(45deg);
 			}
+
 			&:nth-child(2) {
 				opacity: 0;
 			}
+
 			&:nth-child(3) {
 				transform: translateY(-8px) rotate(-45deg);
 			}
@@ -80,19 +89,44 @@
 	}
 }
 
+.menu-close {
+	display: none;
+	background: transparent;
+	border: 0;
+	padding: 0;
+	cursor: pointer;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	font-size: 1.75rem;
+	line-height: 1;
+	color: #ffffff;
+	z-index: 1002;
+
+	&:hover,
+	&:focus,
+	&:focus-visible {
+		color: var(--cpt360-primary);
+	}
+}
+
 .menu-menu-1-container {
 	height: 100%;
 }
+
 .nav-menu {
 	height: 100%;
 	display: flex;
 	gap: 20px;
 	align-items: center;
+
 	li {
 		a {
 			color: #fff;
 			transition: color 0.2s ease;
 		}
+
 		&:not(:last-of-type) {
 			a {
 				&:hover,
@@ -102,17 +136,21 @@
 				}
 			}
 		}
-		&:last-of-type a {
-			border-radius: 27px;
-			padding: 8px 30px;
-			cursor: pointer;
-			background-color: var(--cpt360-primary);
-			color: #ffffff;
-			border: 1px solid var(--cpt360-primary);
-			transition: transform 0.2s ease, background-color 0.2s ease;
-			&:hover {
-				background-color: transparent;
-				border: 1px solid #fff;
+
+		&:last-of-type {
+			a {
+				border-radius: 27px;
+				padding: 8px 30px;
+				cursor: pointer;
+				background-color: var(--cpt360-primary);
+				color: #ffffff;
+				border: 1px solid var(--cpt360-primary);
+				transition: transform 0.2s ease, background-color 0.2s ease;
+
+				&:hover {
+					background-color: transparent;
+					border: 1px solid #fff;
+				}
 			}
 		}
 	}
@@ -125,12 +163,39 @@ body.mobile-menu-open {
 @media (max-width: 1024px) {
 	.site-header {
 		.header_inner {
-			padding: 0 20px;
+			padding: 0 10px;
 		}
 	}
+
 	.menu-toggle {
 		display: flex;
 	}
+
+	.main-navigation {
+		gap: 12px;
+
+		&.toggled {
+			.menu-toggle {
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			.menu-close {
+				display: flex;
+				position: fixed;
+				top: 24px;
+				right: 24px;
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 50%;
+			}
+
+			.nav-menu {
+				display: flex;
+				padding-top: 100px;
+			}
+		}
+	}
+
 	.nav-menu {
 		display: none;
 		position: fixed;
@@ -142,26 +207,32 @@ body.mobile-menu-open {
 		background-color: #292626;
 		flex-direction: column;
 		gap: 24px;
-		align-items: flex-start;
+		align-items: center;
+		text-align: center;
 		z-index: 1000;
 		overflow-y: auto;
+
 		li {
 			width: 100%;
+
 			a {
+				display: block;
 				width: 100%;
-				font-size: 1.125rem;
-				padding: 12px 0;
+				font-size: 30px;
+				padding: 0;
 			}
+
 			&:last-of-type {
 				a {
-					text-align: center;
+					display: inline-block;
+					width: auto;
 				}
 			}
 		}
 	}
-	.main-navigation.toggled {
-		.nav-menu {
-			display: flex;
-		}
+
+	.floating-assessment-button,
+	#floating-assessment-button {
+		display: none !important;
 	}
 }

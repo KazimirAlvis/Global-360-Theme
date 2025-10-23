@@ -165,6 +165,7 @@ Custom rewrite rules handle state-based URLs and fallback to default clinic page
 -   **Touch-friendly interfaces** for mobile devices
 -   **Optimized map interactions** for all screen sizes
 -   **Accessible navigation** with keyboard support
+-   **Adaptive footer layout** that wraps gracefully on tablets and centers content on small screens
 
 ## 🔌 API Integration
 

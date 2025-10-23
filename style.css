@@ -1,56 +1,10 @@
-
-/*--------------------------------------------------------------
-# Individual Doctor Page Layout (inline for immediate effect; SCSS source in sass/pages/_single-doctor.scss)
---------------------------------------------------------------*/
-.doctor-info-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
-.doctor-details { display: grid; grid-template-columns: 300px 1fr; gap: 3rem; margin-bottom: 3rem; align-items: start; }
-.doctor-details .doctor-photo { justify-self: center; }
-.doctor-details .doctor-photo img { width: 250px; height: 250px; border-radius: 10px; object-fit: cover; }
-.doctor-details .doctor-content { padding-top: 0; }
-.doctor-info-container .doctor-title { font-size: 18px; color: #000000; margin: 0 0 0.75em; font-weight: 300; text-align: left; }
-.doctor-bio h2 { color: #000000; margin-bottom: 1rem; font-size: 1.5rem; }
-.bio-content { line-height: 1.6; color: var(--text-color, #333); }
-.doctor-clinics { margin-bottom: 3rem; }
-.doctor-clinics h2 { color: var(--cpt360-primary, #528224); margin-bottom: 1.5rem; font-size: 1.5rem; }
-.clinics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
-.doctor-info-container .clinic-card { border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; background: white; }
-.doctor-info-container .clinic-card:hover { border-color: var(--cpt360-primary, #528224); }
-.clinic-card h3 { margin-bottom: 1rem; font-size: 1.2rem; }
-.clinic-card h3 a { color: var(--cpt360-primary, #528224); text-decoration: none; }
-.clinic-card h3 a:hover { text-decoration: underline; }
-.clinic-address { margin-bottom: 0.5rem; }
-.clinic-phone, .clinic-website { margin-top: 1rem; }
-.clinic-phone a, .clinic-website a { color: var(--cpt360-primary, #528224); text-decoration: none; }
-.clinic-phone a:hover, .clinic-website a:hover { text-decoration: underline; }
-.doctor-navigation { text-align: center; padding-top: 2rem; border-top: 1px solid #eee; }
-.back-button { background-color: var(--cpt360-primary, #007cba) !important; border: 1px solid var(--cpt360-primary, #007cba) !important; border-radius: 27px !important; box-sizing: border-box !important; color: #fff !important; cursor: pointer !important; display: inline-block !important; font-family: var(--body-font, Arial, sans-serif) !important; font-size: 18px !important; font-weight: 500 !important; height: 54px !important; line-height: 22px !important; margin: 0 !important; max-width: 312px !important; min-height: auto !important; padding: 15px 30px !important; text-align: center !important; text-decoration: none !important; transition: transform 0.2s ease, background-color 0.2s ease !important; white-space: nowrap !important; }
-.back-button:hover { background-color: white !important; color: #282e24 !important; border: 1px solid #282e24 !important; }
-@media (max-width: 768px) { .doctor-details { grid-template-columns: 1fr; gap: 2rem; text-align: center; } .doctor-details .doctor-content { text-align: left; } .doctor-info-container .doctor-title { text-align: center; } }
-.doctor-left-column { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
-.doctor-photo { width: 250px; height: 250px; border-radius: 50%; overflow: hidden; border: 1px solid #dddddd; }
-.doctor-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
-.doctor-title-section { text-align: center; width: 100%; }
-.doctor-right-column { display: flex; flex-direction: column; gap: 2rem; }
-.doctor-practice-locations { margin-top: 1rem; }
-.doctor-practice-locations h2 { color: #000000; font-size: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; }
-.practice-locations-list { display: flex; flex-direction: column; gap: 1.5rem; }
-.practice-location { padding: 0; margin: 0; }
-.practice-location h3 { margin: 0 0 1rem 0; font-size: 1.2rem; }
-.practice-location h3 a { color: var(--cpt360-primary, #528224); text-decoration: none; }
-.practice-location h3 a:hover { text-decoration: underline; }
-.clinic-address { margin-bottom: 0.5rem; }
-.clinic-address a { color: #000000; text-decoration: none; transition: text-decoration 0.2s ease; }
-.clinic-address a:hover { text-decoration: underline; }
-.clinic-phone, .clinic-website { margin-top: 0.5rem; }
-.clinic-phone a, .clinic-website a { color: var(--cpt360-primary, #528224); text-decoration: none; }
-.clinic-phone a:hover, .clinic-website a:hover { text-decoration: underline; }
 /*!
 Theme Name: Global-360-Theme
 Theme URI: http://underscores.me/
 Author: Underscores.me
 Author URI: http://underscores.me/
 Description: Description
-Version: 1.0.20251022114500
+Version: 1.0.20251022143000
 Tested up to: 5.4
 Requires PHP: 5.6
 License: GNU General Public License v2 or later
@@ -72,48 +26,6 @@ Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
 ----------------------------------------------------------------
 # Generic
 	- Normalize
-.menu-toggle {
-  display: none;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 8px;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-  z-index: 1001;
-}
-.menu-toggle .menu-toggle-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-.menu-toggle .menu-toggle-bar {
-  width: 24px;
-  height: 2px;
-  background-color: #ffffff;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-.menu-toggle:hover,
-.menu-toggle:focus,
-.menu-toggle:focus-visible {
-  border-color: var(--cpt360-primary);
-}
-.menu-toggle.is-active .menu-toggle-bar:nth-child(1) {
-  transform: translateY(8px) rotate(45deg);
-}
-.menu-toggle.is-active .menu-toggle-bar:nth-child(2) {
-  opacity: 0;
-}
-.menu-toggle.is-active .menu-toggle-bar:nth-child(3) {
-  transform: translateY(-8px) rotate(-45deg);
-}
 	- Box sizing
 # Base
 	- Typography
@@ -137,48 +49,6 @@ Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
 
 --------------------------------------------------------------*/
 /*--------------------------------------------------------------
-
-body.mobile-menu-open {
-  overflow: hidden;
-}
-
-@media (max-width: 1024px) {
-  .site-header .header_inner {
-    padding: 0 20px;
-  }
-  .menu-toggle {
-    display: flex;
-  }
-  .nav-menu {
-    display: none;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    padding: 110px 24px 32px;
-    background-color: #292626;
-    flex-direction: column;
-    gap: 24px;
-    align-items: flex-start;
-    z-index: 1000;
-    overflow-y: auto;
-  }
-  .nav-menu li {
-    width: 100%;
-  }
-  .nav-menu li a {
-    width: 100%;
-    font-size: 1.125rem;
-    padding: 12px 0;
-  }
-  .nav-menu li:last-of-type a {
-    text-align: center;
-  }
-  .main-navigation.toggled .nav-menu {
-    display: flex;
-  }
-}
 # Generic
 --------------------------------------------------------------*/
 /* Normalize
@@ -771,7 +641,7 @@ textarea {
   display: none;
   list-style: none;
   margin: 0;
-  padding-left: 0;
+  padding: 0;
 }
 
 .main-navigation ul ul {
@@ -818,7 +688,7 @@ textarea {
   display: block;
 }
 
-@media screen and (min-width: 37.5em) {
+@media screen and (min-width: 64em) {
   .menu-toggle {
     display: none;
   }
@@ -1261,24 +1131,91 @@ textarea {
 .site-header .header_inner {
   display: flex;
   justify-content: space-between;
-  height: 100%;
+  align-items: center;
+  gap: 24px;
+  height: 71px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 50px;
 }
 .site-header .header_inner .site-branding {
   display: flex;
   align-items: center;
 }
-.site-header .header_inner .site-branding a img {
-  margin: 0;
+.site-header .header_inner .site-branding a {
   display: block;
+}
+.site-header .header_inner .site-branding a img {
+  display: block;
+  margin: 0;
   max-width: 240px;
 }
 .site-header .header_inner .main-navigation {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-left: auto;
+  flex: 0 0 auto;
   width: auto;
 }
 
 /*--------------------------------------------------------------
  Header Nav
 --------------------------------------------------------------*/
+.menu-toggle {
+  display: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  z-index: 1001;
+}
+.menu-toggle .menu-toggle-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.menu-toggle .menu-toggle-bar {
+  width: 24px;
+  height: 2px;
+  background-color: #ffffff;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.menu-toggle.is-active .menu-toggle-bar:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+.menu-toggle.is-active .menu-toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle.is-active .menu-toggle-bar:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.menu-close {
+  display: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: #ffffff;
+  z-index: 1002;
+}
+.menu-close:hover, .menu-close:focus, .menu-close:focus-visible {
+  color: var(--cpt360-primary);
+}
+
 .menu-menu-1-container {
   height: 100%;
 }
@@ -1293,9 +1230,7 @@ textarea {
   color: #fff;
   transition: color 0.2s ease;
 }
-.nav-menu li:not(:last-of-type) a:hover,
-.nav-menu li:not(:last-of-type) a:focus,
-.nav-menu li:not(:last-of-type) a:focus-visible {
+.nav-menu li:not(:last-of-type) a:hover, .nav-menu li:not(:last-of-type) a:focus, .nav-menu li:not(:last-of-type) a:focus-visible {
   color: var(--cpt360-primary);
 }
 .nav-menu li:last-of-type a {
@@ -1312,6 +1247,70 @@ textarea {
   border: 1px solid #fff;
 }
 
+body.mobile-menu-open {
+  overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .site-header .header_inner {
+    padding: 0 10px;
+  }
+  .menu-toggle {
+    display: flex;
+  }
+  .main-navigation {
+    gap: 12px;
+  }
+  .main-navigation.toggled .menu-toggle {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .main-navigation.toggled .menu-close {
+    display: flex;
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+  }
+  .main-navigation.toggled .nav-menu {
+    display: flex;
+    padding-top: 100px;
+  }
+  .nav-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 110px 24px 32px;
+    background-color: #292626;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+    text-align: center;
+    z-index: 1000;
+    overflow-y: auto;
+  }
+  .nav-menu li {
+    width: 100%;
+  }
+  .nav-menu li a {
+    display: block;
+    width: 100%;
+    font-size: 30px;
+    padding: 0;
+  }
+  .nav-menu li:last-of-type a {
+    display: inline-block;
+    width: auto;
+  }
+  .floating-assessment-button,
+  #floating-assessment-button {
+    display: none !important;
+  }
+}
 /*--------------------------------------------------------------
  Footer
 --------------------------------------------------------------*/
@@ -1322,6 +1321,7 @@ textarea {
 .site-footer .footer_inner {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   padding-bottom: 20px;
 }
 .site-footer .footer_inner .column a {
@@ -1351,6 +1351,9 @@ textarea {
 .site-footer .footer_inner .column ul li {
   text-decoration: none;
 }
+.site-footer .footer_inner .site_links .menu-menu-1-container {
+  width: auto;
+}
 .site-footer .footer_inner .contact_links span {
   display: block;
   color: #fff;
@@ -1366,6 +1369,13 @@ textarea {
   padding-left: 12px;
   display: flex;
   gap: 20px;
+}
+.site-footer .footer_inner .footer_logo {
+  /* Ensure footer logo image does not exceed desired width */
+}
+.site-footer .footer_inner .footer_logo .footer-logo-image {
+  max-width: 250px;
+  height: auto;
 }
 .site-footer .footer_inner .offsite_links ul li a {
   display: flex;
@@ -1389,21 +1399,11 @@ textarea {
   width: 100%;
   background-color: #7c7c7e;
 }
-.site-footer .footer_inner .footer_logo .footer-logo-image {
-  max-width: 250px;
-  height: auto;
-}
 .site-footer .lower_footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px 0;
-}
-/* Header container sizing */
-.site-header .header_inner {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0 50px;
 }
 .site-footer .legal {
   text-align: left;
@@ -1436,7 +1436,9 @@ textarea {
   border-radius: 27px;
   padding: 8px 30px;
   border: 1px solid #7c7c7e;
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .site-footer .footer_form_pu span:hover {
   cursor: pointer;
@@ -1445,6 +1447,63 @@ textarea {
   color: #fff;
 }
 
+@media (max-width: 1200px) {
+  .site-footer .footer_inner {
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+  .site-footer .footer_inner .column {
+    flex: 0 1 auto;
+    min-width: 0;
+    width: auto;
+  }
+  .site-footer .footer_inner {
+    padding: 0 20px;
+  }
+  .site-footer .offsite_links ul li a {
+    font-size: 14px;
+  }
+  .site-footer .lower_footer {
+    padding: 15px 20px;
+  }
+}
+@media (max-width: 768px) {
+  .site-footer {
+    padding: 35px 0 0 0;
+  }
+  .site-footer .footer_inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .site-footer .footer_inner .column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    width: 100%;
+    max-width: 420px;
+    align-items: center;
+  }
+  .site-footer .footer_inner .footer_logo ul {
+    justify-content: center;
+  }
+  .site-footer .footer_inner .offsite_links ul li a {
+    justify-content: center;
+  }
+  .site-footer .lower_footer {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  .site-footer .legal {
+    text-align: center;
+  }
+  .site-footer .footer_form_pu span {
+    width: 100%;
+    max-width: 280px;
+  }
+}
 /*--------------------------------------------------------------
  Do Not Sell Modal
 --------------------------------------------------------------*/
@@ -1629,6 +1688,14 @@ textarea {
   margin-bottom: 10px;
 }
 
+.two-column-block .two-column-container .two-column-content {
+  padding: 40px 30px;
+}
+
+.popular-practices-content {
+  padding: 0 15px;
+}
+
 /*--------------------------------------------------------------
  Global
 --------------------------------------------------------------*/
@@ -1671,13 +1738,7 @@ textarea {
   line-height: 1.2;
 }
 
-/* Homepage layout tweaks */
-/* Pull the right-hand text column in slightly so it doesn't sit too close to the edge */
-.home main .wp-block-columns.is-layout-flex .wp-block-column + .wp-block-column {
-  /* previously had extra right padding; keep a subtle spacing only */
-  padding-right: clamp(0rem, 1vw, 1rem);
-}
-
+/* (reverted) */
 /*--------------------------------------------------------------
  Clinic page top main info
 --------------------------------------------------------------*/
@@ -1886,6 +1947,7 @@ textarea {
   margin: 20px 0 10px 0;
   text-align: center;
 }
+
 .clinic-doctors .doctor-name a,
 .clinic-doctors .doctor-name a:visited,
 .clinic-doctors .doctor-name a:hover,
@@ -1915,10 +1977,10 @@ textarea {
 .doctor-photo {
   width: 250px;
   height: 250px;
-  border-radius: 50%; /* circle mask */
+  border-radius: 50%;
   overflow: hidden;
-  margin: 0 auto;
   border: 1px solid #dddddd;
+  margin: 0 auto;
 }
 
 .doctor-photo img {
@@ -1934,7 +1996,6 @@ textarea {
 
 .doctor-bio {
   /* Removed display: none to allow doctor bios to show on individual doctor pages */
-  display: block;
 }
 
 /*--------------------------------------------------------------
@@ -2316,6 +2377,266 @@ textarea {
     font-size: 16px;
   }
 }
+/*--------------------------------------------------------------
+# Individual Doctor Page Layout
+--------------------------------------------------------------*/
+.doctor-info-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.doctor-details {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+  align-items: start;
+}
+
+.doctor-details .doctor-photo {
+  justify-self: center;
+}
+
+.doctor-details .doctor-photo img {
+  width: 250px;
+  height: 250px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.doctor-details .doctor-content {
+  padding-top: 0;
+}
+
+.doctor-info-container .doctor-title {
+  font-size: 18px;
+  color: #000000;
+  margin: 0 0 0.75em;
+  font-weight: 300;
+  text-align: left;
+}
+
+.doctor-bio h2 {
+  color: #000000;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.bio-content {
+  line-height: 1.6;
+  color: var(--text-color, #333);
+}
+
+.doctor-clinics {
+  margin-bottom: 3rem;
+}
+
+.doctor-clinics h2 {
+  color: var(--cpt360-primary, #528224);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.clinics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.doctor-info-container .clinic-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: white;
+}
+
+.doctor-info-container .clinic-card:hover {
+  border-color: var(--cpt360-primary, #528224);
+}
+
+.clinic-card h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.clinic-card h3 a {
+  color: var(--cpt360-primary, #528224);
+  text-decoration: none;
+}
+
+.clinic-card h3 a:hover {
+  text-decoration: underline;
+}
+
+.clinic-address {
+  margin-bottom: 0.5rem;
+}
+
+.clinic-phone, .clinic-website {
+  margin-top: 1rem;
+}
+
+.clinic-phone a, .clinic-website a {
+  color: var(--cpt360-primary, #528224);
+  text-decoration: none;
+}
+
+.clinic-phone a:hover, .clinic-website a:hover {
+  text-decoration: underline;
+}
+
+.doctor-navigation {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+}
+
+.back-button {
+  background-color: var(--cpt360-primary, #007cba) !important;
+  border: 1px solid var(--cpt360-primary, #007cba) !important;
+  border-radius: 27px !important;
+  box-sizing: border-box !important;
+  color: #fff !important;
+  cursor: pointer !important;
+  display: inline-block !important;
+  font-family: var(--body-font, Arial, sans-serif) !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  height: 54px !important;
+  line-height: 22px !important;
+  margin: 0 !important;
+  max-width: 312px !important;
+  min-height: auto !important;
+  padding: 15px 30px !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  transition: transform 0.2s ease, background-color 0.2s ease !important;
+  white-space: nowrap !important;
+}
+
+.back-button:hover {
+  background-color: white !important;
+  color: #282e24 !important;
+  border: 1px solid #282e24 !important;
+}
+
+/* Doctor page responsive */
+@media (max-width: 768px) {
+  .doctor-details {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+  .doctor-details .doctor-content {
+    text-align: left;
+  }
+  .doctor-info-container .doctor-title {
+    text-align: center;
+  }
+}
+/* Updated Doctor Page Layout */
+.doctor-left-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.doctor-photo {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #dddddd;
+}
+
+.doctor-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.doctor-title-section {
+  text-align: center;
+  width: 100%;
+}
+
+.doctor-right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.doctor-practice-locations {
+  margin-top: 1rem;
+}
+
+.doctor-practice-locations h2 {
+  color: #000000;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.5rem;
+}
+
+.practice-locations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.practice-location {
+  /* Minimal spacing for clean appearance */
+  padding: 0;
+  margin: 0;
+}
+
+.practice-location h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+}
+
+.practice-location h3 a {
+  color: var(--cpt360-primary, #528224);
+  text-decoration: none;
+}
+
+.practice-location h3 a:hover {
+  text-decoration: underline;
+}
+
+.clinic-address {
+  margin-bottom: 0.5rem;
+}
+
+.clinic-address a {
+  color: #000000;
+  text-decoration: none;
+  transition: text-decoration 0.2s ease;
+}
+
+.clinic-address a:hover {
+  text-decoration: underline;
+}
+
+.clinic-phone,
+.clinic-website {
+  margin-top: 0.5rem;
+}
+
+.clinic-phone a,
+.clinic-website a {
+  color: var(--cpt360-primary, #528224);
+  text-decoration: none;
+}
+
+.clinic-phone a:hover,
+.clinic-website a:hover {
+  text-decoration: underline;
+}
+
 /*--------------------------------------------------------------
  Find a doctor
 --------------------------------------------------------------*/

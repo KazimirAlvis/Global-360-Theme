@@ -12,10 +12,11 @@
 		return;
 	}
 
-	const button = siteNavigation.getElementsByTagName( 'button' )[ 0 ];
+	const button = siteNavigation.querySelector( '.menu-toggle' );
+	const closeButton = siteNavigation.querySelector( '.menu-close' );
 
 	// Return early if the button doesn't exist.
-	if ( 'undefined' === typeof button ) {
+	if ( ! button ) {
 		return;
 	}
 
@@ -36,13 +37,28 @@
 		button.setAttribute( 'aria-expanded', isOpen ? 'true' : 'false' );
 		button.classList.toggle( 'is-active', isOpen );
 		document.body.classList.toggle( 'mobile-menu-open', isOpen );
+
+		if ( closeButton ) {
+			closeButton.setAttribute( 'aria-expanded', isOpen ? 'true' : 'false' );
+			closeButton.setAttribute( 'aria-hidden', isOpen ? 'false' : 'true' );
+			closeButton.tabIndex = isOpen ? 0 : -1;
+		}
 	};
+
+	setMenuState( false );
 
 	// Toggle the .toggled class and the aria-expanded value each time the button is clicked.
 	button.addEventListener( 'click', function() {
 		const isExpanded = button.getAttribute( 'aria-expanded' ) === 'true';
 		setMenuState( ! isExpanded );
 	} );
+
+	if ( closeButton ) {
+		closeButton.addEventListener( 'click', function() {
+			setMenuState( false );
+			button.focus();
+		} );
+	}
 
 	// Remove the .toggled class and set aria-expanded to false when the user clicks outside the navigation.
 	document.addEventListener( 'click', function( event ) {
