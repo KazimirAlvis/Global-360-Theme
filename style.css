@@ -4,7 +4,7 @@ Theme URI: http://underscores.me/
 Author: Underscores.me
 Author URI: http://underscores.me/
 Description: Description
-Version: 1.0.20251024160827
+Version: 1.0.20251024164826
 Tested up to: 5.4
 Requires PHP: 5.6
 License: GNU General Public License v2 or later
@@ -1085,7 +1085,7 @@ textarea {
   font-weight: 500 !important;
   height: 54px !important;
   line-height: 22px !important;
-  margin: 0 !important;
+  margin: 0 0 20px !important;
   max-width: 312px !important;
   min-height: auto !important;
   padding: 15px 30px !important;

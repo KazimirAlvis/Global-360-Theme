@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20251024160827' );
+	define( '_S_VERSION', '1.0.20251024164826' );
 }
 
 /**
@@ -852,19 +852,49 @@ add_filter('post_class', function ($classes, $class, $post_id) {
 add_action('wp_enqueue_scripts', 'global_360_theme_enqueue_google_fonts');
 function global_360_theme_enqueue_google_fonts()
 {
-	// Only enqueue if not already loaded by plugin
-	if (!wp_style_is('google-fonts', 'enqueued') && !wp_style_is('myclinic-google-fonts', 'enqueued')) {
-		$font_url = 'https://fonts.googleapis.com/css2'
-			. '?family=Roboto:ital,wght@0,400;0,700'
-			. '&family=Anton'
-			. '&family=Marcellus'
-			. '&family=Inter:ital,wght@0,400;0,700'
-			. '&family=Arvo'
-			. '&family=Bodoni+Moda'
-			. '&family=Cabin'
-			. '&family=Chivo'
-			. '&display=swap';
+	// Build font manifest once per request
+	$font_map = [
+		'anton'        => 'Anton',
+		'arvo'         => 'Arvo',
+		'bodoni-moda'  => 'Bodoni Moda',
+		'cabin'        => 'Cabin',
+		'chivo'        => 'Chivo',
+		'inter'        => 'Inter:ital,wght@0,400;0,700',
+		'marcellus'    => 'Marcellus',
+		'roboto'       => 'Roboto:ital,wght@0,400;0,700',
+	];
 
+	$settings      = get_option(_360_Global_Settings::OPTION_KEY, []);
+	$requested     = [];
+	$font_settings = ['body_font', 'heading_font'];
+
+	foreach ($font_settings as $key) {
+		if (!empty($settings[$key]) && isset($font_map[$settings[$key]])) {
+			$requested[$settings[$key]] = $font_map[$settings[$key]];
+		}
+	}
+
+	// Ensure we always have at least one web font available for legacy content
+	if (empty($requested)) {
+		$requested['inter'] = $font_map['inter'];
+	}
+
+	$families = [];
+	foreach ($requested as $slug => $family) {
+		// Skip system font slug entirely
+		if ($slug === 'system-font') {
+			continue;
+		}
+		$families[] = str_replace(' ', '+', $family);
+	}
+
+	if (empty($families)) {
+		return;
+	}
+
+	$font_url = 'https://fonts.googleapis.com/css2?family=' . implode('&family=', $families) . '&display=swap';
+
+	if (!wp_style_is('global-360-theme-google-fonts', 'enqueued')) {
 		wp_enqueue_style('global-360-theme-google-fonts', esc_url($font_url), [], null);
 	}
 }

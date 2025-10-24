@@ -10,6 +10,20 @@ if (! class_exists('_360_Global_Settings')) {
     {
         const OPTION_KEY = '360_global_settings';
 
+        /**
+         * Cache for computed CSS variable rules.
+         *
+         * @var string|null
+         */
+        private $cached_css_variables = null;
+
+        /**
+         * Track whether the inline style tag has already been output.
+         *
+         * @var bool
+         */
+        private $has_printed_css_variables = false;
+
         public function __construct()
         {
             add_action('admin_menu',                [$this, 'add_admin_page']);
@@ -17,6 +31,9 @@ if (! class_exists('_360_Global_Settings')) {
             add_action('admin_init',                [$this, 'handle_import_export']);
             add_action('admin_enqueue_scripts',     [$this, 'enqueue_color_picker']);
             add_action('wp_head',                   [$this, 'print_global_css_variables']);
+            add_action('admin_head',                [$this, 'print_global_css_variables']);
+            add_action('login_head',                [$this, 'print_global_css_variables']);
+            add_action('wp_enqueue_scripts',        [$this, 'enqueue_global_css_variables'], 20);
             
             // Add 360 settings to WordPress export/import
             add_action('export_wp',                 [$this, 'export_360_settings_to_xml']);
@@ -692,32 +709,77 @@ if (! class_exists('_360_Global_Settings')) {
          */
         public function print_global_css_variables()
         {
-            $opts = get_option(self::OPTION_KEY, []);
-            echo '<style id="360-global-vars">:root {';
-            
-            // Colors
+            if ($this->has_printed_css_variables) {
+                return;
+            }
+
+            $css = $this->build_css_variable_rules();
+            if ($css === '') {
+                return;
+            }
+
+            $this->has_printed_css_variables = true;
+            echo '<style id="360-global-vars">' . $css . '</style>';
+        }
+
+        /**
+         * Attach CSS variable rules to the main stylesheet when available.
+         */
+        public function enqueue_global_css_variables()
+        {
+            $css = $this->build_css_variable_rules();
+            if ($css === '' || ! function_exists('wp_add_inline_style')) {
+                return;
+            }
+
+            wp_add_inline_style('global-360-theme-style', $css);
+        }
+
+        /**
+         * Build the CSS variable rules for front-end consumption.
+         */
+        private function build_css_variable_rules()
+        {
+            if ($this->cached_css_variables !== null) {
+                return $this->cached_css_variables;
+            }
+
+            $opts  = get_option(self::OPTION_KEY, []);
+            $rules = [];
+
             if (! empty($opts['primary_color'])) {
-                echo '--cpt360-primary: ' . esc_html($opts['primary_color']) . ';';
+                $primary = sanitize_hex_color($opts['primary_color']);
+                if ($primary) {
+                    $rules[] = '--cpt360-primary: ' . $primary . ';';
+                }
             }
+
             if (! empty($opts['secondary_color'])) {
-                echo '--cpt360--preset--color--secondary: ' . esc_html($opts['secondary_color']) . ';';
+                $secondary = sanitize_hex_color($opts['secondary_color']);
+                if ($secondary) {
+                    $rules[] = '--cpt360--preset--color--secondary: ' . $secondary . ';';
+                }
             }
-            
-            // Fonts - Create both the preset variable and actual font stack
+
             if (! empty($opts['body_font'])) {
                 $font_stack = $this->get_font_stack($opts['body_font']);
-                echo '--wp--preset--font-family--body-font: ' . $font_stack . ';';
-                // Also create the simplified version for SASS compatibility
-                echo '--body-font: ' . $font_stack . ';';
+                $rules[]    = '--wp--preset--font-family--body-font: ' . $font_stack . ';';
+                $rules[]    = '--body-font: ' . $font_stack . ';';
             }
+
             if (! empty($opts['heading_font'])) {
                 $font_stack = $this->get_font_stack($opts['heading_font']);
-                echo '--wp--preset--font-family--heading-font: ' . $font_stack . ';';
-                // Also create the simplified version for SASS compatibility  
-                echo '--heading-font: ' . $font_stack . ';';
+                $rules[]    = '--wp--preset--font-family--heading-font: ' . $font_stack . ';';
+                $rules[]    = '--heading-font: ' . $font_stack . ';';
             }
-            
-            echo '}</style>';
+
+            if (empty($rules)) {
+                $this->cached_css_variables = '';
+                return $this->cached_css_variables;
+            }
+
+            $this->cached_css_variables = ':root {' . implode(' ', $rules) . '}';
+            return $this->cached_css_variables;
         }
 
         /**

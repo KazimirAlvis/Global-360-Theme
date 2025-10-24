@@ -37,6 +37,13 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20251024164826 (2025-10-24)
+- Added 20px bottom margin to `.single-clinic pr360-questionnaire::part(begin-button)` to improve spacing beneath CTA buttons
+
+#### v1.0.20251024162841 (2025-10-24)
+- Restored dynamic font variables by outputting CSS both inline and in wp_head/login/admin contexts
+- Enqueued only the Google Fonts required by the current 360 settings selection
+
 #### v1.0.20251024160827 (2025-10-24)
 - Added text-transform: uppercase to #floating-assessment-button pr360-questionnaire::part(begin-button)
 - Reduced font-size from 18px to 16px for #floating-assessment-button pr360-questionnaire::part(begin-button)
