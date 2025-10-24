@@ -4,7 +4,7 @@ Theme URI: http://underscores.me/
 Author: Underscores.me
 Author URI: http://underscores.me/
 Description: Description
-Version: 1.0.20251024014500
+Version: 1.0.20251024023045
 Tested up to: 5.4
 Requires PHP: 5.6
 License: GNU General Public License v2 or later
@@ -1123,15 +1123,15 @@ textarea {
 @keyframes pr360-pulse {
   0% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(82, 130, 36, 0.55);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.45);
   }
   55% {
     transform: scale(1.07);
-    box-shadow: 0 0 22px 10px rgba(82, 130, 36, 0);
+    box-shadow: 0 0 26px 14px rgba(0, 0, 0, 0.25);
   }
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(82, 130, 36, 0);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
   }
 }
 
