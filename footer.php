@@ -277,9 +277,9 @@ if (function_exists('cpt360_get_assessment_id')) {
 						try {
 							if (!targetButton._pr360PulseAnimation) {
 								targetButton._pr360PulseAnimation = targetButton.animate([
-									{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(82, 130, 36, 0.55)' },
-									{ transform: 'scale(1.07)', boxShadow: '0 0 22px 10px rgba(82, 130, 36, 0)', offset: 0.55 },
-									{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(82, 130, 36, 0)' }
+									{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0, 0, 0, 0.45)' },
+									{ transform: 'scale(1.07)', boxShadow: '0 0 26px 14px rgba(0, 0, 0, 0.25)', offset: 0.55 },
+									{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0, 0, 0, 0)' }
 								], {
 									duration: 1800,
 									easing: 'ease-in-out',

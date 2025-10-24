@@ -21,7 +21,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 ### Current Version Management
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20251024023045`)
+- Current version: matches `_S_VERSION` (currently `1.0.20251024031545`)
 
 ### Release Process
 1. Update version number in both:
@@ -36,6 +36,9 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251024031545 (2025-10-24)
+- Updated the shadow DOM animation to use the same charcoal glow, ensuring the floating CTA never falls back to the old green tint.
 
 #### v1.0.20251024023045 (2025-10-24)
 - Swapped the pulse glow to a neutral charcoal tint so the floating CTA effect matches the theme palette without the green highlight.
