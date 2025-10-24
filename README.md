@@ -203,7 +203,27 @@ npm run lint:js
 npm run lint:scss
 ```
 
-## 📝 Content Management
+## � Theme Update Workflow (No GitHub Release Required)
+
+When you ship theme changes, keep the following lightweight flow so the WordPress updater notices the new build without creating a GitHub release:
+
+1. **Bump the version numbers**
+    - Update `_S_VERSION` in `functions.php`.
+    - Update the `Version:` header at the top of `style.css`.
+    - (Optional) add a bullet to `THEME-UPDATES.md` describing the change.
+2. **Commit and push to `main`**
+    ```bash
+    git add functions.php style.css THEME-UPDATES.md
+    git commit -m "Sync theme version to <new version>"
+    git push origin main
+    ```
+3. **Refresh WordPress**
+    - In the WordPress admin, open **Dashboard → Updates** and click **Check Again**.
+    - WordPress compares the version in GitHub to the installed theme and shows the familiar **Update Theme** button.
+
+You only need to create a GitHub release if you specifically want to distribute a packaged ZIP or trigger third-party tooling. Routine deployments can stay on the “push to GitHub → update from the WP admin” loop.
+
+## �📝 Content Management
 
 ### Adding Clinics
 
