@@ -13,7 +13,7 @@
 	font-weight: 500 !important;
 	height: 54px !important;
 	line-height: 22px !important;
-	margin: 0 0 30px !important;
+	margin: 0 !important;
 	max-width: 312px !important;
 	min-height: auto !important;
 	padding: 15px 30px !important;
@@ -37,7 +37,7 @@
 	font-weight: 500 !important;
 	height: 54px !important;
 	line-height: 22px !important;
-	margin: 0 0 30px !important;
+	margin: 0 !important;
 	max-width: 312px !important;
 	min-height: auto !important;
 	padding: 15px 30px !important;
@@ -47,3 +47,29 @@
 	white-space: nowrap !important;
 	width: 100% !important;
 }
+
+@keyframes pr360-pulse {
+	0% {
+		transform: scale(1);
+		box-shadow: 0 0 0 0 rgba(82, 130, 36, 0.55);
+	}
+	55% {
+		transform: scale(1.07);
+		box-shadow: 0 0 22px 10px rgba(82, 130, 36, 0);
+	}
+	100% {
+		transform: scale(1);
+		box-shadow: 0 0 0 0 rgba(82, 130, 36, 0);
+	}
+}
+
+#floating-assessment-button.pr360-pulse-enabled pr360-questionnaire::part(begin-button),
+#floating-assessment-button.pr360-pulse-enabled .pr360-pulse-btn {
+	animation: pr360-pulse 1.8s ease-in-out infinite !important;
+	position: relative !important;
+	transform-origin: center;
+	will-change: transform, box-shadow;
+	filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+}
+
+

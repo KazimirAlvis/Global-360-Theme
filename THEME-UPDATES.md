@@ -21,7 +21,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 ### Current Version Management
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20251022114500`)
+- Current version: matches `_S_VERSION` (currently `1.0.20251023104512`)
 
 ### Release Process
 1. Update version number in both:
@@ -36,6 +36,9 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251023104512 (2025-10-23)
+- Supercharged the floating assessment CTA with a shadow-root-aware pulse animation, persistent drop shadow, and 0px margin footprint so the button hugs its container cleanly.
 
 #### v1.0.20251022143000 (2025-10-22)
 - Refined the footer layout for responsive breakpoints, keeping desktop columns compact while introducing tablet/mobile wrapping with consistent padding and horizontal social links.
