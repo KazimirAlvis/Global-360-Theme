@@ -196,7 +196,7 @@ if (function_exists('cpt360_get_assessment_id')) {
     echo '<!-- DEBUG: Assessment ID found: "' . $assess_id . '" -->';
     if (!empty($assess_id)) {
         ?>
-        <div id="floating-assessment-button" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: block;">
+	<div id="floating-assessment-button" class="pr360-pulse-enabled" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: block;">
             <pr360-questionnaire 
                 url="wss://app.patientreach360.com/socket" 
                 site-id="<?php echo esc_attr($assess_id); ?>">
@@ -215,7 +215,7 @@ if (function_exists('cpt360_get_assessment_id')) {
         
         if (!empty($global_id)) {
             ?>
-            <div id="floating-assessment-button">
+			<div id="floating-assessment-button" class="pr360-pulse-enabled">
                 <pr360-questionnaire 
                     url="wss://app.patientreach360.com/socket" 
                     site-id="<?php echo esc_attr($global_id); ?>">
@@ -230,7 +230,7 @@ if (function_exists('cpt360_get_assessment_id')) {
     echo '<!-- DEBUG: cpt360_get_assessment_id function not available -->';
     // Show button with test ID for now
     ?>
-    <div id="floating-assessment-button">
+	<div id="floating-assessment-button" class="pr360-pulse-enabled">
         <pr360-questionnaire 
             url="wss://app.patientreach360.com/socket" 
             site-id="TEST-ID">
@@ -241,7 +241,112 @@ if (function_exists('cpt360_get_assessment_id')) {
 }
 ?>
 
-<?php wp_footer(); ?>
+	<script>
+	(function() {
+		function ready(fn) {
+			if (document.readyState !== 'loading') {
+				fn();
+			} else {
+				document.addEventListener('DOMContentLoaded', fn, { once: true });
+			}
+		}
+
+		ready(function() {
+			const wrapper = document.getElementById('floating-assessment-button');
+			if (!wrapper) {
+				return;
+			}
+
+			const component = wrapper.querySelector('pr360-questionnaire');
+			if (!component) {
+				return;
+			}
+
+			const applyPulseEffect = () => {
+				if (!component.shadowRoot) {
+					return false;
+				}
+
+				const targetButton = component.shadowRoot.querySelector('button[part="begin-button"], button');
+				if (targetButton) {
+					if (!targetButton.dataset.pr360PulseApplied) {
+						targetButton.classList.add('pr360-pulse-btn');
+						targetButton.style.position = targetButton.style.position || 'relative';
+						targetButton.style.transformOrigin = 'center';
+						targetButton.style.filter = 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3))';
+						try {
+							if (!targetButton._pr360PulseAnimation) {
+								targetButton._pr360PulseAnimation = targetButton.animate([
+									{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(82, 130, 36, 0.55)' },
+									{ transform: 'scale(1.07)', boxShadow: '0 0 22px 10px rgba(82, 130, 36, 0)', offset: 0.55 },
+									{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(82, 130, 36, 0)' }
+								], {
+									duration: 1800,
+									easing: 'ease-in-out',
+									iterations: Infinity
+								});
+							}
+						} catch (err) {
+							// If Web Animations API isn't available, fall back to CSS animation via class.
+						}
+						targetButton.dataset.pr360PulseApplied = '1';
+					}
+					return true;
+				}
+
+				return false;
+			};
+
+			const observeShadow = () => {
+				if (!component.shadowRoot) {
+					return false;
+				}
+
+				const observer = new MutationObserver(() => {
+					applyPulseEffect();
+				});
+
+				observer.observe(component.shadowRoot, { childList: true, subtree: true });
+				applyPulseEffect();
+				return true;
+			};
+
+			const bootstrapPulse = () => {
+				if (observeShadow()) {
+					return;
+				}
+
+				let attempts = 0;
+				const maxAttempts = 40;
+				const poll = () => {
+					if (observeShadow()) {
+						return;
+					}
+					attempts += 1;
+					if (attempts < maxAttempts) {
+						setTimeout(poll, 250);
+					}
+				};
+
+				poll();
+			};
+
+			if (window.customElements && customElements.whenDefined) {
+				customElements.whenDefined('pr360-questionnaire').then(bootstrapPulse).catch(() => {
+					bootstrapPulse();
+				});
+			} else {
+				bootstrapPulse();
+			}
+		});
+	})();
+	</script>
+
+<?php
+if (function_exists('wp_footer')) {
+	wp_footer();
+}
+?>
 
 </body>
 
