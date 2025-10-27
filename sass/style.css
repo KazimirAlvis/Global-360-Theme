@@ -1086,7 +1086,7 @@ textarea {
 }
 .site-footer .footer_inner .column h4 {
   font-size: 16px;
-  font-weight: var(--heading-font-weight, 700);
+  font-weight: var(--heading-font-weight, 400);
   color: var(--cpt360-primary);
   text-transform: uppercase;
   line-height: 1.75rem;
