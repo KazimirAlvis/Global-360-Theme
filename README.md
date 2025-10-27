@@ -40,6 +40,15 @@ A comprehensive WordPress theme designed for Patient 360 medical websites, featu
 
 ## 🚀 Installation
 
+> **Local workflow note**
+>
+> When developing on Patient‑360 infrastructure you will see **two copies** of the theme:
+>
+> - `wp-content/themes/Global-360-Theme` – the copy WordPress actively runs.
+> - `Global-360-Theme.repo/` – the Git checkout you commit and push to GitHub.
+>
+> To keep version bumps painless, edit files inside `Global-360-Theme.repo/` and then deploy/sync into the live theme directory as needed. Mixing edits between both copies is what causes the long “bump & push” clean‑ups.
+
 ### Requirements
 
 -   WordPress 5.0 or higher

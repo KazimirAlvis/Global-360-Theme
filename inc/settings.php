@@ -10,12 +10,12 @@ if (! class_exists('_360_Global_Settings')) {
     {
         const OPTION_KEY = '360_global_settings';
 
-        /**
-         * Cache for computed CSS variable rules.
-         *
-         * @var string|null
-         */
-        private $cached_css_variables = null;
+    /**
+     * Cache for computed CSS variable rules keyed by context.
+     *
+     * @var array<string, string>
+     */
+    private $cached_css_variables = [];
 
         /**
          * Track whether the inline style tag has already been output.
@@ -713,7 +713,10 @@ if (! class_exists('_360_Global_Settings')) {
                 return;
             }
 
-            $css = $this->build_css_variable_rules();
+            $current_hook = current_action();
+            $include_element_rules = !in_array($current_hook, ['admin_head'], true);
+
+            $css = $this->build_css_variable_rules($include_element_rules);
             if ($css === '') {
                 return;
             }
@@ -727,7 +730,7 @@ if (! class_exists('_360_Global_Settings')) {
          */
         public function enqueue_global_css_variables()
         {
-            $css = $this->build_css_variable_rules();
+            $css = $this->build_css_variable_rules(true);
             if ($css === '' || ! function_exists('wp_add_inline_style')) {
                 return;
             }
@@ -738,14 +741,17 @@ if (! class_exists('_360_Global_Settings')) {
         /**
          * Build the CSS variable rules for front-end consumption.
          */
-        private function build_css_variable_rules()
+        private function build_css_variable_rules($include_element_rules = true)
         {
-            if ($this->cached_css_variables !== null) {
-                return $this->cached_css_variables;
+            $cache_key = $include_element_rules ? 'with-elements' : 'vars-only';
+            if (isset($this->cached_css_variables[$cache_key])) {
+                return $this->cached_css_variables[$cache_key];
             }
 
             $opts  = get_option(self::OPTION_KEY, []);
             $rules = [];
+            $has_body_font = false;
+            $has_heading_font = false;
 
             if (! empty($opts['primary_color'])) {
                 $primary = sanitize_hex_color($opts['primary_color']);
@@ -765,21 +771,41 @@ if (! class_exists('_360_Global_Settings')) {
                 $font_stack = $this->get_font_stack($opts['body_font']);
                 $rules[]    = '--wp--preset--font-family--body-font: ' . $font_stack . ';';
                 $rules[]    = '--body-font: ' . $font_stack . ';';
+                $has_body_font = true;
             }
 
             if (! empty($opts['heading_font'])) {
                 $font_stack = $this->get_font_stack($opts['heading_font']);
                 $rules[]    = '--wp--preset--font-family--heading-font: ' . $font_stack . ';';
                 $rules[]    = '--heading-font: ' . $font_stack . ';';
+                $has_heading_font = true;
             }
 
-            if (empty($rules)) {
-                $this->cached_css_variables = '';
-                return $this->cached_css_variables;
+            $blocks = [];
+
+            if (! empty($rules)) {
+                $blocks[] = ':root {' . implode(' ', $rules) . '}';
             }
 
-            $this->cached_css_variables = ':root {' . implode(' ', $rules) . '}';
-            return $this->cached_css_variables;
+            if ($include_element_rules) {
+                $system_stack = $this->get_font_stack('system-font');
+
+                if ($has_body_font) {
+                    $blocks[] = 'body, p { font-family: var(--body-font, ' . $system_stack . '); }';
+                }
+
+                if ($has_heading_font) {
+                    $blocks[] = 'h1, h2, h3, h4, h5, h6 { font-family: var(--heading-font, var(--body-font, ' . $system_stack . ')); }';
+                }
+            }
+
+            if (empty($blocks)) {
+                $this->cached_css_variables[$cache_key] = '';
+                return $this->cached_css_variables[$cache_key];
+            }
+
+            $this->cached_css_variables[$cache_key] = implode(' ', $blocks);
+            return $this->cached_css_variables[$cache_key];
         }
 
         /**
