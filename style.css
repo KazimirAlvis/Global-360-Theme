@@ -4,7 +4,7 @@ Theme URI: http://underscores.me/
 Author: Underscores.me
 Author URI: http://underscores.me/
 Description: Description
-Version: 1.0.20251027101500
+Version: 1.0.20251027121500
 Tested up to: 5.4
 Requires PHP: 5.6
 License: GNU General Public License v2 or later
@@ -1361,7 +1361,7 @@ body.mobile-menu-open {
 }
 .site-footer .footer_inner .column h4 {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: var(--heading-font-weight, 700);
   color: var(--cpt360-primary);
   text-transform: uppercase;
   line-height: 1.75rem;

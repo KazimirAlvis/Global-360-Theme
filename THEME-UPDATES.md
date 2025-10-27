@@ -37,8 +37,9 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
-#### v1.0.20251027101500 (2025-10-27)
+#### v1.0.20251027121500 (2025-10-27)
 - Applied the 360 Settings typography choices directly to headings and paragraph defaults while keeping the admin area untouched.
+- Extended the heading font variable so Anton renders at weight 400 and wired footer h4s to honor the dynamic weight.
 
 #### v1.0.20251024164826 (2025-10-24)
 - Added 20px bottom margin to `.single-clinic pr360-questionnaire::part(begin-button)` to improve spacing beneath CTA buttons

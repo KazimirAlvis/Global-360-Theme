@@ -778,6 +778,10 @@ if (! class_exists('_360_Global_Settings')) {
                 $font_stack = $this->get_font_stack($opts['heading_font']);
                 $rules[]    = '--wp--preset--font-family--heading-font: ' . $font_stack . ';';
                 $rules[]    = '--heading-font: ' . $font_stack . ';';
+                $heading_weight = $this->get_heading_font_weight($opts['heading_font']);
+                if ($heading_weight !== null) {
+                    $rules[] = '--heading-font-weight: ' . $heading_weight . ';';
+                }
                 $has_heading_font = true;
             }
 
@@ -795,7 +799,7 @@ if (! class_exists('_360_Global_Settings')) {
                 }
 
                 if ($has_heading_font) {
-                    $blocks[] = 'h1, h2, h3, h4, h5, h6 { font-family: var(--heading-font, var(--body-font, ' . $system_stack . ')); }';
+                    $blocks[] = 'h1, h2, h3, h4, h5, h6 { font-family: var(--heading-font, var(--body-font, ' . $system_stack . ')); font-weight: var(--heading-font-weight, 700); }';
                 }
             }
 
@@ -826,6 +830,15 @@ if (! class_exists('_360_Global_Settings')) {
             ];
             
             return isset($font_stacks[$font_slug]) ? $font_stacks[$font_slug] : $font_stacks['system-font'];
+        }
+
+        private function get_heading_font_weight($font_slug)
+        {
+            $weights = [
+                'anton' => '400',
+            ];
+
+            return isset($weights[$font_slug]) ? $weights[$font_slug] : null;
         }
 
         /**
