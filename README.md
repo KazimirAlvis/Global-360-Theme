@@ -47,7 +47,14 @@ A comprehensive WordPress theme designed for Patient 360 medical websites, featu
 > - `wp-content/themes/Global-360-Theme` – the copy WordPress actively runs.
 > - `Global-360-Theme.repo/` – the Git checkout you commit and push to GitHub.
 >
-> To keep version bumps painless, edit files inside `Global-360-Theme.repo/` and then deploy/sync into the live theme directory as needed. Mixing edits between both copies is what causes the long “bump & push” clean‑ups.
+> To keep version bumps painless:
+>
+> 1. Always start in `Global-360-Theme.repo/` and run `git pull` so the repo matches GitHub.
+> 2. Make and test your changes **inside the repo copy first**.
+> 3. Copy the updated files into `wp-content/themes/Global-360-Theme` when you need WordPress to use them.
+> 4. Bump versions / update `THEME-UPDATES.md`, commit, and push from the repo directory.
+>
+> Skipping step 1 or editing the live copy first is what forces the long “rebase & conflict” cleanup at the end of the day.
 
 ### Requirements
 
