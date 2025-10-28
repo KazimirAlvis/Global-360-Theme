@@ -77,6 +77,9 @@ The Global 360 Theme now includes automatic update functionality that integrates
 #### v1.0.20251021241001 (2025-10-21)
 - Updated primary navigation hover/focus states to use the brand green while keeping the CTA button styling intact, and reset default `.post`/`.page` margins to zero for tighter layouts.
 
+-#### v1.0.20251028154000 (2025-10-28)
+- Enhanced Yoast SEO integration so Clinics and Doctors custom meta content, internal links, and external links contribute to analysis.
+- Added child-theme override support for state SVG assets so per-site colors persist across parent theme updates.
 #### v1.0.20251021234500 (2025-10-21)
 - Restrict Google review debug details to the WordPress admin area so public pages only show the friendly “No reviews yet” message and call-to-action.
 

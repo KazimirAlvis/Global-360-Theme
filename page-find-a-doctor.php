@@ -36,7 +36,10 @@ get_header();
                 'WI'=>'Wisconsin','WY'=>'Wyoming',
             ];
             $default_clinic_url = '/clinics/interventional-radiology-institute/';
-            $svg_base = get_template_directory_uri() . '/assets/state_svg/';
+            $svg_child_dir = trailingslashit( get_stylesheet_directory() ) . 'assets/state_svg/';
+            $svg_child_uri = trailingslashit( get_stylesheet_directory_uri() ) . 'assets/state_svg/';
+            $svg_parent_dir = trailingslashit( get_template_directory() ) . 'assets/state_svg/';
+            $svg_parent_uri = trailingslashit( get_template_directory_uri() ) . 'assets/state_svg/';
             echo '<ul class="state-grid">';
             foreach ($states as $abbr => $name) {
                 $clinics = get_posts([
@@ -52,7 +55,18 @@ get_header();
                     $link = $default_clinic_url;
                 }
                 $svg_filename = str_replace(' ', '_', $name) . '.svg';
-                $svg_file = $svg_base . $svg_filename;
+                $svg_path = $svg_child_dir . $svg_filename;
+                if ( ! file_exists( $svg_path ) ) {
+                    $svg_path = $svg_parent_dir . $svg_filename;
+                }
+
+                if ( file_exists( $svg_path ) ) {
+                    $svg_file = ( strpos( $svg_path, $svg_child_dir ) === 0 )
+                        ? $svg_child_uri . $svg_filename
+                        : $svg_parent_uri . $svg_filename;
+                } else {
+                    $svg_file = '';
+                }
                 echo '<li>
                     <a href="' . esc_url($link) . '">
                         <div class="state-icon" style="--mask-url:url(\'' . esc_url($svg_file) . '\')"></div>

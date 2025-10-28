@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20251027124500' );
+	define( '_S_VERSION', '1.0.20251028154000' );
 }
 
 /**
@@ -1152,4 +1152,194 @@ function global_360_social_sharing($post_id = null) {
     </script>
     <?php
     return ob_get_clean();
+}
+
+/*--------------------------------------------------------------
+# Yoast SEO integration for Clinics and Doctors
+--------------------------------------------------------------*/
+
+add_action( 'plugins_loaded', function () {
+	if ( ! defined( 'WPSEO_VERSION' ) ) {
+		return;
+	}
+
+	add_filter( 'wpseo_pre_analysis_post_content', 'global_360_theme_yoast_append_meta', 10, 2 );
+} );
+
+function global_360_theme_yoast_append_meta( $content, $post ) {
+	if ( ! ( $post instanceof WP_Post ) ) {
+		return $content;
+	}
+
+	if ( ! in_array( $post->post_type, array( 'clinic', 'doctor' ), true ) ) {
+		return $content;
+	}
+
+	$extras = array();
+
+	if ( 'clinic' === $post->post_type ) {
+		$extras = array_merge( $extras, global_360_theme_collect_clinic_meta_for_yoast( $post->ID ) );
+	}
+
+	if ( 'doctor' === $post->post_type ) {
+		$extras = array_merge( $extras, global_360_theme_collect_doctor_meta_for_yoast( $post->ID ) );
+	}
+
+	$extras = array_filter( $extras );
+
+	if ( empty( $extras ) ) {
+		return $content;
+	}
+
+	return $content . "\n\n" . implode( "\n\n", $extras );
+}
+
+function global_360_theme_collect_clinic_meta_for_yoast( $post_id ) {
+	$pieces = array();
+
+	$bio = get_post_meta( $post_id, '_cpt360_clinic_bio', true );
+	if ( $bio ) {
+		$pieces[] = '<section class="yoast-clinic-bio"><h2>Clinic Bio</h2>' . wpautop( wp_kses_post( $bio ) ) . '</section>';
+	}
+
+	$phone = get_post_meta( $post_id, '_cpt360_clinic_phone', true );
+	if ( $phone ) {
+		$pieces[] = '<p class="yoast-clinic-phone"><strong>Clinic Phone Number:</strong> ' . esc_html( $phone ) . '</p>';
+	}
+
+	$website = get_post_meta( $post_id, '_clinic_website_url', true );
+	if ( $website ) {
+		$pieces[] = '<p class="yoast-clinic-website"><strong>Clinic Website:</strong> <a href="' . esc_url( $website ) . '" rel="nofollow noopener">Visit Clinic Website</a></p>';
+	}
+
+	$addresses = get_post_meta( $post_id, 'clinic_addresses', true );
+	if ( is_array( $addresses ) && ! empty( $addresses ) ) {
+		$rows = array();
+		foreach ( $addresses as $address ) {
+			$line = array_filter( array(
+				$address['street'] ?? '',
+				$address['city'] ?? '',
+				$address['state'] ?? '',
+				$address['zip'] ?? '',
+			) );
+
+			if ( $line ) {
+				$rows[] = '<li>' . esc_html( implode( ', ', $line ) ) . '</li>';
+			}
+		}
+
+		if ( $rows ) {
+			$pieces[] = '<section class="yoast-clinic-addresses"><h2>Clinic Addresses</h2><ul>' . implode( '', $rows ) . '</ul></section>';
+		}
+	}
+
+	$info_items = get_post_meta( $post_id, 'clinic_info', true );
+	if ( is_array( $info_items ) ) {
+		$rows = array();
+		foreach ( $info_items as $item ) {
+			$title = isset( $item['title'] ) ? sanitize_text_field( $item['title'] ) : '';
+			$desc  = isset( $item['description'] ) ? sanitize_textarea_field( $item['description'] ) : '';
+			if ( $title || $desc ) {
+				$rows[] = '<p><strong>' . esc_html( $title ) . ':</strong> ' . esc_html( $desc ) . '</p>';
+			}
+		}
+
+		if ( $rows ) {
+			$pieces[] = '<section class="yoast-clinic-info"><h2>Clinic Information</h2>' . implode( '', $rows ) . '</section>';
+		}
+	}
+
+	$reviews = get_post_meta( $post_id, 'clinic_reviews', true );
+	if ( is_array( $reviews ) ) {
+		$rows = array();
+		foreach ( $reviews as $review ) {
+			$reviewer = isset( $review['reviewer'] ) ? sanitize_text_field( $review['reviewer'] ) : '';
+			$text     = isset( $review['review'] ) ? sanitize_textarea_field( $review['review'] ) : '';
+
+			if ( $reviewer || $text ) {
+				$rows[] = '<blockquote><p>' . esc_html( $text ) . '</p><cite>' . esc_html( $reviewer ) . '</cite></blockquote>';
+			}
+		}
+
+		if ( $rows ) {
+			$pieces[] = '<section class="yoast-clinic-reviews"><h2>Clinic Reviews</h2>' . implode( '', $rows ) . '</section>';
+		}
+	}
+
+	$states = cpt360_get_clinic_state_names( $post_id, true );
+	if ( $states ) {
+		$pieces[] = '<p class="yoast-clinic-states"><strong>States Served:</strong> ' . esc_html( implode( ', ', $states ) ) . '</p>';
+	}
+
+	$assessment = cpt360_get_assessment_id( $post_id );
+	if ( $assessment ) {
+		$pieces[] = '<p class="yoast-clinic-assessment"><strong>Clinic Assessment ID:</strong> ' . esc_html( $assessment ) . '</p>';
+	}
+
+	$google_place = get_post_meta( $post_id, 'google_place_id', true );
+	if ( $google_place ) {
+		$pieces[] = '<p class="yoast-clinic-google"><strong>Google Place ID:</strong> ' . esc_html( $google_place ) . '</p>';
+	}
+
+	$associated_doctors = (array) get_posts( array(
+		'post_type'      => 'doctor',
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+		'meta_query'     => array(
+			array(
+				'key'     => 'clinic_id',
+				'value'   => $post_id,
+				'compare' => 'LIKE',
+			),
+		),
+	) );
+
+	if ( $associated_doctors ) {
+		$links = array();
+		foreach ( $associated_doctors as $doctor_id ) {
+			$links[] = '<li><a href="' . esc_url( get_permalink( $doctor_id ) ) . '">' . esc_html( get_the_title( $doctor_id ) ) . '</a></li>';
+		}
+
+		if ( $links ) {
+			$pieces[] = '<section class="yoast-clinic-doctors"><h2>Associated Doctors</h2><ul>' . implode( '', $links ) . '</ul></section>';
+		}
+	}
+
+	return $pieces;
+}
+
+function global_360_theme_collect_doctor_meta_for_yoast( $post_id ) {
+	$pieces = array();
+
+	$name = get_post_meta( $post_id, 'doctor_name', true );
+	if ( $name ) {
+		$pieces[] = '<p class="yoast-doctor-name"><strong>Doctor Name:</strong> ' . esc_html( $name ) . '</p>';
+	}
+
+	$title = get_post_meta( $post_id, 'doctor_title', true );
+	if ( $title ) {
+		$pieces[] = '<p class="yoast-doctor-title"><strong>Doctor Title:</strong> ' . esc_html( $title ) . '</p>';
+	}
+
+	$bio = get_post_meta( $post_id, 'doctor_bio', true );
+	if ( $bio ) {
+		$pieces[] = '<section class="yoast-doctor-bio"><h2>Doctor Bio</h2>' . wpautop( wp_kses_post( $bio ) ) . '</section>';
+	}
+
+	$clinic_ids = (array) get_post_meta( $post_id, 'clinic_id', true );
+	if ( $clinic_ids ) {
+		$links = array();
+		foreach ( $clinic_ids as $clinic_id ) {
+			$clinic_title = get_the_title( $clinic_id );
+			if ( $clinic_title ) {
+				$links[] = '<li><a href="' . esc_url( get_permalink( $clinic_id ) ) . '">' . esc_html( $clinic_title ) . '</a></li>';
+			}
+		}
+
+		if ( $links ) {
+			$pieces[] = '<section class="yoast-doctor-clinics"><h2>Practice Locations</h2><ul>' . implode( '', $links ) . '</ul></section>';
+		}
+	}
+
+	return $pieces;
 }
