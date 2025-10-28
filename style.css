@@ -1360,6 +1360,8 @@ body.mobile-menu-open {
   color: var(--cpt360-primary);
 }
 .site-footer .footer_inner .column h4 {
+  font-family: var(--wp--preset--font-family--heading-font);
+  letter-spacing: var(--heading-letter-spacing, normal);
   font-size: 16px;
   font-weight: var(--heading-font-weight, 400);
   color: var(--cpt360-primary);
