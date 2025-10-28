@@ -775,15 +775,18 @@ if (! class_exists('_360_Global_Settings')) {
             }
 
             $heading_weight = '700';
+            $heading_letter_spacing = 'normal';
             if (! empty($opts['heading_font'])) {
                 $font_stack = $this->get_font_stack($opts['heading_font']);
                 $rules[]    = '--wp--preset--font-family--heading-font: ' . $font_stack . ';';
                 $rules[]    = '--heading-font: ' . $font_stack . ';';
                 $heading_weight = $this->get_heading_font_weight($opts['heading_font']);
+                $heading_letter_spacing = $this->get_heading_letter_spacing($opts['heading_font']);
                 $has_heading_font = true;
             }
 
             $rules[] = '--heading-font-weight: ' . $heading_weight . ';';
+            $rules[] = '--heading-letter-spacing: ' . $heading_letter_spacing . ';';
 
             $blocks = [];
 
@@ -799,7 +802,7 @@ if (! class_exists('_360_Global_Settings')) {
                 }
 
                 if ($has_heading_font) {
-                    $blocks[] = 'h1, h2, h3, h4, h5, h6 { font-family: var(--heading-font, var(--body-font, ' . $system_stack . ')); font-weight: var(--heading-font-weight, 400); }';
+                    $blocks[] = 'h1, h2, h3, h4, h5, h6 { font-family: var(--heading-font, var(--body-font, ' . $system_stack . ')); font-weight: var(--heading-font-weight, 400); letter-spacing: var(--heading-letter-spacing, normal); }';
                 }
             }
 
@@ -839,6 +842,15 @@ if (! class_exists('_360_Global_Settings')) {
             ];
 
             return isset($weights[$font_slug]) ? $weights[$font_slug] : '700';
+        }
+
+        private function get_heading_letter_spacing($font_slug)
+        {
+            $spacings = [
+                'anton' => '0.5px',
+            ];
+
+            return isset($spacings[$font_slug]) ? $spacings[$font_slug] : 'normal';
         }
 
         /**

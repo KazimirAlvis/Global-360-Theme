@@ -1781,6 +1781,7 @@ body.mobile-menu-open {
 
 .clinic-content h2 {
   font-family: var(--wp--preset--font-family--heading-font);
+  letter-spacing: var(--heading-letter-spacing, normal);
   text-align: center;
   font-size: 45px;
   font-weight: 400;
@@ -1831,6 +1832,7 @@ body.mobile-menu-open {
 
 .clinic_main_info .column:nth-child(1) .clinic-title {
   font-family: var(--wp--preset--font-family--heading-font);
+  letter-spacing: var(--heading-letter-spacing, normal);
   font-size: 32px;
   color: var(--text-color);
   margin: 10px 0 0 0;
@@ -1838,6 +1840,7 @@ body.mobile-menu-open {
 
 .clinic_main_info h4 {
   font-family: var(--wp--preset--font-family--heading-font);
+  letter-spacing: var(--heading-letter-spacing, normal);
   font-size: 1.25rem;
   color: var(--text-color);
   margin: 10px 0 0 0;
@@ -1940,6 +1943,7 @@ body.mobile-menu-open {
 
 .map_heading h4 {
   font-family: var(--wp--preset--font-family--heading-font);
+  letter-spacing: var(--heading-letter-spacing, normal);
   font-size: 24px;
   color: #fff;
   margin: 20px 0 10px 0;
@@ -2044,6 +2048,7 @@ body.mobile-menu-open {
 
 .clinic_info .clinic_info_title {
   font-family: var(--wp--preset--font-family--heading-font);
+  letter-spacing: var(--heading-letter-spacing, normal);
   font-size: 24px;
   color: var(--cpt360-primary);
   margin: 10px 0 10px 0;
@@ -2136,6 +2141,7 @@ body.mobile-menu-open {
 
 .clinic_cta_wrap .clinic-cta-BG-wrap .clinic-cta-inner h3 {
   font-family: var(--wp--preset--font-family--heading-font);
+  letter-spacing: var(--heading-letter-spacing, normal);
   font-size: 45px;
   font-weight: 400;
   color: #fff;
@@ -2165,6 +2171,7 @@ body.mobile-menu-open {
 
 .clinic_hero .clinic-hero-BG-wrap .clinic-hero-inner h1 {
   font-family: var(--wp--preset--font-family--heading-font);
+  letter-spacing: var(--heading-letter-spacing, normal);
   font-size: 56px;
   font-weight: 400;
   color: #fff;
@@ -2228,6 +2235,7 @@ body.mobile-menu-open {
 
 .state-clinics-grid .state-clinic .clinic-title {
   font-family: var(--wp--preset--font-family--heading-font);
+  letter-spacing: var(--heading-letter-spacing, normal);
   font-size: 1.25rem;
   margin: 0.5em 0 0;
 }
