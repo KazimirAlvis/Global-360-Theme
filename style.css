@@ -1680,6 +1680,18 @@ body.mobile-menu-open {
   font-family: var(--wp--preset--font-family--body-font);
 }
 
+.main-paragraph-con p a {
+  display: inline-block;
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.main-paragraph-con p a sup {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
 .main-heading-con h1,
 .main-heading-con h2,
 .main-heading-con h3,
