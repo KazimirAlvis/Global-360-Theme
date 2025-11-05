@@ -24,38 +24,6 @@
 	<!-- PR360 Questionnaire Script -->
 	<script type="module" src="https://unpkg.com/pr360-questionnaire"></script>
 	
-	<!-- Open Graph / Social Media Meta Tags -->
-	<?php if (is_single() && get_post_type() == 'post') : ?>
-		<meta property="og:type" content="article" />
-		<meta property="og:title" content="<?php echo esc_attr(get_the_title()); ?>" />
-		<meta property="og:description" content="<?php echo esc_attr(wp_trim_words(get_the_excerpt(), 20, '...')); ?>" />
-		<meta property="og:url" content="<?php echo esc_url(get_permalink()); ?>" />
-		<meta property="og:site_name" content="<?php echo esc_attr(get_bloginfo('name')); ?>" />
-		<?php if (has_post_thumbnail()) : ?>
-			<meta property="og:image" content="<?php echo esc_url(get_the_post_thumbnail_url(null, 'large')); ?>" />
-			<meta property="og:image:width" content="1200" />
-			<meta property="og:image:height" content="630" />
-		<?php endif; ?>
-		
-		<!-- Twitter Card -->
-		<meta name="twitter:card" content="summary_large_image" />
-		<meta name="twitter:title" content="<?php echo esc_attr(get_the_title()); ?>" />
-		<meta name="twitter:description" content="<?php echo esc_attr(wp_trim_words(get_the_excerpt(), 20, '...')); ?>" />
-		<?php if (has_post_thumbnail()) : ?>
-			<meta name="twitter:image" content="<?php echo esc_url(get_the_post_thumbnail_url(null, 'large')); ?>" />
-		<?php endif; ?>
-		
-		<!-- LinkedIn specific -->
-		<meta property="linkedin:owner" content="<?php echo esc_attr(get_bloginfo('name')); ?>" />
-	<?php else : ?>
-		<meta property="og:type" content="website" />
-		<meta property="og:title" content="<?php echo esc_attr(wp_get_document_title()); ?>" />
-		<meta property="og:description" content="<?php echo esc_attr(get_bloginfo('description')); ?>" />
-		<meta property="og:url" content="<?php echo esc_url(home_url()); ?>" />
-		<meta property="og:site_name" content="<?php echo esc_attr(get_bloginfo('name')); ?>" />
-	<?php endif; ?>
-	
-	
 </head>
 
 <body <?php body_class(); ?>>
