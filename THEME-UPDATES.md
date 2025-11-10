@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20251104113000`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20251110121500`)
 
 ### Release Process
 
@@ -42,6 +42,10 @@ The Global 360 Theme now includes automatic update functionality that integrates
 -   If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251110121500 (2025-11-10)
+
+-   Updated `style-min.css` to capture the latest design adjustments and bumped the theme version so WordPress sites pick up the refreshed minified assets.
 
 #### v1.0.20251104113000 (2025-11-04)
 

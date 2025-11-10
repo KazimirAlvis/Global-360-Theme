@@ -206,6 +206,16 @@ Custom rewrite rules handle state-based URLs and fallback to default clinic page
 sass sass/main.scss style.css --watch
 ```
 
+### CSS Minification
+
+After editing `style.css`, regenerate the minified build with a one-off `npx` command—no local install required:
+
+```bash
+npx --yes clean-css-cli@5.6.3 -o style-min.css style.css
+```
+
+Run the command from the theme directory (`wp-content/themes/Global-360-Theme/`). The tool will fetch `clean-css-cli` on the fly, compress `style.css`, and overwrite `style-min.css`. Commit both files together so WordPress loads the updated minified asset everywhere.
+
 ### Code Quality
 
 ```bash

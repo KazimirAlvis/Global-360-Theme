@@ -284,6 +284,31 @@ add_action( 'add_meta_boxes', function() {
                 'render_clinic_addresses_box', 'clinic', 'normal', 'high' );
 } );
 
+// Make the address repeater span the editor width for easier editing.
+add_action( 'admin_head', function() {
+    $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+    if ( ! $screen || 'clinic' !== $screen->post_type ) {
+        return;
+    }
+    echo '<style>
+        .post-type-clinic #clinic-addresses-container .clinic-address-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .post-type-clinic #clinic-addresses-container .clinic-address-row input[type="text"],
+        .post-type-clinic #clinic-addresses-container .clinic-address-row select,
+        .post-type-clinic #clinic-addresses-container .clinic-address-row textarea {
+            flex: 1 1 320px;
+            max-width: 100%;
+        }
+        .post-type-clinic #clinic-addresses-container .clinic-address-row .remove-address {
+            flex: 0 0 auto;
+        }
+    </style>';
+} );
+
 // 2) Render the box (in cpt360-plugin.php)
 function render_clinic_addresses_box( $post ) {
   wp_nonce_field( 'save_clinic_addresses', 'clinic_addresses_nonce' );
