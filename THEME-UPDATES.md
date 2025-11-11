@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20251110121500`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20251111160000`)
 
 ### Release Process
 
@@ -42,6 +42,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 -   If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251111160000 (2025-11-11)
+
+-   Styled the Linktree risk assessment button via the PR360 `begin-button` shadow part so it matches the other CTAs without adding extra host classes.
+-   Unified all Linktree CTA heights at 52px and aligned spacing so anchors and the embedded PR360 button sit flush in the list.
+-   Regenerated the minified stylesheet after polishing the Linktree layout.
 
 #### v1.0.20251111143000 (2025-11-11)
 

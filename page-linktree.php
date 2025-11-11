@@ -43,10 +43,9 @@ $cta_links = [];
 $assessment_id = function_exists('cpt360_get_assessment_id') ? cpt360_get_assessment_id() : '';
 if ($assessment_id) {
     $cta_links[] = [
-        'label'  => __('Take Risk Assessment', 'cpt360'),
-        'url'    => home_url('/take-assessment/?clinic_id=' . rawurlencode($assessment_id)),
-        'target' => '_blank',
-        'rel'    => 'noopener',
+        'type'    => 'assessment',
+        'label'   => __('Take Risk Assessment', 'cpt360'),
+        'site_id' => $assessment_id,
     ];
 }
 
@@ -55,11 +54,13 @@ if (! $find_doctor_url) {
     $find_doctor_url = home_url('/find-a-doctor/');
 }
 $cta_links[] = [
+    'type'  => 'link',
     'label' => __('Find a Doctor', 'cpt360'),
     'url'   => $find_doctor_url,
 ];
 
 $cta_links[] = [
+    'type'  => 'link',
     'label' => __('Visit Homepage', 'cpt360'),
     'url'   => home_url('/'),
 ];
@@ -67,6 +68,7 @@ $cta_links[] = [
 $contact_phone = isset($opts['contact_phone']) ? trim($opts['contact_phone']) : '';
 if ($contact_phone) {
     $cta_links[] = [
+        'type'  => 'link',
         'label' => sprintf(__('Call %s', 'cpt360'), $contact_phone),
         'url'   => 'tel:' . preg_replace('/[^\d\+]/', '', $contact_phone),
     ];
@@ -109,9 +111,18 @@ $icon_map = [
                 <ul class="linktree-cta-list">
                     <?php foreach ($cta_links as $cta) : ?>
                         <li>
-                            <a class="linktree-button" href="<?php echo esc_url($cta['url']); ?>"<?php echo !empty($cta['target']) ? ' target="' . esc_attr($cta['target']) . '"' : ''; ?><?php echo !empty($cta['rel']) ? ' rel="' . esc_attr($cta['rel']) . '"' : ''; ?>>
-                                <?php echo esc_html($cta['label']); ?>
-                            </a>
+                            <?php $type = isset($cta['type']) ? $cta['type'] : 'link'; ?>
+                            <?php if ('assessment' === $type && !empty($cta['site_id'])) : ?>
+                                <pr360-questionnaire
+                                    url="wss://app.patientreach360.com/socket"
+                                    site-id="<?php echo esc_attr($cta['site_id']); ?>">
+                                    <?php echo esc_html($cta['label']); ?>
+                                </pr360-questionnaire>
+                            <?php else : ?>
+                                <a class="linktree-button" href="<?php echo esc_url($cta['url']); ?>"<?php echo !empty($cta['target']) ? ' target="' . esc_attr($cta['target']) . '"' : ''; ?><?php echo !empty($cta['rel']) ? ' rel="' . esc_attr($cta['rel']) . '"' : ''; ?>>
+                                    <?php echo esc_html($cta['label']); ?>
+                                </a>
+                            <?php endif; ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>

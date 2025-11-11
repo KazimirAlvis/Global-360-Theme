@@ -4,7 +4,7 @@ Theme URI: http://underscores.me/
 Author: Underscores.me
 Author URI: http://underscores.me/
 Description: Description
-Version: 1.0.20251111143000
+Version: 1.0.20251111160000
 Tested up to: 5.4
 Requires PHP: 5.6
 License: GNU General Public License v2 or later
@@ -3577,9 +3577,12 @@ body.page-template-page-linktree #page {
 }
 
 .page-template-page-linktree .linktree-button {
-	display: block;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	width: 100%;
-	padding: 14px 18px;
+	min-height: 52px;
+	padding: 0 18px;
 	border-radius: 999px;
 	background-color: var(--linktree-primary, var(--cpt360-primary, #1a73e8));
 	color: #ffffff;
@@ -3590,10 +3593,37 @@ body.page-template-page-linktree #page {
 	box-shadow: 0 12px 25px rgba(26, 115, 232, 0.25);
 }
 
+.page-template-page-linktree pr360-questionnaire::part(begin-button) {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 52px;
+	padding: 0 18px;
+	border-radius: 999px;
+	background-color: var(--linktree-primary, var(--cpt360-primary, #1a73e8));
+	color: #ffffff;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	text-align: center;
+	box-shadow: 0 12px 25px rgba(26, 115, 232, 0.25);
+	border: none;
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	margin: 0;
+}
+
 .page-template-page-linktree .linktree-button:hover,
 .page-template-page-linktree .linktree-button:focus {
 	transform: translateY(-2px);
 	box-shadow: 0 18px 32px rgba(26, 115, 232, 0.35);
+}
+
+.page-template-page-linktree pr360-questionnaire::part(begin-button):hover,
+.page-template-page-linktree pr360-questionnaire::part(begin-button):focus {
+	transform: translateY(-2px);
+	box-shadow: 0 18px 32px rgba(26, 115, 232, 0.35);
+	outline: none;
 }
 
 .page-template-page-linktree .linktree-social-list {
