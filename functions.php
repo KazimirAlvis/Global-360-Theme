@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20251111134500' );
+	define( '_S_VERSION', '1.0.20251111143000' );
 }
 
 /**
@@ -831,7 +831,7 @@ add_action( 'admin_enqueue_scripts', function( $hook ) {
 			'global-360-media-meta',
 			get_template_directory_uri() . '/js/media-meta-boxes.js',
 			[ 'jquery' ],
-			'1.0',
+			_S_VERSION,
 			true
 		);
 	}
@@ -842,7 +842,7 @@ add_action( 'admin_enqueue_scripts', function( $hook ) {
 			'global-360-media-meta',
 			get_template_directory_uri() . '/js/media-meta-boxes.js',
 			[ 'jquery' ],
-			'1.0',
+			_S_VERSION,
 			true
 		);
 	}
@@ -1003,7 +1003,7 @@ add_action('admin_enqueue_scripts', function() {
 		'global-360-admin-meta',
 		get_template_directory_uri() . '/style-admin-meta.css', // adjust path as needed
 		[],
-		'1.0'
+		_S_VERSION
 	);
 });
 

@@ -43,6 +43,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20251111143000 (2025-11-11)
+
+-   Cache-busted the admin media uploader script so the Linktree logo field immediately works after updates and ships with the new release version.
+-   Added the missing `style-admin-meta.css` placeholder so the admin enqueue stops returning 404s and keeps both logo preview blocks styled.
+
 #### v1.0.20251111134500 (2025-11-11)
 
 -   Added a Linktree landing page template that auto-builds primary CTAs from the global 360 settings (assessment ID, links, phone, and social profiles).

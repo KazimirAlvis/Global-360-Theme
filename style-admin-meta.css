@@ -1,0 +1,21 @@
+/*
+ * Admin-specific styles for Global 360 Theme meta fields.
+ */
+
+#linktree-logo-settings-container img {
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    padding: 8px;
+}
+
+#linktree-logo-settings-container .button {
+    margin-right: 6px;
+}
+
+#header-logo-settings-container img {
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    padding: 8px;
+}
