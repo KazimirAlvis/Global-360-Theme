@@ -121,4 +121,17 @@ jQuery(function ($) {
 		selectText: 'Select Logo',
 		changeText: 'Change Logo',
 	});
+
+	// Linktree Logo (for settings page)
+	setupMediaButton({
+		button: '#linktree_logo_button',
+		remove: '#linktree_logo_remove',
+		field: '#linktree_logo_id',
+		container: '#linktree-logo-settings-container',
+		insertTarget: '#linktree_logo_button',
+		title: 'Select or Upload Linktree Logo',
+		buttonText: 'Use this logo',
+		selectText: 'Select Logo',
+		changeText: 'Change Logo',
+	});
 });

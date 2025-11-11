@@ -160,6 +160,16 @@ if (! class_exists('_360_Global_Settings')) {
                 '360_main_section',
                 ['label_for' => 'header_logo_id']
             );
+
+            // Linktree Logo
+            add_settings_field(
+                'linktree_logo_id',
+                __('Linktree Logo', 'cpt360'),
+                [$this, 'field_linktree_logo'],
+                '360-settings',
+                '360_main_section',
+                ['label_for' => 'linktree_logo_id']
+            );
         }
 
         /**
@@ -384,6 +394,27 @@ if (! class_exists('_360_Global_Settings')) {
         <?php
         }
 
+        /**
+         * Render the Linktree Logo input.
+         */
+        public function field_linktree_logo($args)
+        {
+            $opts = get_option(self::OPTION_KEY, []);
+            $logo_id = $opts[$args['label_for']] ?? '';
+            $logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, 'medium') : '';
+?>
+            <div id="linktree-logo-settings-container">
+                <?php if ($logo_url): ?>
+                    <img src="<?php echo esc_url($logo_url); ?>" style="max-width:200px; display:block; margin-bottom:10px;" />
+                <?php endif; ?>
+                <input type="hidden" id="linktree_logo_id" name="<?php echo esc_attr(self::OPTION_KEY . '[linktree_logo_id]'); ?>" value="<?php echo esc_attr($logo_id); ?>" />
+                <button type="button" class="button" id="linktree_logo_button"><?php echo $logo_id ? esc_html__('Change Logo', 'cpt360') : esc_html__('Select Logo', 'cpt360'); ?></button>
+                <button type="button" class="button" id="linktree_logo_remove" style="<?php echo $logo_id ? '' : 'display:none;'; ?>"><?php esc_html_e('Remove Logo', 'cpt360'); ?></button>
+                <p class="description"><?php esc_html_e('Optional logo displayed on the Linktree landing page.', 'cpt360'); ?></p>
+            </div>
+        <?php
+        }
+
 
         /**
          * Sanitize all settings inputs.
@@ -453,6 +484,10 @@ if (! class_exists('_360_Global_Settings')) {
             
             if (isset($input['header_logo_id']) && is_numeric($input['header_logo_id'])) {
                 $output['header_logo_id'] = intval($input['header_logo_id']);
+            }
+
+            if (isset($input['linktree_logo_id']) && is_numeric($input['linktree_logo_id'])) {
+                $output['linktree_logo_id'] = intval($input['linktree_logo_id']);
             }
 
             // Social links
@@ -550,6 +585,13 @@ if (! class_exists('_360_Global_Settings')) {
                             echo '<div style="margin-bottom: 30px;">';
                             echo '<h3>Header Logo</h3>';
                             $this->field_header_logo(['label_for' => 'header_logo_id']);
+                            echo '</div>';
+
+                            // Linktree Logo Section
+                            echo '<div style="margin-bottom: 30px;">';
+                            echo '<h3>Linktree Logo</h3>';
+                            $this->field_linktree_logo(['label_for' => 'linktree_logo_id']);
+                            echo '<p class="description">This logo appears on the Linktree landing page. Falls back to the header logo if left blank.</p>';
                             echo '</div>';
 
                             // Social Media Repeater
@@ -974,6 +1016,7 @@ if (! class_exists('_360_Global_Settings')) {
                             'body_font' => 'Body Font',
                             'heading_font' => 'Heading Font',
                             'header_logo_id' => 'Header Logo',
+                            'linktree_logo_id' => 'Linktree Logo',
                             'assessment_id' => 'Assessment ID',
                             'contact_email' => 'Contact Email',
                             'contact_phone' => 'Contact Phone',

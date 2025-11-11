@@ -44,8 +44,8 @@ A comprehensive WordPress theme designed for Patient 360 medical websites, featu
 >
 > When developing on Patient‑360 infrastructure you will see **two copies** of the theme:
 >
-> - `wp-content/themes/Global-360-Theme` – the copy WordPress actively runs.
-> - `Global-360-Theme.repo/` – the Git checkout you commit and push to GitHub.
+> -   `wp-content/themes/Global-360-Theme` – the copy WordPress actively runs.
+> -   `Global-360-Theme.repo/` – the Git checkout you commit and push to GitHub.
 >
 > To keep version bumps painless:
 >
@@ -103,6 +103,13 @@ Access comprehensive theme settings via **Appearance > Theme Settings**:
 
 -   Google Maps API key configuration
 -   Assessment tool integration settings
+
+### Linktree Landing Page
+
+1. Open **Appearance → 360 Settings → Header & Footer** and upload the optional _Linktree Logo_ (the header logo is used as a fallback).
+2. Verify your primary color, phone number, assessment ID, and social links are filled out in the 360 settings—they drive the auto-generated buttons.
+3. Create a new WordPress page, assign the **Linktree Landing** template from the Page Attributes panel, and publish.
+4. The page renders a white Linktree-style card with CTAs for the PR360 assessment, Find a Doctor, homepage, tap-to-call, and social icons using the brand primary color.
 
 ### Google Maps Setup
 

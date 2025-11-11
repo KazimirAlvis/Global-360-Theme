@@ -43,6 +43,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20251111134500 (2025-11-11)
+
+-   Added a Linktree landing page template that auto-builds primary CTAs from the global 360 settings (assessment ID, links, phone, and social profiles).
+-   Introduced a Linktree-specific logo field in 360 Settings plus dedicated styling, including hiding the floating assessment button on that layout and polishing the social icons.
+
 #### v1.0.20251110121500 (2025-11-10)
 
 -   Updated `style-min.css` to capture the latest design adjustments and bumped the theme version so WordPress sites pick up the refreshed minified assets.
