@@ -134,4 +134,202 @@ jQuery(function ($) {
 		selectText: 'Select Logo',
 		changeText: 'Change Logo',
 	});
+
+	initializeFaviconManager();
+
+	function initializeFaviconManager() {
+		var manager = $('#cpt360-favicon-manager');
+		if (!manager.length || typeof wp === 'undefined' || !wp.media) {
+			return;
+		}
+
+		var bulkFrame;
+		var singleFrames = {};
+		var order = ['png_96_id', 'svg_id', 'ico_id', 'apple_touch_180_id', 'manifest_id'];
+
+		var bulkButton = manager.find('#cpt360-favicon-bulk-upload');
+		var clearAllButton = manager.find('.cpt360-favicon-clear-all');
+
+		function getRow(key) {
+			return manager.find('.cpt360-favicon-row[data-favicon-key="' + key + '"]');
+		}
+
+		function filenameFromAttachment(file) {
+			if (!file) {
+				return '';
+			}
+			if (file.filename) {
+				return file.filename;
+			}
+			if (file.title) {
+				return file.title;
+			}
+			if (file.url) {
+				return file.url.split('/').pop();
+			}
+			return '';
+		}
+
+		function matchesSlot(key, file) {
+			if (!file) {
+				return false;
+			}
+			var filename = (filenameFromAttachment(file) || '').toLowerCase();
+			var mime = (file.mime || '').toLowerCase();
+			var subtype = (file.subtype || '').toLowerCase();
+			var width = parseInt(file.width, 10);
+			var height = parseInt(file.height, 10);
+
+			switch (key) {
+				case 'png_96_id':
+					if (mime === 'image/png' || subtype === 'png') {
+						if (width === 96 && height === 96) {
+							return true;
+						}
+						return filename.indexOf('favicon') !== -1 && filename.indexOf('96x96') !== -1;
+					}
+					return false;
+				case 'svg_id':
+					return filename.endsWith('.svg');
+				case 'ico_id':
+					return filename.endsWith('.ico') || mime === 'image/x-icon' || subtype === 'ico';
+				case 'apple_touch_180_id':
+					if (mime === 'image/png' || subtype === 'png') {
+						if (width === 180 && height === 180) {
+							return true;
+						}
+						return filename.indexOf('apple') !== -1 && filename.indexOf('touch') !== -1;
+					}
+					return false;
+				case 'manifest_id':
+					return filename.endsWith('.webmanifest') || filename.endsWith('manifest.json');
+			}
+			return false;
+		}
+
+		function updateRow(key, file) {
+			var row = getRow(key);
+			if (!row.length) {
+				return;
+			}
+			var field = row.find('.cpt360-favicon-field');
+			var filename = filenameFromAttachment(file);
+			var preview = row.find('.cpt360-favicon-preview');
+			var link = row.find('.cpt360-favicon-link');
+			var removeBtn = row.find('.cpt360-favicon-remove');
+			var emptyLabel = row.find('.cpt360-favicon-filename').data('empty-label') || 'Not set';
+
+			field.val(file && file.id ? file.id : '');
+			row.find('.cpt360-favicon-filename').text(filename || emptyLabel);
+
+			var viewLabel = row.data('viewLabel') || 'View file';
+			if (file && file.url) {
+				link.show().html('<a href="' + file.url + '" target="_blank" rel="noopener">' + viewLabel + '</a>');
+			} else {
+				link.hide().empty();
+			}
+
+			if (preview.length) {
+				if ((key === 'png_96_id' || key === 'apple_touch_180_id') && file && file.url) {
+					preview.empty().append($('<img>', { src: file.url, alt: '' }));
+				} else if (key === 'svg_id') {
+					preview.empty().append($('<span class="dashicons dashicons-media-code"></span>'));
+				} else if (key === 'ico_id') {
+					preview.empty().append($('<span class="dashicons dashicons-art"></span>'));
+				} else if (key === 'manifest_id') {
+					preview.empty().append($('<span class="dashicons dashicons-media-text"></span>'));
+				} else {
+					preview.empty();
+				}
+			}
+
+			if (removeBtn.length) {
+				if (file && file.id) {
+					removeBtn.show();
+				} else {
+					removeBtn.hide();
+				}
+			}
+
+			row.toggleClass('is-set', !!(file && file.id));
+		}
+
+		function clearRow(row) {
+			var emptyLabel = row.find('.cpt360-favicon-filename').data('empty-label') || 'Not set';
+			row.removeClass('is-set');
+			row.find('.cpt360-favicon-field').val('');
+			row.find('.cpt360-favicon-filename').text(emptyLabel);
+			row.find('.cpt360-favicon-link').hide().empty();
+			row.find('.cpt360-favicon-preview').empty();
+			row.find('.cpt360-favicon-remove').hide();
+		}
+
+		function handleSingleSelection(key) {
+			if (!singleFrames[key]) {
+				singleFrames[key] = wp.media({
+					title: 'Select favicon file',
+					button: { text: 'Use this file' },
+					multiple: false,
+				});
+				singleFrames[key].on('select', function () {
+					var attachment = singleFrames[key].state().get('selection').first().toJSON();
+					if (!matchesSlot(key, attachment)) {
+						window.alert('The selected file does not match the expected format for this icon slot.');
+						return;
+					}
+					updateRow(key, attachment);
+				});
+			}
+			singleFrames[key].open();
+		}
+
+		manager.on('click', '.cpt360-favicon-select', function (e) {
+			e.preventDefault();
+			var key = $(this).closest('.cpt360-favicon-row').data('faviconKey');
+			if (!key) {
+				return;
+			}
+			handleSingleSelection(key);
+		});
+
+		manager.on('click', '.cpt360-favicon-remove', function (e) {
+			e.preventDefault();
+			var row = $(this).closest('.cpt360-favicon-row');
+			clearRow(row);
+		});
+
+		clearAllButton.on('click', function (e) {
+			e.preventDefault();
+			manager.find('.cpt360-favicon-row').each(function () {
+				clearRow($(this));
+			});
+		});
+
+		bulkButton.on('click', function (e) {
+			e.preventDefault();
+			if (bulkFrame) {
+				bulkFrame.open();
+				return;
+			}
+			bulkFrame = wp.media({
+				title: 'Upload favicon files',
+				button: { text: 'Use selected files' },
+				multiple: true,
+			});
+			bulkFrame.on('select', function () {
+				var selection = bulkFrame.state().get('selection');
+				selection.each(function (attachment) {
+					var data = attachment.toJSON();
+					for (var i = 0; i < order.length; i++) {
+						var key = order[i];
+						if (matchesSlot(key, data)) {
+							updateRow(key, data);
+							break;
+						}
+					}
+				});
+			});
+			bulkFrame.open();
+		});
+	}
 });

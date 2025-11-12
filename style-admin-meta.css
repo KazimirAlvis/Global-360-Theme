@@ -19,3 +19,93 @@
     border: 1px solid #e2e8f0;
     padding: 8px;
 }
+
+#cpt360-favicon-manager {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    padding: 16px;
+    margin-top: 12px;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-bulk {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-list {
+    display: grid;
+    gap: 12px;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-row {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 12px 14px;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-row-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-hint {
+    color: #64748b;
+    font-size: 12px;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-row-body {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-preview {
+    width: 56px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: #f1f5f9;
+    overflow: hidden;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-preview img {
+    max-width: 48px;
+    max-height: 48px;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-preview .dashicons {
+    font-size: 24px;
+    color: #334155;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-details {
+    flex: 1;
+    min-width: 0;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-filename {
+    font-weight: 600;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-link {
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+#cpt360-favicon-manager .cpt360-favicon-app-title {
+    margin-top: 20px;
+}

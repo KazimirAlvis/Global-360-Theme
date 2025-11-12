@@ -31,6 +31,7 @@ if (! class_exists('_360_Global_Settings')) {
             add_action('admin_init',                [$this, 'handle_import_export']);
             add_action('admin_enqueue_scripts',     [$this, 'enqueue_color_picker']);
             add_action('wp_head',                   [$this, 'print_global_css_variables']);
+            add_action('wp_head',                   [$this, 'output_site_icons'], 5);
             add_action('admin_head',                [$this, 'print_global_css_variables']);
             add_action('login_head',                [$this, 'print_global_css_variables']);
             add_action('wp_enqueue_scripts',        [$this, 'enqueue_global_css_variables'], 20);
@@ -415,6 +416,169 @@ if (! class_exists('_360_Global_Settings')) {
         <?php
         }
 
+        /**
+         * Configuration map for favicon-related uploads.
+         *
+         * @return array<string, array<string, mixed>>
+         */
+        private function get_favicon_field_config()
+        {
+            return [
+                'png_96_id' => [
+                    'label'     => __('Favicon PNG (96x96)', 'cpt360'),
+                    'hint'      => __('Expected name: favicon-96x96.png', 'cpt360'),
+                    'preview'   => true,
+                    'type'      => 'image',
+                ],
+                'svg_id' => [
+                    'label'   => __('Favicon SVG', 'cpt360'),
+                    'hint'    => __('Expected name: favicon.svg', 'cpt360'),
+                    'preview' => false,
+                    'type'    => 'image',
+                ],
+                'ico_id' => [
+                    'label'   => __('Favicon ICO', 'cpt360'),
+                    'hint'    => __('Expected name: favicon.ico', 'cpt360'),
+                    'preview' => false,
+                    'type'    => 'image',
+                ],
+                'apple_touch_180_id' => [
+                    'label'     => __('Apple Touch Icon (180x180)', 'cpt360'),
+                    'hint'      => __('Expected name: apple-touch-icon.png', 'cpt360'),
+                    'preview'   => true,
+                    'type'      => 'image',
+                ],
+                'manifest_id' => [
+                    'label'   => __('Web App Manifest', 'cpt360'),
+                    'hint'    => __('Expected name: site.webmanifest', 'cpt360'),
+                    'preview' => false,
+                    'type'    => 'application',
+                ],
+            ];
+        }
+
+        /**
+         * Render favicon and manifest controls.
+         */
+        public function render_favicon_bundle_controls()
+        {
+            $opts     = get_option(self::OPTION_KEY, []);
+            $favicons = isset($opts['favicons']) && is_array($opts['favicons']) ? $opts['favicons'] : [];
+            $config   = $this->get_favicon_field_config();
+            $app_title = isset($favicons['app_title']) ? $favicons['app_title'] : '';
+
+            echo '<div id="cpt360-favicon-manager" class="cpt360-card">';
+            echo '<p class="description">' . esc_html__('Upload your favicon bundle (PNG, SVG, ICO, Apple touch icon, and manifest). Use the bulk upload button to select multiple files at once - the theme will map filenames to the right slots automatically.', 'cpt360') . '</p>';
+            echo '<div class="cpt360-favicon-bulk">';
+            echo '<button type="button" class="button" id="cpt360-favicon-bulk-upload">' . esc_html__('Upload favicon files', 'cpt360') . '</button>';
+            echo '<button type="button" class="button-link cpt360-favicon-clear-all">' . esc_html__('Clear all', 'cpt360') . '</button>';
+            echo '</div>';
+
+            echo '<div class="cpt360-favicon-list">';
+            foreach ($config as $key => $field) {
+                $attachment_id = isset($favicons[$key]) ? intval($favicons[$key]) : 0;
+                $file_url      = $attachment_id ? wp_get_attachment_url($attachment_id) : '';
+                $file_name     = $file_url ? wp_basename($file_url) : '';
+                $preview_html  = '';
+                if ($file_url && ! empty($field['preview'])) {
+                    $preview_html = '<img src="' . esc_url($file_url) . '" alt="" />';
+                }
+
+                echo '<div class="cpt360-favicon-row" data-favicon-key="' . esc_attr($key) . '" data-upload-type="' . esc_attr($field['type']) . '" data-view-label="' . esc_attr__('View file', 'cpt360') . '">';
+                echo '<div class="cpt360-favicon-row-header">';
+                echo '<strong>' . esc_html($field['label']) . '</strong>';
+                if (! empty($field['hint'])) {
+                    echo '<span class="cpt360-favicon-hint">' . esc_html($field['hint']) . '</span>';
+                }
+                echo '</div>';
+
+                echo '<div class="cpt360-favicon-row-body">';
+                echo '<div class="cpt360-favicon-preview">' . $preview_html . '</div>';
+                echo '<div class="cpt360-favicon-details">';
+                echo '<div class="cpt360-favicon-filename" data-empty-label="' . esc_attr__('Not set', 'cpt360') . '">';
+                if ($file_name) {
+                    echo esc_html($file_name);
+                } else {
+                    echo esc_html__('Not set', 'cpt360');
+                }
+                echo '</div>';
+                if ($file_url) {
+                    echo '<div class="cpt360-favicon-link"><a href="' . esc_url($file_url) . '" target="_blank" rel="noopener">' . esc_html__('View file', 'cpt360') . '</a></div>';
+                } else {
+                    echo '<div class="cpt360-favicon-link" style="display:none;"></div>';
+                }
+                echo '<div class="cpt360-favicon-actions">';
+                echo '<button type="button" class="button cpt360-favicon-select">' . esc_html__('Select file', 'cpt360') . '</button>';
+                echo '<button type="button" class="button-link cpt360-favicon-remove"' . ($attachment_id ? '' : ' style="display:none;"') . '>' . esc_html__('Remove', 'cpt360') . '</button>';
+                echo '</div>';
+                echo '</div>'; // details
+                echo '</div>'; // row body
+
+                echo '<input type="hidden" name="' . esc_attr(self::OPTION_KEY . '[favicons][' . $key . ']') . '" value="' . ($attachment_id ? esc_attr($attachment_id) : '') . '" class="cpt360-favicon-field" />';
+                echo '</div>'; // row
+            }
+            echo '</div>'; // list
+
+            echo '<div class="cpt360-favicon-app-title">';
+            echo '<label for="cpt360_favicons_app_title"><strong>' . esc_html__('Apple web app title', 'cpt360') . '</strong></label>';
+            echo '<input type="text" id="cpt360_favicons_app_title" name="' . esc_attr(self::OPTION_KEY . '[favicons][app_title]') . '" value="' . esc_attr($app_title) . '" class="regular-text" />';
+            echo '<p class="description">' . esc_html__('Used for the apple-mobile-web-app-title meta tag. Falls back to the site title if left blank.', 'cpt360') . '</p>';
+            echo '</div>';
+
+            echo '</div>'; // manager
+        }
+
+        /**
+         * Output favicon and manifest tags in the document head.
+         */
+        public function output_site_icons()
+        {
+            $opts = get_option(self::OPTION_KEY, []);
+            if (empty($opts['favicons']) || ! is_array($opts['favicons'])) {
+                return;
+            }
+
+            $favicons = $opts['favicons'];
+
+            $png_96 = ! empty($favicons['png_96_id']) ? wp_get_attachment_url($favicons['png_96_id']) : '';
+            $svg    = ! empty($favicons['svg_id']) ? wp_get_attachment_url($favicons['svg_id']) : '';
+            $ico    = ! empty($favicons['ico_id']) ? wp_get_attachment_url($favicons['ico_id']) : '';
+            $apple  = ! empty($favicons['apple_touch_180_id']) ? wp_get_attachment_url($favicons['apple_touch_180_id']) : '';
+            $manifest = ! empty($favicons['manifest_id']) ? wp_get_attachment_url($favicons['manifest_id']) : '';
+
+            if (! $png_96 && ! $svg && ! $ico && ! $apple && ! $manifest) {
+                return;
+            }
+
+            if ($png_96) {
+                printf("\n<link rel=\"icon\" type=\"image/png\" href=\"%s\" sizes=\"96x96\" />\n", esc_url($png_96));
+            }
+
+            if ($svg) {
+                printf("<link rel=\"icon\" type=\"image/svg+xml\" href=\"%s\" />\n", esc_url($svg));
+            }
+
+            if ($ico) {
+                printf("<link rel=\"shortcut icon\" href=\"%s\" />\n", esc_url($ico));
+            }
+
+            if ($apple) {
+                printf("<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"%s\" />\n", esc_url($apple));
+            }
+
+            $app_title = isset($favicons['app_title']) ? trim((string) $favicons['app_title']) : '';
+            if ($app_title === '') {
+                $app_title = get_bloginfo('name', 'display');
+            }
+            if ($app_title !== '') {
+                printf("<meta name=\"apple-mobile-web-app-title\" content=\"%s\" />\n", esc_attr($app_title));
+            }
+
+            if ($manifest) {
+                printf("<link rel=\"manifest\" href=\"%s\" />\n", esc_url($manifest));
+            }
+        }
+
 
         /**
          * Sanitize all settings inputs.
@@ -488,6 +652,25 @@ if (! class_exists('_360_Global_Settings')) {
 
             if (isset($input['linktree_logo_id']) && is_numeric($input['linktree_logo_id'])) {
                 $output['linktree_logo_id'] = intval($input['linktree_logo_id']);
+            }
+
+            if (isset($input['favicons']) && is_array($input['favicons'])) {
+                $favicon_output = [];
+                $favicon_keys = ['png_96_id', 'svg_id', 'ico_id', 'apple_touch_180_id', 'manifest_id'];
+                foreach ($favicon_keys as $key) {
+                    if (! empty($input['favicons'][$key]) && is_numeric($input['favicons'][$key])) {
+                        $favicon_output[$key] = intval($input['favicons'][$key]);
+                    }
+                }
+
+                if (isset($input['favicons']['app_title'])) {
+                    $app_title = trim((string) $input['favicons']['app_title']);
+                    if ($app_title !== '') {
+                        $favicon_output['app_title'] = sanitize_text_field($app_title);
+                    }
+                }
+
+                $output['favicons'] = $favicon_output;
             }
 
             // Social links
@@ -592,6 +775,11 @@ if (! class_exists('_360_Global_Settings')) {
                             echo '<h3>Linktree Logo</h3>';
                             $this->field_linktree_logo(['label_for' => 'linktree_logo_id']);
                             echo '<p class="description">This logo appears on the Linktree landing page. Falls back to the header logo if left blank.</p>';
+                            echo '</div>';
+
+                            echo '<div style="margin-bottom: 30px;">';
+                            echo '<h3>' . esc_html__('Favicons & Web App Manifest', 'cpt360') . '</h3>';
+                            $this->render_favicon_bundle_controls();
                             echo '</div>';
 
                             // Social Media Repeater

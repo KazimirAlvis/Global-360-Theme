@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20251111160000`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20251111221908`)
 
 ### Release Process
 
@@ -42,6 +42,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 -   If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251111221908 (2025-11-12)
+
+-   Added a favicon bundle manager to 360 Settings with bulk media uploads for PNG, SVG, ICO, Apple touch, and manifest files.
+-   Output the uploaded favicon links, manifest reference, and optional Apple web app title into the site `<head>` so browsers pick up the custom icons.
+-   Allowed administrators to upload SVG, ICO, and `.webmanifest` files, ensured WordPress accepts and stores them without triggering image processing failures, and polished the settings UI preview styling.
 
 #### v1.0.20251111160000 (2025-11-11)
 

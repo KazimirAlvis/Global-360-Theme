@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20251111160000' );
+	define( '_S_VERSION', '1.0.20251111221908' );
 }
 
 /**
@@ -713,6 +713,93 @@ require get_template_directory() . '/inc/customizer.php';
 if ( defined( 'JETPACK__VERSION' ) ) {
 	require get_template_directory() . '/inc/jetpack.php';
 }
+
+/**
+ * Allow administrators to upload favicon bundle assets (SVG, ICO, and webmanifest files).
+ */
+function cpt360_allow_site_icon_mimes( $mimes ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return $mimes;
+	}
+
+	$mimes['ico'] = 'image/x-icon';
+	$mimes['cur'] = 'image/x-icon';
+	$mimes['svg'] = 'image/svg+xml';
+	$mimes['webmanifest'] = 'application/json';
+
+	return $mimes;
+}
+add_filter( 'upload_mimes', 'cpt360_allow_site_icon_mimes' );
+
+/**
+ * Ensure favicon bundle files pass WordPress' upload validation.
+ */
+function cpt360_allow_manifest_filetype( $data, $file, $filename, $mimes, $real_mime ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return $data;
+	}
+
+	$raw_filename = $filename;
+	$filename     = strtolower( $filename );
+
+	$display_name = $raw_filename;
+	if ( $display_name === '' ) {
+		if ( is_array( $file ) && isset( $file['name'] ) ) {
+			$display_name = $file['name'];
+		} elseif ( is_string( $file ) ) {
+			$display_name = basename( $file );
+		}
+	}
+
+	$sanitized_name = sanitize_file_name( $display_name );
+
+	if ( substr( $filename, -4 ) === '.ico' ) {
+		$data['ext']  = 'ico';
+		$data['type'] = 'image/x-icon';
+		if ( empty( $data['proper_filename'] ) ) {
+			$data['proper_filename'] = $sanitized_name;
+		}
+		return $data;
+	}
+
+	if ( substr( $filename, -13 ) === '.webmanifest' || substr( $filename, -13 ) === 'manifest.json' ) {
+		$data['ext']  = 'webmanifest';
+		$data['type'] = 'application/json';
+		if ( empty( $data['proper_filename'] ) ) {
+			$data['proper_filename'] = $sanitized_name;
+		}
+		return $data;
+	}
+
+	return $data;
+}
+add_filter( 'wp_check_filetype_and_ext', 'cpt360_allow_manifest_filetype', 10, 5 );
+
+/**
+ * Prevent WordPress from attempting to rasterize ICO uploads, which often fails on constrained hosts.
+ */
+function cpt360_treat_ico_as_non_image( $is_image, $attachment_id ) {
+	$mime = get_post_mime_type( $attachment_id );
+
+	if ( in_array( $mime, [ 'image/x-icon', 'image/vnd.microsoft.icon' ], true ) ) {
+		return false;
+	}
+
+	return $is_image;
+}
+add_filter( 'wp_attachment_is_image', 'cpt360_treat_ico_as_non_image', 10, 2 );
+
+/**
+ * Ensure ICO uploads skip the image processing pipeline entirely.
+ */
+function cpt360_flag_ico_upload_non_image( $upload, $context ) {
+	if ( isset( $upload['type'] ) && in_array( $upload['type'], [ 'image/x-icon', 'image/vnd.microsoft.icon' ], true ) ) {
+		$upload['is_image'] = false;
+	}
+
+	return $upload;
+}
+add_filter( 'wp_handle_upload', 'cpt360_flag_ico_upload_non_image', 10, 2 );
 
 /**
  * Register Clinics CPT (only if not already registered by plugin)
