@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20251111221908' );
+	define( '_S_VERSION', '1.0.20251120120000' );
 }
 
 /**
@@ -679,13 +679,14 @@ add_action( 'wp_enqueue_scripts', 'global_360_theme_scripts', 5 ); // Higher pri
 
 /**
  * Add preload link for main stylesheet to prevent FOUC
+ * Disabled to prevent duplicate loading with child themes
  */
 function global_360_theme_preload_styles() {
-	$stylesheet_uri = global_360_theme_get_stylesheet_asset();
-    echo '<link rel="preload" href="' . esc_url($stylesheet_uri) . '" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">' . "\n";
-    echo '<noscript><link rel="stylesheet" href="' . esc_url($stylesheet_uri) . '"></noscript>' . "\n";
+	// $stylesheet_uri = global_360_theme_get_stylesheet_asset();
+	// echo '<link rel="preload" href="' . esc_url($stylesheet_uri) . '" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">' . "\n";
+	// echo '<noscript><link rel="stylesheet" href="' . esc_url($stylesheet_uri) . '"></noscript>' . "\n";
 }
-add_action( 'wp_head', 'global_360_theme_preload_styles', 1 );
+// add_action( 'wp_head', 'global_360_theme_preload_styles', 1 );
 
 /**
  * Implement the Custom Header feature.

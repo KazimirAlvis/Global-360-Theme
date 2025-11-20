@@ -10,6 +10,7 @@ A comprehensive WordPress theme designed for Patient 360 medical websites, featu
 -   **Dynamic State Pages**: Interactive clinic finder with `/find-a-doctor/{state}` routing
 -   **Interactive Maps**: Leaflet integration with Google Maps geocoding
 -   **Global Settings**: Comprehensive admin interface for theme customization
+-   **Favicon Bundle Manager**: Upload PNG/SVG/ICO/Apple-touch/manifest assets directly from the 360 Settings UI
 -   **Social Media Integration**: Font Awesome icons with dynamic social links
 -   **SASS Architecture**: Modular styling with automatic compilation
 -   **Gutenberg Support**: Full block editor compatibility
@@ -98,6 +99,17 @@ Access comprehensive theme settings via **Appearance > Theme Settings**:
 -   Header styling options
 -   Footer content management
 -   Social media links with Font Awesome icons
+-   Favicon bundle manager with bulk upload for PNG, SVG, ICO, Apple touch icon, and web manifest files
+-   Optional Apple web app title override for home screen installs
+
+#### Favicons & Web App Manifest
+
+The 360 Settings header tab now includes a **Favicon & Manifest** panel:
+
+1. Click **Upload favicon files** to open the bulk uploader. The theme auto-maps filenames like `favicon-96x96.png`, `favicon.svg`, `favicon.ico`, `apple-touch-icon.png`, and `site.webmanifest` to the correct slots.
+2. Use the per-row **Select file** buttons if you prefer to upload assets individually; invalid formats trigger an inline warning.
+3. Set the optional **Apple web app title** to override the default site name for iOS home screen shortcuts.
+4. After saving, the theme outputs the appropriate `<link rel="icon">`, Apple touch icon, manifest, and Apple title meta tags in the site `<head>`.
 
 #### Assessment Tab
 
