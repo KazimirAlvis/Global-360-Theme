@@ -13,7 +13,86 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20251120120000' );
+	define( '_S_VERSION', '1.0.20251120170000' );
+}
+
+if (!function_exists('global_360_get_icon_svg')) {
+	/**
+	 * Return inline SVG markup for a given icon key.
+	 *
+	 * @param string $icon   Icon identifier.
+	 * @param string $classes Optional space-separated class list to append to the SVG element.
+	 * @return string
+	 */
+	function global_360_get_icon_svg($icon, $classes = '') {
+		static $icon_map = [
+			'facebook' => [
+				'viewBox' => '0 0 640 640',
+				'paths'   => '<path d="M240 363.3L240 576L356 576L356 363.3L442.5 363.3L460.5 265.5L356 265.5L356 230.9C356 179.2 376.3 159.4 428.7 159.4C445 159.4 458.1 159.8 465.7 160.6L465.7 71.9C451.4 68 416.4 64 396.2 64C289.3 64 240 114.5 240 223.4L240 265.5L174 265.5L174 363.3L240 363.3z"/>'
+			],
+			'instagram' => [
+				'viewBox' => '0 0 640 640',
+				'paths'   => '<path d="M320.3 205C256.8 204.8 205.2 256.2 205 319.7C204.8 383.2 256.2 434.8 319.7 435C383.2 435.2 434.8 383.8 435 320.3C435.2 256.8 383.8 205.2 320.3 205zM319.7 245.4C360.9 245.2 394.4 278.5 394.6 319.7C394.8 360.9 361.5 394.4 320.3 394.6C279.1 394.8 245.6 361.5 245.4 320.3C245.2 279.1 278.5 245.6 319.7 245.4zM413.1 200.3C413.1 185.5 425.1 173.5 439.9 173.5C454.7 173.5 466.7 185.5 466.7 200.3C466.7 215.1 454.7 227.1 439.9 227.1C425.1 227.1 413.1 215.1 413.1 200.3zM542.8 227.5C541.1 191.6 532.9 159.8 506.6 133.6C480.4 107.4 448.6 99.2 412.7 97.4C375.7 95.3 264.8 95.3 227.8 97.4C192 99.1 160.2 107.3 133.9 133.5C107.6 159.7 99.5 191.5 97.7 227.4C95.6 264.4 95.6 375.3 97.7 412.3C99.4 448.2 107.6 480 133.9 506.2C160.2 532.4 191.9 540.6 227.8 542.4C264.8 544.5 375.7 544.5 412.7 542.4C448.6 540.7 480.4 532.5 506.6 506.2C532.8 480 541 448.2 542.8 412.3C544.9 375.3 544.9 264.5 542.8 227.5zM495 452C487.2 471.6 472.1 486.7 452.4 494.6C422.9 506.3 352.9 503.6 320.3 503.6C287.7 503.6 217.6 506.2 188.2 494.6C168.6 486.8 153.5 471.7 145.6 452C133.9 422.5 136.6 352.5 136.6 319.9C136.6 287.3 134 217.2 145.6 187.8C153.4 168.2 168.5 153.1 188.2 145.2C217.7 133.5 287.7 136.2 320.3 136.2C352.9 136.2 423 133.6 452.4 145.2C472 153 487.1 168.1 495 187.8C506.7 217.3 504 287.3 504 319.9C504 352.5 506.7 422.6 495 452z"/>'
+			],
+			'x' => [
+				'viewBox' => '0 0 640 640',
+				'paths'   => '<path d="M453.2 112L523.8 112L369.6 288.2L551 528L409 528L297.7 382.6L170.5 528L99.8 528L264.7 339.5L90.8 112L236.4 112L336.9 244.9L453.2 112zM428.4 485.8L467.5 485.8L215.1 152L173.1 152L428.4 485.8z"/>'
+			],
+			'youtube' => [
+				'viewBox' => '0 0 640 640',
+				'paths'   => '<path d="M581.7 188.1C575.5 164.4 556.9 145.8 533.4 139.5C490.9 128 320.1 128 320.1 128C320.1 128 149.3 128 106.7 139.5C83.2 145.8 64.7 164.4 58.4 188.1C47 231 47 320.4 47 320.4C47 320.4 47 409.8 58.4 452.7C64.7 476.3 83.2 494.2 106.7 500.5C149.3 512 320.1 512 320.1 512C320.1 512 490.9 512 533.5 500.5C557 494.2 575.5 476.3 581.8 452.7C593.2 409.8 593.2 320.4 593.2 320.4C593.2 320.4 593.2 231 581.8 188.1zM264.2 401.6L264.2 239.2L406.9 320.4L264.2 401.6z"/>'
+			],
+			'tiktok' => [
+				'viewBox' => '0 0 640 640',
+				'paths'   => '<path d="M544.5 273.9C500.5 274 457.5 260.3 421.7 234.7L421.7 413.4C421.7 446.5 411.6 478.8 392.7 506C373.8 533.2 347.1 554 316.1 565.6C285.1 577.2 251.3 579.1 219.2 570.9C187.1 562.7 158.3 545 136.5 520.1C114.7 495.2 101.2 464.1 97.5 431.2C93.8 398.3 100.4 365.1 116.1 336C131.8 306.9 156.1 283.3 185.7 268.3C215.3 253.3 248.6 247.8 281.4 252.3L281.4 342.2C266.4 337.5 250.3 337.6 235.4 342.6C220.5 347.6 207.5 357.2 198.4 369.9C189.3 382.6 184.4 398 184.5 413.8C184.6 429.6 189.7 444.8 199 457.5C208.3 470.2 221.4 479.6 236.4 484.4C251.4 489.2 267.5 489.2 282.4 484.3C297.3 479.4 310.4 469.9 319.6 457.2C328.8 444.5 333.8 429.1 333.8 413.4L333.8 64L421.8 64C421.7 71.4 422.4 78.9 423.7 86.2C426.8 102.5 433.1 118.1 442.4 131.9C451.7 145.7 463.7 157.5 477.6 166.5C497.5 179.6 520.8 186.6 544.6 186.6L544.6 274z"/>'
+			],
+			'linkedin' => [
+				'viewBox' => '0 0 640 640',
+				'paths'   => '<path d="M196.3 512L103.4 512L103.4 212.9L196.3 212.9L196.3 512zM149.8 172.1C120.1 172.1 96 147.5 96 117.8C96 103.5 101.7 89.9 111.8 79.8C121.9 69.7 135.6 64 149.8 64C164 64 177.7 69.7 187.8 79.8C197.9 89.9 203.6 103.6 203.6 117.8C203.6 147.5 179.5 172.1 149.8 172.1zM543.9 512L451.2 512L451.2 366.4C451.2 331.7 450.5 287.2 402.9 287.2C354.6 287.2 347.2 324.9 347.2 363.9L347.2 512L254.4 512L254.4 212.9L343.5 212.9L343.5 253.7L344.8 253.7C357.2 230.2 387.5 205.4 432.7 205.4C526.7 205.4 544 267.3 544 347.7L544 512L543.9 512z"/>'
+			],
+			'email' => [
+				'viewBox' => '0 0 24 24',
+				'paths'   => '<path fill-rule="evenodd" d="M1.5 5.25A2.25 2.25 0 013.75 3h16.5A2.25 2.25 0 0122.5 5.25v13.5A2.25 2.25 0 0120.25 21h-16.5A2.25 2.25 0 011.5 18.75V5.25zm1.91-.75a.75.75 0 00-.66.375 49.504 49.504 0 009.25 5.41 49.503 49.503 0 009.25-5.41.75.75 0 00-.66-.375H3.41zm17.34 3.438a50.861 50.861 0 01-8.94 4.912.75.75 0 01-.62 0A50.862 50.862 0 012.25 7.938V18.75c0 .414.336.75.75.75h16.5a.75.75 0 00.75-.75V7.938z" clip-rule="evenodd"/>'
+			],
+			'link' => [
+				'viewBox' => '0 0 24 24',
+				'paths'   => '<path d="M8.25 4.5h2.25a4.5 4.5 0 013.396 7.542l-.884.884a.75.75 0 11-1.06-1.06l.884-.884a3 3 0 00-2.236-5.102H8.25a3 3 0 100 6h1.5a.75.75 0 010 1.5h-1.5a4.5 4.5 0 010-9z"/><path d="M15.75 19.5h-2.25a4.5 4.5 0 01-3.396-7.542l.884-.884a.75.75 0 111.06 1.06l-.884.884a3 3 0 002.236 5.102h2.25a3 3 0 100-6h-1.5a.75.75 0 010-1.5h1.5a4.5 4.5 0 010 9z"/>'
+			],
+			'check' => [
+				'viewBox' => '0 0 24 24',
+				'paths'   => '<path d="M9 16.2L4.8 12 3.4 13.4l5.6 5.6L20.6 7.4 19.2 6z"/>'
+			],
+			'globe' => [
+				'viewBox' => '0 0 24 24',
+				'paths'   => '<path fill-rule="evenodd" d="M12 1.5a10.5 10.5 0 100 21 10.5 10.5 0 000-21zm0 1.5a9 9 0 018.862 7.5H15.75a16.93 16.93 0 00-2.27-6.482A9.012 9.012 0 0112 3zm-1.48.018A16.928 16.928 0 008.25 10.5H3.138A9.002 9.002 0 0110.52 3.018zM3.01 12a9 9 0 0017.98 0H15.75a16.93 16.93 0 01-2.27 6.482A9.012 9.012 0 0112 21a9.012 9.012 0 01-1.48-.018A16.928 16.928 0 008.25 12H3.01zm6.24 0a15.432 15.432 0 002.25 6.93A15.432 15.432 0 0013.75 12a15.432 15.432 0 00-2.25-6.93A15.432 15.432 0 009.25 12z" clip-rule="evenodd"/>'
+			],
+			'location-pin' => [
+				'viewBox' => '0 0 24 24',
+				'paths'   => '<path fill-rule="evenodd" d="M12 2.25a6.75 6.75 0 00-6.75 6.75c0 4.097 3.265 8.455 5.262 10.637a1.125 1.125 0 001.676 0C15.485 17.455 18.75 13.097 18.75 9a6.75 6.75 0 00-6.75-6.75zm0 9.75a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>'
+			],
+			'location-dot' => [
+				'viewBox' => '0 0 24 24',
+				'paths'   => '<path fill-rule="evenodd" d="M12 2.25a6.75 6.75 0 00-6.75 6.75c0 4.097 3.265 8.455 5.262 10.637a1.125 1.125 0 001.676 0C15.485 17.455 18.75 13.097 18.75 9a6.75 6.75 0 00-6.75-6.75zm0 9.75a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>'
+			],
+			'quote' => [
+				'viewBox' => '0 0 24 24',
+				'paths'   => '<path d="M7.5 6h4A1.5 1.5 0 0113 7.5V14a3 3 0 11-6 0v-3h-3V9a3 3 0 013-3zm9 0h4A1.5 1.5 0 0122 7.5V14a3 3 0 11-6 0v-3h-3V9a3 3 0 013-3z"/>'
+			],
+		];
+		if (!isset($icon_map[$icon])) {
+			return '';
+		}
+		$base_class = 'icon icon--' . preg_replace('/[^a-z0-9\-]/', '-', strtolower($icon));
+		$all_classes = trim($base_class . ' ' . $classes);
+		$view_box = $icon_map[$icon]['viewBox'];
+		$paths = $icon_map[$icon]['paths'];
+		return sprintf(
+			'<svg class="%1$s" xmlns="http://www.w3.org/2000/svg" viewBox="%2$s" fill="currentColor" aria-hidden="true" focusable="false">%3$s</svg>',
+			esc_attr($all_classes),
+			esc_attr($view_box),
+			$paths
+		);
+	}
 }
 
 /**
@@ -683,8 +762,8 @@ add_action( 'wp_enqueue_scripts', 'global_360_theme_scripts', 5 ); // Higher pri
  */
 function global_360_theme_preload_styles() {
 	// $stylesheet_uri = global_360_theme_get_stylesheet_asset();
-	// echo '<link rel="preload" href="' . esc_url($stylesheet_uri) . '" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">' . "\n";
-	// echo '<noscript><link rel="stylesheet" href="' . esc_url($stylesheet_uri) . '"></noscript>' . "\n";
+    // echo '<link rel="preload" href="' . esc_url($stylesheet_uri) . '" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">' . "\n";
+    // echo '<noscript><link rel="stylesheet" href="' . esc_url($stylesheet_uri) . '"></noscript>' . "\n";
 }
 // add_action( 'wp_head', 'global_360_theme_preload_styles', 1 );
 
@@ -1003,18 +1082,6 @@ function global_360_theme_enqueue_google_fonts()
 
 
 /*--------------------------------------------------------------
- Font Awesome
---------------------------------------------------------------*/
-add_action('wp_enqueue_scripts', function () {
-  wp_enqueue_style(
-	'my-plugin-fa',
-	'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
-	[],
-	'6.5.1'
-  );
-});
-
-/*--------------------------------------------------------------
  Slick CDN
 --------------------------------------------------------------*/
 
@@ -1176,24 +1243,25 @@ function global_360_social_sharing($post_id = null) {
         <h4 class="sharing-title">Share this article:</h4>
         <div class="sharing-buttons">
             <a href="<?php echo $facebook_url; ?>" target="_blank" rel="noopener" class="share-button facebook" aria-label="Share on Facebook">
-                <i class="fab fa-facebook-f"></i>
-                <span>Facebook</span>
+				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('facebook', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<span class="share-label">Facebook</span>
             </a>
             <a href="<?php echo $twitter_url; ?>" target="_blank" rel="noopener" class="share-button twitter" aria-label="Share on Twitter/X">
-                <i class="fab fa-x-twitter"></i>
-                <span>Twitter</span>
+				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('x', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<span class="share-label">Twitter</span>
             </a>
             <a href="<?php echo $linkedin_url; ?>" target="_blank" rel="noopener" class="share-button linkedin" aria-label="Share on LinkedIn">
-                <i class="fab fa-linkedin-in"></i>
-                <span>LinkedIn</span>
+				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('linkedin', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<span class="share-label">LinkedIn</span>
             </a>
             <a href="<?php echo $email_url; ?>" class="share-button email" aria-label="Share via Email">
-                <i class="fas fa-envelope"></i>
-                <span>Email</span>
+				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('email', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<span class="share-label">Email</span>
             </a>
-            <button class="share-button copy-link" onclick="copyToClipboard('<?php echo $post_url; ?>')" aria-label="Copy Link">
-                <i class="fas fa-link"></i>
-                <span>Copy Link</span>
+			<button type="button" class="share-button copy-link" onclick="copyToClipboard('<?php echo esc_js($post_url); ?>')" aria-label="Copy Link">
+				<span class="share-icon share-icon--default" aria-hidden="true"><?php echo global_360_get_icon_svg('link', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<span class="share-icon share-icon--success" aria-hidden="true" hidden><?php echo global_360_get_icon_svg('check', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<span class="share-label copy-label">Copy Link</span>
             </button>
         </div>
     </div>
@@ -1233,20 +1301,34 @@ function global_360_social_sharing($post_id = null) {
     }
     
     function showCopyMessage() {
-        const button = document.querySelector('.copy-link');
-        const originalText = button.querySelector('span').innerText;
-        const originalIcon = button.querySelector('i').className;
+		const button = document.querySelector('.share-button.copy-link');
+		if (!button) {
+			return;
+		}
+		const label = button.querySelector('.copy-label');
+		const defaultIcon = button.querySelector('.share-icon--default');
+		const successIcon = button.querySelector('.share-icon--success');
+		if (!label) {
+			return;
+		}
+		const originalText = label.innerText;
         
         // Change button to show success
-        button.querySelector('span').innerText = 'Copied!';
-        button.querySelector('i').className = 'fas fa-check';
+		label.innerText = 'Copied!';
+		if (defaultIcon && successIcon) {
+			defaultIcon.hidden = true;
+			successIcon.hidden = false;
+		}
         button.style.backgroundColor = '#28a745';
         button.style.borderColor = '#28a745';
         
         // Reset after 2 seconds
         setTimeout(() => {
-            button.querySelector('span').innerText = originalText;
-            button.querySelector('i').className = originalIcon;
+			label.innerText = originalText;
+			if (defaultIcon && successIcon) {
+				defaultIcon.hidden = false;
+				successIcon.hidden = true;
+			}
             button.style.backgroundColor = '';
             button.style.borderColor = '';
         }, 2000);
