@@ -42,24 +42,24 @@
 			<h4>Follow Us</h4>
 			<ul class="sm_links_list">
 				<?php
-				$opts = get_option('360_global_settings', []);
+				$label_map = [
+					'facebook' => 'Facebook',
+					'instagram' => 'Instagram',
+					'x' => 'X',
+					'youtube' => 'YouTube',
+					'tiktok' => 'TikTok',
+					'linkedin' => 'LinkedIn',
+				];
 				if (!empty($opts['social_links']) && is_array($opts['social_links'])) {
-					// Font Awesome icon map
-					$fa_map = [
-						'facebook' => 'fab fa-facebook-f',
-						'instagram' => 'fab fa-instagram',
-						'x' => 'fab fa-x-twitter',
-						'youtube' => 'fab fa-youtube',
-						'tiktok' => 'fab fa-tiktok',
-						'linkedin' => 'fab fa-linkedin-in',
-						'website' => 'fas fa-globe',
-					];
 					foreach ($opts['social_links'] as $row) {
-						$platform = isset($row['platform']) ? $row['platform'] : '';
+						$platform = isset($row['platform']) ? sanitize_key($row['platform']) : '';
 						$url = isset($row['url']) ? $row['url'] : '';
 						if ($platform && $url) {
-							$icon = isset($fa_map[$platform]) ? $fa_map[$platform] : 'fas fa-link';
-							echo '<li><a href="' . esc_url($url) . '" target="_blank" rel="noopener"><i class="' . esc_attr($icon) . '"></i></a></li>';
+							$label = isset($label_map[$platform]) ? $label_map[$platform] : ucwords(str_replace('-', ' ', $platform));
+							$icon = global_360_get_icon_svg($platform, 'social-icon__svg');
+							if ($icon) {
+								echo '<li><a href="' . esc_url($url) . '" target="_blank" rel="noopener" class="social-icon">' . $icon . '<span class="screen-reader-text">' . esc_html($label) . '</span></a></li>';
+							}
 						}
 					}
 				}
