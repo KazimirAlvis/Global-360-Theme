@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20251111221908`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20251124094520`)
 
 ### Release Process
 
