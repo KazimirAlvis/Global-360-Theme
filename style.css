@@ -4,7 +4,7 @@ Theme URI: http://underscores.me/
 Author: Underscores.me
 Author URI: http://underscores.me/
 Description: Description
-Version: 1.0.20251125175136
+Version: 1.0.20251125181016
 Tested up to: 5.4
 Requires PHP: 5.6
 License: GNU General Public License v2 or later
@@ -25,27 +25,27 @@ Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
 >>> TABLE OF CONTENTS:
 ----------------------------------------------------------------
 # Generic
-	- Normalize
-	- Box sizing
+  - Normalize
+  - Box sizing
 # Base
-	- Typography
-	- Elements
-	- Links
-	- Forms
+  - Typography
+  - Elements
+  - Links
+  - Forms
 ## Layouts
 # Components
-	- Navigation
-	- Posts and pages
-	- Comments
-	- Widgets
-	- Media
-	- Captions
-	- Galleries
+  - Navigation
+  - Posts and pages
+  - Comments
+  - Widgets
+  - Media
+  - Captions
+  - Galleries
 # plugins
-	- Jetpack infinite scroll
+  - Jetpack infinite scroll
 # Utilities
-	- Accessibility
-	- Alignments
+  - Accessibility
+  - Alignments
 
 --------------------------------------------------------------*/
 /*--------------------------------------------------------------
@@ -91,7 +91,7 @@ h1 {
 }
 
 /* Grouping content
-Version: 1.0.20251125091500
+	 ========================================================================== */
 /**
  * 1. Add the correct box sizing in Firefox.
  * 2. Show the overflow in Edge and IE.
@@ -1781,91 +1781,166 @@ body.mobile-menu-open {
 }
 
 /* (reverted) */
-/* Linktree landing page styles */
-.linktree-main {
-  background: #f7f7f9;
+/*--------------------------------------------------------------
+ Linktree Landing Page
+--------------------------------------------------------------*/
+body.page-template-page-linktree {
+  background-color: #ffffff;
+}
+
+body.page-template-page-linktree #masthead,
+body.page-template-page-linktree .site-footer {
+  display: none;
+}
+
+body.page-template-page-linktree #page {
+  min-height: 100vh;
+}
+
+.page-template-page-linktree .linktree-main {
+  padding: 0;
+}
+
+.page-template-page-linktree .linktree-wrapper {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  background-color: #ffffff;
 }
 
-.linktree-wrapper {
+.page-template-page-linktree .linktree-card {
   width: 100%;
-  max-width: 480px;
-}
-
-.linktree-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-  padding: 28px;
+  max-width: 420px;
   text-align: center;
+  background-color: #ffffff;
+  padding: 32px 28px;
+  border-radius: 24px;
+  box-shadow: 0 18px 45px rgba(17, 24, 39, 0.08);
 }
 
-.linktree-logo-img {
-  max-width: 140px;
+.page-template-page-linktree .linktree-logo {
+  margin-bottom: 24px;
+}
+
+.page-template-page-linktree .linktree-logo-img {
+  max-width: 180px;
   height: auto;
-  margin: 0 auto 16px;
+  margin: 0 auto;
   display: block;
 }
 
-.linktree-title {
-  margin: 8px 0 18px;
-  font-size: 22px;
-  font-weight: 600;
-  color: #222;
+.page-template-page-linktree .linktree-title {
+  font-size: 1.875rem;
+  margin-bottom: 20px;
 }
 
-.linktree-content {
-  margin-bottom: 12px;
-  color: #444;
+.page-template-page-linktree .linktree-content {
+  margin-bottom: 24px;
 }
 
-.linktree-cta-list {
+.page-template-page-linktree .linktree-content p:last-child {
+  margin-bottom: 0;
+}
+
+.page-template-page-linktree .linktree-cta-list {
   list-style: none;
   padding: 0;
-  margin: 18px 0;
+  margin: 0 0 28px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.linktree-cta-list li {
-  margin-bottom: 12px;
-}
-
-.linktree-button {
-  display: inline-block;
+.page-template-page-linktree .linktree-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 14px 16px;
-  background: var(--linktree-primary, #0073aa);
-  color: #fff;
-  border-radius: 8px;
+  min-height: 52px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background-color: var(--linktree-primary, var(--cpt360-primary, #1a73e8));
+  color: #ffffff;
   text-decoration: none;
   font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 12px 25px rgba(26, 115, 232, 0.25);
 }
 
-.linktree-social-list {
+.page-template-page-linktree pr360-questionnaire::part(begin-button) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background-color: var(--linktree-primary, var(--cpt360-primary, #1a73e8));
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-align: center;
+  box-shadow: 0 12px 25px rgba(26, 115, 232, 0.25);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin: 0;
+}
+
+.page-template-page-linktree .linktree-button:hover,
+.page-template-page-linktree .linktree-button:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 32px rgba(26, 115, 232, 0.35);
+}
+
+.page-template-page-linktree pr360-questionnaire::part(begin-button):hover,
+.page-template-page-linktree pr360-questionnaire::part(begin-button):focus {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 32px rgba(26, 115, 232, 0.35);
+  outline: none;
+}
+
+.page-template-page-linktree .linktree-social-list {
   list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   justify-content: center;
-  gap: 12px;
-  padding: 0;
-  margin-top: 14px;
+  gap: 14px;
 }
 
-.linktree-social-icon {
-  width: 22px;
-  height: 22px;
-  vertical-align: middle;
-  display: inline-block;
+.page-template-page-linktree .linktree-social-list a {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #f3f4f6;
+  color: var(--linktree-primary, var(--cpt360-primary, #1a73e8));
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border: none;
+  text-decoration: none;
 }
 
-@media (max-width: 480px) {
-  .linktree-card {
-    padding: 20px;
+.page-template-page-linktree .linktree-social-list a:hover,
+.page-template-page-linktree .linktree-social-list a:focus {
+  background-color: var(--linktree-primary, var(--cpt360-primary, #1a73e8));
+  color: #ffffff;
+}
+
+body.page-template-page-linktree #floating-assessment-button {
+  display: none !important;
+}
+
+@media (max-width: 600px) {
+  .page-template-page-linktree .linktree-card {
+    padding: 28px 20px;
   }
-  .linktree-title {
-    font-size: 20px;
+  .page-template-page-linktree .linktree-title {
+    font-size: 1.65rem;
   }
 }
 /*--------------------------------------------------------------
@@ -3625,3 +3700,5 @@ body.mobile-menu-open {
     margin-top: 10px;
   }
 }
+
+/*# sourceMappingURL=style.css.map */

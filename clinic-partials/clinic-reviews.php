@@ -6,7 +6,7 @@ if ( ! empty( $reviews ) && is_array( $reviews ) ): ?>
     <div class="clinic-reviews-slider">
       <?php foreach ( $reviews as $r ): ?>
         <div class="review-slide">
-          <i class="fa-solid fa-quote-right review-quote-icon"></i>
+          <?php echo global_360_get_icon_svg('quote', 'review-quote-icon'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
           <blockquote class="review-text">
             <?php echo nl2br( esc_html( $r['review'] ) ); ?>
           </blockquote>

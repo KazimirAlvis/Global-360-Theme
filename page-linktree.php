@@ -76,13 +76,13 @@ if ($contact_phone) {
 
 $social_links = isset($opts['social_links']) && is_array($opts['social_links']) ? $opts['social_links'] : [];
 $icon_map = [
-    'facebook'  => 'fab fa-facebook-f',
-    'instagram' => 'fab fa-instagram',
-    'x'         => 'fab fa-x-twitter',
-    'youtube'   => 'fab fa-youtube',
-    'tiktok'    => 'fab fa-tiktok',
-    'linkedin'  => 'fab fa-linkedin-in',
-    'website'   => 'fas fa-globe',
+    'facebook'  => 'facebook',
+    'instagram' => 'instagram',
+    'x'         => 'x',
+    'youtube'   => 'youtube',
+    'tiktok'    => 'tiktok',
+    'linkedin'  => 'linkedin',
+    'website'   => 'globe',
 ];
 ?>
 
@@ -136,11 +136,11 @@ $icon_map = [
                         if (! $platform || ! $url) {
                             continue;
                         }
-                        $icon = isset($icon_map[$platform]) ? $icon_map[$platform] : 'fas fa-link';
+                        $icon_id  = isset($icon_map[$platform]) ? $icon_map[$platform] : 'link';
                         ?>
                         <li>
                             <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener">
-                                <i class="<?php echo esc_attr($icon); ?>" aria-hidden="true"></i>
+                                <?php echo global_360_get_icon_svg($icon_id, 'linktree-social-icon'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                                 <span class="screen-reader-text"><?php echo esc_html(ucwords($platform)); ?></span>
                             </a>
                         </li>

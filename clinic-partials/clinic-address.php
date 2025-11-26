@@ -4,8 +4,10 @@
     if (! empty($addresses)) {
         echo '<ul class="clinic-addresses">';
         foreach ($addresses as $addr) {
+            $icon = global_360_get_icon_svg('location-pin', 'clinic-address-icon');
             printf(
-                '<li><i class="fa-solid fa-location-pin"></i> %s %s %s %s</li>',
+                '<li>%s %s %s %s %s</li>',
+                $icon, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 esc_html($addr['street']),
                 esc_html($addr['city']),
                 esc_html($addr['state']),

@@ -46,7 +46,7 @@ function cpt360_render_clinic_maps() {
 
           // Heading + address
           echo '<div class="map_heading">';
-          echo '<i class="fa-solid fa-location-dot clinic-map-icon"></i>';
+          echo global_360_get_icon_svg('location-dot', 'clinic-map-icon'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             echo '<h4 class="clinic-title">' . esc_html( get_the_title() ) . '</h4>';
             echo '<p>' . esc_html( $full_address ) . '</p>';
           echo '</div>';
