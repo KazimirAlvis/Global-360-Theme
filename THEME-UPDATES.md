@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20251125172813`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20251125175136`)
 
 ### Release Process
 
@@ -42,6 +42,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 -   If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251125175136 (2025-11-25)
+
+-   Recompiled `style-min.css` from the latest `style.css` so the Linktree landing page polish ships to live sites using the minified bundle.
+-   Bumped the theme version to trigger the WordPress updater and ensure hosted environments pick up the refreshed styling.
 
 #### v1.0.20251125172813 (2025-11-25)
 
