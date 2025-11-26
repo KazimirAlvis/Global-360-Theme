@@ -4,7 +4,7 @@ Theme URI: http://underscores.me/
 Author: Underscores.me
 Author URI: http://underscores.me/
 Description: Description
-Version: 1.0.20251124094520
+Version: 1.0.20251125091500
 Tested up to: 5.4
 Requires PHP: 5.6
 License: GNU General Public License v2 or later
@@ -91,7 +91,7 @@ h1 {
 }
 
 /* Grouping content
-	 ========================================================================== */
+Version: 1.0.20251125091500
 /**
  * 1. Add the correct box sizing in Firefox.
  * 2. Show the overflow in Edge and IE.
@@ -958,6 +958,28 @@ textarea {
   display: inline-block;
 }
 
+/* Ensure any inline SVGs inside buttons inherit color and size correctly */
+.button--begin svg,
+.btn svg,
+.linktree-button svg,
+.btn_green svg,
+.btn_green_ol svg {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-right: 10px;
+  fill: currentColor;
+}
+
+/* Generic icon sizing for inline SVG helpers */
+.icon,
+.icon svg {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  fill: currentColor;
+}
+
 .btn_green {
   background-color: var(--cpt360-primary);
   color: #ffffff;
@@ -1759,6 +1781,93 @@ body.mobile-menu-open {
 }
 
 /* (reverted) */
+/* Linktree landing page styles */
+.linktree-main {
+  background: #f7f7f9;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.linktree-wrapper {
+  width: 100%;
+  max-width: 480px;
+}
+
+.linktree-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  padding: 28px;
+  text-align: center;
+}
+
+.linktree-logo-img {
+  max-width: 140px;
+  height: auto;
+  margin: 0 auto 16px;
+  display: block;
+}
+
+.linktree-title {
+  margin: 8px 0 18px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #222;
+}
+
+.linktree-content {
+  margin-bottom: 12px;
+  color: #444;
+}
+
+.linktree-cta-list {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0;
+}
+
+.linktree-cta-list li {
+  margin-bottom: 12px;
+}
+
+.linktree-button {
+  display: inline-block;
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--linktree-primary, #0073aa);
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.linktree-social-list {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 0;
+  margin-top: 14px;
+}
+
+.linktree-social-icon {
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+@media (max-width: 480px) {
+  .linktree-card {
+    padding: 20px;
+  }
+  .linktree-title {
+    font-size: 20px;
+  }
+}
 /*--------------------------------------------------------------
  Clinic page top main info
 --------------------------------------------------------------*/

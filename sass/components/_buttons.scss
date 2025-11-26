@@ -22,6 +22,28 @@
 	text-decoration: none;
 	display: inline-block;
 }
+
+/* Ensure any inline SVGs inside buttons inherit color and size correctly */
+.button--begin svg,
+.btn svg,
+.linktree-button svg,
+.btn_green svg,
+.btn_green_ol svg {
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+	margin-right: 10px;
+	fill: currentColor;
+}
+
+/* Generic icon sizing for inline SVG helpers */
+.icon,
+.icon svg {
+	width: 1em;
+	height: 1em;
+	vertical-align: middle;
+	fill: currentColor;
+}
 .btn_green {
 	background-color: var(--cpt360-primary);
 	color: #ffffff;
