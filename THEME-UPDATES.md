@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20251208211305`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20251208212958`)
 
 ### Release Process
 
@@ -42,6 +42,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 -   If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251208212958 (2025-12-08)
+
+-   Prefilled the 360 Settings contact phone field with `(513) 587-6827` so new installs inherit the Patient Reach support line automatically.
+-   Added `https://www.patientreach360.com/get-started` as the default "Become a provider" button URL, ensuring the CTA points to the standard onboarding form without manual setup.
 
 #### v1.0.20251208211305 (2025-12-08)
 

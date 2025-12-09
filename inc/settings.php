@@ -238,7 +238,7 @@ if (! class_exists('_360_Global_Settings')) {
         public function field_assessment_id($args)
         {
             $opts = get_option(self::OPTION_KEY, []);
-            $val  = $opts[$args['label_for']] ?? '';
+            $val  = $opts[$args['label_for']] ?? '(513) 587-6827';
             printf(
                 '<input type="text" id="%1$s" name="%2$s[%1$s]" value="%3$s" class="regular-text" />',
                 esc_attr($args['label_for']),
@@ -256,7 +256,7 @@ if (! class_exists('_360_Global_Settings')) {
         public function field_site_name($args)
         {
             $opts = get_option(self::OPTION_KEY, []);
-            $val  = $opts[$args['label_for']] ?? '';
+            $val  = $opts[$args['label_for']] ?? 'https://www.patientreach360.com/get-started';
             printf(
                 '<input type="text" id="%1$s" name="%2$s[%1$s]" value="%3$s" class="regular-text" placeholder="%4$s" />',
                 esc_attr($args['label_for']),
