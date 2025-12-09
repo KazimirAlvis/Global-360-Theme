@@ -216,6 +216,7 @@ if (! class_exists('_360_Global_Settings')) {
                 'roboto'       => 'Roboto',         // Add this
                 'marcellus'    => 'Marcellus',      // Add this
                 'inter'        => 'Inter',          // Add this
+                'playfair-display' => 'Playfair Display',
             ];
             $opts = get_option(self::OPTION_KEY, []);
             $sel = $opts[$args['label_for']] ?? '';
@@ -1060,6 +1061,7 @@ if (! class_exists('_360_Global_Settings')) {
                 'roboto' => '"Roboto", sans-serif',
                 'marcellus' => '"Marcellus", serif',
                 'inter' => '"Inter", sans-serif',
+                'playfair-display' => '"Playfair Display", serif',
             ];
             
             return isset($font_stacks[$font_slug]) ? $font_stacks[$font_slug] : $font_stacks['system-font'];
@@ -1069,6 +1071,7 @@ if (! class_exists('_360_Global_Settings')) {
         {
             $weights = [
                 'anton' => '400',
+                'playfair-display' => '600',
             ];
 
             return isset($weights[$font_slug]) ? $weights[$font_slug] : '700';

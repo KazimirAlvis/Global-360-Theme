@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20251125181016' );
+	define( '_S_VERSION', '1.0.20251208211305' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -1043,6 +1043,7 @@ function global_360_theme_enqueue_google_fonts()
 		'inter'        => 'Inter:ital,wght@0,400;0,700',
 		'marcellus'    => 'Marcellus',
 		'roboto'       => 'Roboto:ital,wght@0,400;0,700',
+		'playfair-display' => 'Playfair Display:ital,wght@0,400;0,600;1,400;1,600',
 	];
 
 	$settings      = get_option(_360_Global_Settings::OPTION_KEY, []);

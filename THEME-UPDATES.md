@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20251125181016`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20251208211305`)
 
 ### Release Process
 
@@ -42,6 +42,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 -   If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251208211305 (2025-12-08)
+
+-   Added Playfair Display to the 360 Settings font dropdown so teams can select it for headings right from the admin UI.
+-   Updated the Google Fonts loader, font stacks, and default heading weight so the new option renders consistently on the front end.
 
 #### v1.0.20251125181016 (2025-11-25)
 
