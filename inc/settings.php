@@ -256,13 +256,14 @@ if (! class_exists('_360_Global_Settings')) {
         public function field_site_name($args)
         {
             $opts = get_option(self::OPTION_KEY, []);
-            $val  = $opts[$args['label_for']] ?? 'https://www.patientreach360.com/get-started';
+            $default_site_name = get_bloginfo('name');
+            $val  = $opts[$args['label_for']] ?? $default_site_name;
             printf(
                 '<input type="text" id="%1$s" name="%2$s[%1$s]" value="%3$s" class="regular-text" placeholder="%4$s" />',
                 esc_attr($args['label_for']),
                 esc_attr(self::OPTION_KEY),
                 esc_attr($val),
-                esc_attr(get_bloginfo('name'))
+                esc_attr($default_site_name)
             );
         }
 
@@ -326,7 +327,9 @@ if (! class_exists('_360_Global_Settings')) {
         public function field_contact_phone($args)
         {
             $opts = get_option(self::OPTION_KEY, []);
-            $val  = $opts[$args['label_for']] ?? '';
+            $default_phone = '513-587-6827';
+            $raw_value     = $opts[$args['label_for']] ?? '';
+            $val           = trim((string) $raw_value) ?: $default_phone;
             printf(
                 '<input type="tel" id="%1$s" name="%2$s[%1$s]" value="%3$s" class="regular-text" placeholder="(555) 123-4567" />',
                 esc_attr($args['label_for']),
@@ -362,7 +365,9 @@ if (! class_exists('_360_Global_Settings')) {
         public function field_become_provider_url($args)
         {
             $opts = get_option(self::OPTION_KEY, []);
-            $val  = $opts[$args['label_for']] ?? '';
+            $default_url = 'https://www.patientreach360.com/get-started';
+            $raw_value   = $opts[$args['label_for']] ?? '';
+            $val         = trim((string) $raw_value) ?: $default_url;
             printf(
                 '<input type="url" id="%1$s" name="%2$s[%1$s]" value="%3$s" class="regular-text" placeholder="https://example.com/become-a-provider" />',
                 esc_attr($args['label_for']),

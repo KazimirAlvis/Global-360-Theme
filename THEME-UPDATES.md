@@ -43,6 +43,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20251211100955 (2025-12-11)
+
+-   Pointed the "Site Name (for footer copyright)" default back to the active WordPress site title instead of the provider CTA URL so new installs inherit the correct label.
+-   Added a fallback so the "Become a Provider" URL field repopulates with `https://www.patientreach360.com/get-started` whenever the saved value is empty.
+-   Mirrored that behavior for the contact phone input, automatically restoring `513-587-6827` after users clear or whitespace the field.
+
 #### v1.0.20251208212958 (2025-12-08)
 
 -   Prefilled the 360 Settings contact phone field with `(513) 587-6827` so new installs inherit the Patient Reach support line automatically.
