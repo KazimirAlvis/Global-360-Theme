@@ -1,62 +1,217 @@
 (() => {
-	const e = document.getElementById('site-navigation');
-	if (!e) return;
-	const t = e.querySelector('.menu-toggle'),
-		n = e.querySelector('.menu-close');
-	if (!t) return;
-	const o = e.getElementsByTagName('ul')[0];
-	if (!o) {
-		t.style.display = 'none';
+	const nav = document.getElementById('site-navigation');
+	if (!nav) {
 		return;
 	}
-	o.classList.contains('nav-menu') || o.classList.add('nav-menu');
-	const s = (a) => {
-		e.classList.toggle('toggled', a),
-			t.setAttribute('aria-expanded', a ? 'true' : 'false'),
-			t.classList.toggle('is-active', a),
-			document.body.classList.toggle('mobile-menu-open', a),
-			n &&
-				(n.setAttribute('aria-expanded', a ? 'true' : 'false'),
-				n.setAttribute('aria-hidden', a ? 'false' : 'true'),
-				(n.tabIndex = a ? 0 : -1));
-	};
-	s(!1),
-		t.addEventListener('click', () => {
-			s('true' !== t.getAttribute('aria-expanded'));
-		}),
-		n &&
-			n.addEventListener('click', () => {
-				s(!1), t.focus();
-			}),
-		document.addEventListener('click', (a) => {
-			e.contains(a.target) || t.contains(a.target) || s(!1);
-		}),
-		document.addEventListener('keyup', (a) => {
-			'Escape' === a.key && s(!1);
-		});
-	const c = window.matchMedia('(min-width: 1025px)');
-	function i(a) {
-		a.matches && s(!1);
+
+	const menuToggle = nav.querySelector('.menu-toggle');
+	const menuClose = nav.querySelector('.menu-close');
+	if (!menuToggle) {
+		return;
 	}
-	'function' == typeof c.addEventListener
-		? c.addEventListener('change', i)
-		: 'function' == typeof c.addListener && c.addListener(i);
-	const d = o.getElementsByTagName('a'),
-		l = o.querySelectorAll('.menu-item-has-children > a, .page_item_has_children > a'),
-		r = (a) => {
-			if ('focus' === a.type || 'blur' === a.type) {
-				let u = a.currentTarget;
-				for (; u && !u.classList.contains('nav-menu'); )
-					'li' === u.tagName.toLowerCase() && u.classList.toggle('focus'), (u = u.parentNode);
+
+	const menuList = nav.getElementsByTagName('ul')[0];
+	if (!menuList) {
+		menuToggle.style.display = 'none';
+		return;
+	}
+
+	if (!menuList.classList.contains('nav-menu')) {
+		menuList.classList.add('nav-menu');
+	}
+
+	const parentItems = menuList.querySelectorAll(
+		'.menu-item-has-children, .page_item_has_children'
+	);
+	const allLinks = menuList.getElementsByTagName('a');
+	const submenuTriggers = menuList.querySelectorAll(
+		'.menu-item-has-children > a, .page_item_has_children > a'
+	);
+
+	const desktopBreakpoint = window.matchMedia('(min-width: 1025px)');
+	const mobileBreakpoint = window.matchMedia('(max-width: 1024px)');
+	const isMobileView = () => mobileBreakpoint.matches;
+
+	const hasExpandableChildren = (item) => {
+		return (
+			item &&
+			item.classList &&
+			(item.classList.contains('menu-item-has-children') ||
+				item.classList.contains('page_item_has_children'))
+		);
+	};
+
+	const isListItem = (node) => {
+		return !!(node && node.tagName && node.tagName.toLowerCase() === 'li');
+	};
+
+	const getTrigger = (item) => {
+		if (!item) {
+			return null;
+		}
+		const firstChild = item.firstElementChild;
+		if (!firstChild || firstChild.tagName.toLowerCase() !== 'a') {
+			return null;
+		}
+		return firstChild;
+	};
+
+	const setExpandedState = (item, expanded) => {
+		if (!hasExpandableChildren(item)) {
+			return;
+		}
+		const trigger = getTrigger(item);
+		if (!trigger) {
+			return;
+		}
+		trigger.setAttribute('aria-haspopup', 'true');
+		trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+		item.classList.toggle('submenu-open', !!expanded);
+	};
+
+	for (const item of parentItems) {
+		item.classList.add('has-submenu-toggle');
+		const trigger = getTrigger(item);
+		if (trigger) {
+			trigger.classList.add('nav-submenu-trigger');
+		}
+	}
+
+	const closeSubmenu = (item) => {
+		if (!isListItem(item)) {
+			return;
+		}
+		item.classList.remove('focus');
+		setExpandedState(item, false);
+	};
+
+	const closeAllSubmenus = (exception = null) => {
+		for (const parentItem of parentItems) {
+			if (parentItem !== exception) {
+				closeSubmenu(parentItem);
 			}
-			if ('touchstart' === a.type) {
-				const u = a.currentTarget.parentNode;
-				a.preventDefault();
-				for (const f of u.parentNode.children) f !== u && f.classList.remove('focus');
-				u.classList.toggle('focus');
+		}
+	};
+
+	const toggleNavigation = (shouldOpen) => {
+		nav.classList.toggle('toggled', shouldOpen);
+		menuToggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+		menuToggle.classList.toggle('is-active', shouldOpen);
+		document.body.classList.toggle('mobile-menu-open', shouldOpen);
+
+		if (menuClose) {
+			menuClose.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+			menuClose.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+			menuClose.tabIndex = shouldOpen ? 0 : -1;
+		}
+
+		if (!shouldOpen) {
+			closeAllSubmenus();
+		}
+	};
+
+	toggleNavigation(false);
+
+	menuToggle.addEventListener('click', () => {
+		const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+		toggleNavigation(!isExpanded);
+	});
+
+	if (menuClose) {
+		menuClose.addEventListener('click', () => {
+			toggleNavigation(false);
+			menuToggle.focus();
+		});
+	}
+
+	document.addEventListener('click', (event) => {
+		if (nav.contains(event.target) || menuToggle.contains(event.target)) {
+			return;
+		}
+		toggleNavigation(false);
+	});
+
+	document.addEventListener('keyup', (event) => {
+		if (event.key === 'Escape') {
+			toggleNavigation(false);
+		}
+	});
+
+	const handleDesktopChange = (event) => {
+		if (event.matches) {
+			toggleNavigation(false);
+		}
+	};
+
+	if (typeof desktopBreakpoint.addEventListener === 'function') {
+		desktopBreakpoint.addEventListener('change', handleDesktopChange);
+	} else if (typeof desktopBreakpoint.addListener === 'function') {
+		desktopBreakpoint.addListener(handleDesktopChange);
+	}
+
+	const handleParentTriggerClick = (event) => {
+		const item = event.currentTarget.parentNode;
+		if (!item) {
+			return;
+		}
+
+		event.preventDefault();
+		const isExpanded = item.classList.contains('submenu-open');
+
+		if (isMobileView()) {
+			const nextState = !isExpanded;
+			if (nextState) {
+				closeAllSubmenus(item);
+			} else {
+				closeSubmenu(item);
 			}
-		};
-	for (const a of d)
-		a.addEventListener('focus', r, !0), a.addEventListener('blur', r, !0), a.addEventListener('click', () => s(!1));
-	for (const a of l) a.addEventListener('touchstart', r, !1);
+			setExpandedState(item, nextState);
+			item.classList.toggle('focus', nextState);
+			return;
+		}
+
+		closeAllSubmenus(item);
+		setExpandedState(item, true);
+		item.classList.add('focus');
+	};
+
+	for (const trigger of submenuTriggers) {
+		trigger.setAttribute('aria-haspopup', 'true');
+		trigger.setAttribute('aria-expanded', 'false');
+		trigger.addEventListener('click', handleParentTriggerClick);
+	}
+
+	const handleLinkFocus = (event) => {
+		if (isMobileView()) {
+			return;
+		}
+		if (event.type !== 'focus' && event.type !== 'blur') {
+			return;
+		}
+		let current = event.currentTarget;
+		while (current && !current.classList.contains('nav-menu')) {
+			if (isListItem(current)) {
+				if (event.type === 'focus') {
+					current.classList.add('focus');
+				} else {
+					current.classList.remove('focus');
+				}
+				setExpandedState(current, current.classList.contains('focus'));
+			}
+			current = current.parentNode;
+		}
+	};
+
+	for (const link of allLinks) {
+		link.addEventListener('focus', handleLinkFocus, true);
+		link.addEventListener('blur', handleLinkFocus, true);
+		link.addEventListener('click', (event) => {
+			if (event.defaultPrevented) {
+				return;
+			}
+			if (isMobileView()) {
+				toggleNavigation(false);
+			}
+		});
+	}
 })();

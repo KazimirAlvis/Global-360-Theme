@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20251208212958`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20251223120500`)
 
 ### Release Process
 
@@ -42,6 +42,10 @@ The Global 360 Theme now includes automatic update functionality that integrates
 -   If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251223120500 (2025-12-23)
+
+-   Added a desktop-only hover buffer for submenu parents so dropdowns stay open while moving the cursor from the parent link into the submenu content.
 
 #### v1.0.20251211100955 (2025-12-11)
 
