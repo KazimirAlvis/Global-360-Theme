@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20251223120500`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20251223134500`)
 
 ### Release Process
 
@@ -42,6 +42,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 -   If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20251223134500 (2025-12-23)
+
+-   Added a dedicated `footer-nav` menu class plus a depth limit so the footer navigation only renders top-level items and no longer exposes dropdowns.
+-   Hid any leftover submenu indicators in the footer column so the layout stays compact and visually distinct from the main header navigation.
 
 #### v1.0.20251223120500 (2025-12-23)
 

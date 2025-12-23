@@ -81,7 +81,10 @@
 			wp_nav_menu(
 				array(
 					'theme_location' => 'menu-1',
-					'menu_id'        => 'primary-menu',
+					'menu_id'        => 'footer-menu',
+					'menu_class'     => 'footer-nav',
+					'container_class' => 'footer-nav-container',
+					'depth'          => 1,
 				)
 			);
 			?>

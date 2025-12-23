@@ -4,7 +4,7 @@ Theme URI: http://underscores.me/
 Author: Underscores.me
 Author URI: http://underscores.me/
 Description: Description
-Version: 1.0.20251223120500
+Version: 1.0.20251223134500
 Tested up to: 5.4
 Requires PHP: 5.6
 License: GNU General Public License v2 or later
@@ -1504,6 +1504,21 @@ body.mobile-menu-open {
 }
 .site-footer .footer_inner .site_links .menu-menu-1-container {
   width: auto;
+}
+.site-footer .footer_inner .site_links .footer-nav {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.site-footer .footer_inner .site_links .footer-nav .menu-item-has-children::after,
+.site-footer .footer_inner .site_links .footer-nav .menu-item-has-children > a::after {
+  display: none;
+}
+.site-footer .footer_inner .site_links .footer-nav .sub-menu {
+  display: none !important;
 }
 .site-footer .footer_inner .contact_links span {
   display: block;
