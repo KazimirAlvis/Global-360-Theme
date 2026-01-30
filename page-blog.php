@@ -10,10 +10,15 @@ get_header();
 
 <main id="primary" class="site-main">
 	
-	<!-- Page Header -->
-	<div class="entry-header sm_hero">
-		<h1 class="entry-title"><?php the_title(); ?></h1>
-	</div><!-- .entry-header -->
+	<?php if ( '' !== trim( get_post_field( 'post_content', get_the_ID() ) ) ) : ?>
+		<div class="page-intro entry-content">
+			<?php the_content(); ?>
+		</div>
+	<?php else : ?>
+		<div class="entry-header sm_hero">
+			<h1 class="entry-title"><?php the_title(); ?></h1>
+		</div>
+	<?php endif; ?>
 
 	<!-- Blog Posts Section with Latest Articles Styling -->
 	<section class="latest-articles-block blog-posts-listing">
