@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20260203123000`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20260203133000`)
 
 ### Release Process
 
@@ -42,6 +42,10 @@ The Global 360 Theme now includes automatic update functionality that integrates
 -   If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20260203133000 (2026-02-03)
+
+-   Renamed the North Star Vascular & Interventional logo asset to `north-star-vascular-interventional-logo.jpg` to match the CPT logo loader pattern.
 
 #### v1.0.20260203123000 (2026-02-03)
 
