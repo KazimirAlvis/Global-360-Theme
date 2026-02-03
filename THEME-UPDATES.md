@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20260128131500`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20260203123000`)
 
 ### Release Process
 
@@ -42,6 +42,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 -   If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20260203123000 (2026-02-03)
+
+-   Added the North Star Vascular & Interventional clinic logo so the refreshed branding appears across listings and detail pages.
+-   Uploaded new doctor headshots for Amin Astani, Andy Manos, Jafar Golzarian, and Kayla Halleron to keep provider bios current.
+-   Let the Blog template render Gutenberg content ahead of the fallback hero while preserving the `.sm_hero` styles when no blocks are present.
 
 #### v1.0.20260128131500 (2026-01-28)
 
