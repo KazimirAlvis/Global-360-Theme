@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 -   Version defined in `functions.php` as `_S_VERSION` constant
 -   Must match version in `style.css` header
--   Current version: matches `_S_VERSION` (currently `1.0.20260203133000`)
+-   Current version: matches `_S_VERSION` (currently `1.0.20260204120000`)
 
 ### Release Process
 
@@ -42,6 +42,10 @@ The Global 360 Theme now includes automatic update functionality that integrates
 -   If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20260204120000 (2026-02-04)
+
+-   Updated the header logo markup to load eagerly with async decoding while removing the `fetchpriority` attribute to let browsers manage priority.
 
 #### v1.0.20260203133000 (2026-02-03)
 

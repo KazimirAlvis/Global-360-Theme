@@ -51,9 +51,12 @@
 							'class'   => 'site-header-logo',
 							'alt'     => $logo_alt,
 							'loading' => 'eager',
+							'decoding' => 'async',
 						]
 					);
 					if ($logo_html) {
+						// Strip fetchpriority attribute so the browser decides priority naturally.
+						$logo_html = preg_replace('/\sfetchpriority="[^"]*"/i', '', $logo_html);
 						echo '<a href="/" class="site-header-logo-link">' . $logo_html . '</a>';
 					}
 				}
