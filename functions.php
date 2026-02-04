@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260204120000' );
+	define( '_S_VERSION', '1.0.20260204130000' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -1033,6 +1033,8 @@ add_filter('post_class', function ($classes, $class, $post_id) {
 add_action('wp_enqueue_scripts', 'global_360_theme_enqueue_google_fonts');
 function global_360_theme_enqueue_google_fonts()
 {
+	global $global_360_theme_font_url;
+
 	// Build font manifest once per request
 	$font_map = [
 		'anton'        => 'Anton',
@@ -1075,10 +1077,29 @@ function global_360_theme_enqueue_google_fonts()
 	}
 
 	$font_url = 'https://fonts.googleapis.com/css2?family=' . implode('&family=', $families) . '&display=swap';
+	$global_360_theme_font_url = $font_url;
 
 	if (!wp_style_is('global-360-theme-google-fonts', 'enqueued')) {
 		wp_enqueue_style('global-360-theme-google-fonts', esc_url($font_url), [], null);
 	}
+}
+
+add_action('wp_head', 'global_360_theme_output_font_preloads', 1);
+function global_360_theme_output_font_preloads()
+{
+	global $global_360_theme_font_url;
+	static $preloads_printed = false;
+
+	if ($preloads_printed || empty($global_360_theme_font_url)) {
+		return;
+	}
+
+	$preloads_printed = true;
+	$font_url = esc_url($global_360_theme_font_url);
+
+	echo '<link rel="preconnect" href="https://fonts.googleapis.com" />' . "\n";
+	echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />' . "\n";
+	echo '<link rel="preload" as="style" href="' . $font_url . '" crossorigin />' . "\n";
 }
 
 
