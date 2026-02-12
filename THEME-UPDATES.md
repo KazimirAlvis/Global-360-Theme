@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20260204223000`)
+- Current version: matches `_S_VERSION` (currently `1.0.20260204224500`)
 
 ### Release Process
 
@@ -42,6 +42,10 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20260204224500 (2026-02-04)
+
+- Updated the clinic logo assets with the latest branding so location pages display the new mark.
 
 #### v1.0.20260204223000 (2026-02-04)
 
