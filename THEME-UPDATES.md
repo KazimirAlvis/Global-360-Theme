@@ -43,6 +43,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260216135639 (2026-02-16)
+
+- Updated Find-a-Doctor state tiles so states without clinics open the PR360 assessment using the global assessment ID instead of linking to the default clinic page.
+- Normalized the PR360 tile styling to avoid focus borders and prevent the state grid from overflowing its container.
+
+
 #### v1.0.20260204224500 (2026-02-04)
 
 - Updated the clinic logo assets with the latest branding so location pages display the new mark.
