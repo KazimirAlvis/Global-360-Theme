@@ -43,6 +43,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260217114847 (2026-02-17)
+
+- Added an HTML sitemap page template that lists public content types and pages.
+- Linked the footer Sitemap link to the actual Sitemap page permalink with a safe fallback.
+
+
 #### v1.0.20260216135639 (2026-02-16)
 
 - Updated Find-a-Doctor state tiles so states without clinics open the PR360 assessment using the global assessment ID instead of linking to the default clinic page.

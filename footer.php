@@ -123,9 +123,11 @@
 			$opts = get_option('360_global_settings', []);
 			$site_name = isset($opts['site_name']) && !empty($opts['site_name']) ? $opts['site_name'] : get_bloginfo('name');
 			$current_year = date('Y');
+			$sitemap_page = get_page_by_path( 'sitemap' );
+			$sitemap_url = $sitemap_page ? get_permalink( $sitemap_page ) : home_url( '/sitemap/' );
 			?>
 			<p>Copyright © <?php echo $current_year; ?> <?php echo esc_html($site_name); ?>. All Rights Reserved</p>
-			<p><a href="https://www.patientreach360.com/privacy-policy/">Privacy Policy</a> | <a href="https://www.patientreach360.com/terms-of-use/">Terms of Use Agreement</a> | <a href="">Sitemap</a></p>
+			<p><a href="https://www.patientreach360.com/privacy-policy/">Privacy Policy</a> | <a href="https://www.patientreach360.com/terms-of-use/">Terms of Use Agreement</a> | <a href="<?php echo esc_url( $sitemap_url ); ?>">Sitemap</a></p>
 		</div>
 		<div class="footer_form_pu">
 			<span id="do-not-sell-trigger" style="cursor: pointer;">Do Not Sell MY Info</span>
