@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20260219145652`)
+- Current version: matches `_S_VERSION` (currently `1.0.20260219152254`)
 
 ### Release Process
 
@@ -42,6 +42,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20260219152254 (2026-02-19)
+
+- Unpinned the PR360 questionnaire loader to use the bare unpkg URL in the theme header.
+- Verified only one PR360 loader script tag exists sitewide (header.php only).
 
 #### v1.0.20260219145652 (2026-02-19)
 
