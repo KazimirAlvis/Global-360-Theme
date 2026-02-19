@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260217114847' );
+	define( '_S_VERSION', '1.0.20260219145652' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -242,7 +242,7 @@ class Global_360_Theme_Updater {
 			if ( $functions_contents !== false ) {
 				$updated_functions = preg_replace(
 					"/define\(\s*'_S_VERSION'\s*,\s*'[^']*'\s*\);/",
-					"define( '_S_VERSION', '1.0.20260217114847' );",
+					sprintf("define( '_S_VERSION', '%s' );", $target_version),
 					$functions_contents,
 					1
 				);
@@ -1099,7 +1099,9 @@ function global_360_theme_output_font_preloads()
 
 	echo '<link rel="preconnect" href="https://fonts.googleapis.com" />' . "\n";
 	echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />' . "\n";
-	echo '<link rel="preload" as="style" href="' . $font_url . '" crossorigin />' . "\n";
+	// Avoid preloading the Google Fonts CSS because it can trigger
+	// credentials-mode mismatch warnings unless the matching stylesheet tag also uses
+	// crossorigin.
 }
 
 
