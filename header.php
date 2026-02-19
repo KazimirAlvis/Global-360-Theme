@@ -22,7 +22,7 @@
 	<?php wp_head(); ?>
 	
 	<!-- PR360 Questionnaire Script -->
-	<script type="module" src="https://unpkg.com/pr360-questionnaire"></script>
+		<script id="pr360-questionnaire-loader" type="module" src="https://unpkg.com/pr360-questionnaire"></script>
 	
 </head>
 
