@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260219160027' );
+	define( '_S_VERSION', '1.0.20260223104342' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -242,7 +242,7 @@ class Global_360_Theme_Updater {
 			if ( $functions_contents !== false ) {
 				$updated_functions = preg_replace(
 					"/define\(\s*'_S_VERSION'\s*,\s*'[^']*'\s*\);/",
-					sprintf("define( '_S_VERSION', '1.0.20260219160027' );", $target_version),
+					sprintf("define( '_S_VERSION', '1.0.20260223104342' );", $target_version),
 					$functions_contents,
 					1
 				);
@@ -749,12 +749,108 @@ function global_360_theme_scripts() {
 	
 	// Add preload for stylesheet to improve loading
 	wp_enqueue_script( 'global-360-theme-navigation', get_template_directory_uri() . '/js/navigation.js', array(), _S_VERSION, true );
+	wp_enqueue_script( 'global-360-theme-lazy-cf7', get_template_directory_uri() . '/js/lazy-cf7.js', array(), _S_VERSION, true );
+	wp_localize_script(
+		'global-360-theme-lazy-cf7',
+		'Global360LazyCF7',
+		array(
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			'nonce'   => wp_create_nonce( 'global_360_lazy_cf7' ),
+		)
+	);
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'global_360_theme_scripts', 5 ); // Higher priority
+
+/**
+ * Contact Form 7: lazy-load assets + markup for footer modal.
+ */
+function global_360_theme_should_load_cf7_assets() {
+	if ( is_admin() ) {
+		return true;
+	}
+
+	if ( ! empty( $GLOBALS['global_360_lazy_cf7_force_assets'] ) ) {
+		return true;
+	}
+
+	$queried_id = get_queried_object_id();
+	if ( ! $queried_id ) {
+		return false;
+	}
+
+	$content = get_post_field( 'post_content', $queried_id );
+	if ( ! is_string( $content ) || $content === '' ) {
+		return false;
+	}
+
+	if ( has_shortcode( $content, 'contact-form-7' ) ) {
+		return true;
+	}
+
+	if ( function_exists( 'has_block' ) ) {
+		if ( has_block( 'contact-form-7/contact-form-selector', $content ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function global_360_theme_wpcf7_load_assets_filter( $load ) {
+	return global_360_theme_should_load_cf7_assets();
+}
+
+add_filter( 'wpcf7_load_js', 'global_360_theme_wpcf7_load_assets_filter' );
+add_filter( 'wpcf7_load_css', 'global_360_theme_wpcf7_load_assets_filter' );
+
+function global_360_theme_ajax_lazy_cf7() {
+	$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+	if ( ! wp_verify_nonce( $nonce, 'global_360_lazy_cf7' ) ) {
+		wp_send_json_error( array( 'message' => 'Invalid nonce.' ), 403 );
+	}
+
+	$form_id = isset( $_POST['form_id'] ) ? sanitize_text_field( wp_unslash( $_POST['form_id'] ) ) : '';
+	if ( $form_id === '' ) {
+		wp_send_json_error( array( 'message' => 'Missing form_id.' ), 400 );
+	}
+
+	if ( ! shortcode_exists( 'contact-form-7' ) ) {
+		wp_send_json_error( array( 'message' => 'Contact Form 7 is not available.' ), 500 );
+	}
+
+	// Force CF7 assets for this AJAX response.
+	$GLOBALS['global_360_lazy_cf7_force_assets'] = true;
+
+	$form_shortcode = sprintf( '[contact-form-7 id="%s"]', esc_attr( $form_id ) );
+	$form_html      = do_shortcode( $form_shortcode );
+
+	ob_start();
+	if ( function_exists( 'wpcf7_enqueue_styles' ) ) {
+		wpcf7_enqueue_styles();
+	}
+	if ( function_exists( 'wpcf7_enqueue_scripts' ) ) {
+		wpcf7_enqueue_scripts();
+	}
+
+	// Print the CF7 handles (WordPress will include dependencies).
+	wp_print_styles( 'contact-form-7' );
+	wp_print_scripts( 'contact-form-7' );
+	$assets_html = ob_get_clean();
+
+	wp_send_json_success(
+		array(
+			'html'   => $form_html,
+			'assets' => $assets_html,
+		)
+	);
+}
+
+add_action( 'wp_ajax_global_360_lazy_cf7', 'global_360_theme_ajax_lazy_cf7' );
+add_action( 'wp_ajax_nopriv_global_360_lazy_cf7', 'global_360_theme_ajax_lazy_cf7' );
 
 /**
  * Add preload link for main stylesheet to prevent FOUC

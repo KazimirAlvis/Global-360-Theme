@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20260219160027`)
+- Current version: matches `_S_VERSION` (currently `1.0.20260223104342`)
 
 ### Release Process
 
@@ -42,6 +42,10 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+#### v1.0.20260223104342 (2026-02-23)
+
+- Lazy-load Contact Form 7 in the footer modal (loads only on click via AJAX), reducing initial JS/CSS on pages that do not use CF7.
+
 
 #### v1.0.20260219160027 (2026-02-19)
 

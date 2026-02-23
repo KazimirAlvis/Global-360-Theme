@@ -142,7 +142,13 @@
 				<span class="modal-close">&times;</span>
 			</div>
 			<div class="modal-body">
-				<?php echo do_shortcode('[contact-form-7 id="98f6667" title="Do Not Sell info Form"]'); ?>
+				<div
+					class="global-360-lazy-cf7"
+					data-cf7-form-id="98f6667"
+					data-cf7-lazy-trigger="#do-not-sell-trigger"
+				>
+					<p>Loading form…</p>
+				</div>
 			</div>
 		</div>
 	</div>
