@@ -42,6 +42,10 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+#### v1.0.20260224165920 (2026-02-24)
+
+- Added a proper `Version:` header to `style.css` so WordPress can read the theme version for update checks.
+
 #### v1.0.20260224161822 (2026-02-24)
 
 - Downscaled clinic and doctor image assets to a max width of 400px (including WebP and AVIF) to reduce page weight and improve load times.
