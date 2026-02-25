@@ -42,6 +42,10 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+#### v1.0.20260224161822 (2026-02-24)
+
+- Downscaled clinic and doctor image assets to a max width of 400px (including WebP and AVIF) to reduce page weight and improve load times.
+
 #### v1.0.20260224145139 (2026-02-23)
 
 - Lazy-load Contact Form 7 in the footer modal (loads only on click via AJAX), reducing initial JS/CSS on pages that do not use CF7.
