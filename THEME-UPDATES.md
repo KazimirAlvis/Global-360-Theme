@@ -42,6 +42,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+#### v1.0.20260305143844 (2026-03-05)
+
+- Refined Doctor JSON-LD so `telephone` inherits from associated clinic phone data (no separate doctor phone field).
+- Improved PostalAddress generation to prefer structured fields and fall back to `streetAddress` string when only unstructured address is available.
+- Updated Clinic JSON-LD image selection to prioritize the dynamic clinic logo source used by the theme.
+
 #### v1.0.20260305135516 (2026-03-05)
 
 - Added automatic JSON-LD schema output in `wp_head` for single Doctor and Clinic pages.

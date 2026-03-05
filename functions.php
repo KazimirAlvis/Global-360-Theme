@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260305135516' );
+	define( '_S_VERSION', '1.0.20260305143844' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -1665,12 +1665,14 @@ if ( ! function_exists( 'fb360_output_schema' ) ) {
 		};
 
 		$get_image_url = static function( $id, $post_type_hint = '' ) use ( $clean_text ) {
-			$thumb = get_the_post_thumbnail_url( $id, 'full' );
-			if ( $thumb ) {
-				return esc_url_raw( $thumb );
-			}
-
 			if ( $post_type_hint === 'clinic' ) {
+				if ( function_exists( 'cpt360_get_clinic_logo_url' ) ) {
+					$logo_url = cpt360_get_clinic_logo_url( $id );
+					if ( $logo_url ) {
+						return esc_url_raw( $logo_url );
+					}
+				}
+
 				$logo_id = get_post_meta( $id, '_clinic_logo_id', true );
 				if ( $logo_id ) {
 					$url = wp_get_attachment_image_url( intval( $logo_id ), 'full' );
@@ -1686,9 +1688,19 @@ if ( ! function_exists( 'fb360_output_schema' ) ) {
 						return esc_url_raw( $url );
 					}
 				}
+
+				$thumb = get_the_post_thumbnail_url( $id, 'full' );
+				if ( $thumb ) {
+					return esc_url_raw( $thumb );
+				}
 			}
 
 			if ( $post_type_hint === 'doctor' ) {
+				$thumb = get_the_post_thumbnail_url( $id, 'full' );
+				if ( $thumb ) {
+					return esc_url_raw( $thumb );
+				}
+
 				$photo_id = get_post_meta( $id, '_doctor_photo_id', true );
 				if ( $photo_id ) {
 					$url = wp_get_attachment_image_url( intval( $photo_id ), 'full' );
@@ -1715,16 +1727,19 @@ if ( ! function_exists( 'fb360_output_schema' ) ) {
 			return '';
 		};
 
-		$build_postal_address = static function( $street, $city, $state, $postal, $country ) use ( $clean_text ) {
+		$build_postal_address = static function( $street, $city, $state, $postal, $country, $fallback_street = '' ) use ( $clean_text ) {
 			$address = array( '@type' => 'PostalAddress' );
 			$street = $clean_text( $street );
 			$city = $clean_text( $city );
 			$state = $clean_text( $state );
 			$postal = $clean_text( $postal );
 			$country = $clean_text( $country );
+			$fallback_street = $clean_text( $fallback_street );
 
 			if ( $street !== '' ) {
 				$address['streetAddress'] = $street;
+			} elseif ( $fallback_street !== '' ) {
+				$address['streetAddress'] = $fallback_street;
 			}
 			if ( $city !== '' ) {
 				$address['addressLocality'] = $city;
@@ -1765,12 +1780,6 @@ if ( ! function_exists( 'fb360_output_schema' ) ) {
 				$clean_text( get_post_meta( $post_id, 'specialty', true ) ),
 			) );
 
-			$telephone = $first_non_empty( array(
-				$clean_phone( $get_acf_or_meta( 'phone', $post_id ) ),
-				$clean_phone( $get_acf_or_meta( 'telephone', $post_id ) ),
-				$clean_phone( get_post_meta( $post_id, 'doctor_phone', true ) ),
-			) );
-
 			$clinic_ids = (array) get_post_meta( $post_id, 'clinic_id', true );
 			if ( empty( $clinic_ids ) && function_exists( 'get_field' ) ) {
 				$acf_clinics = get_field( 'clinic', $post_id );
@@ -1796,11 +1805,21 @@ if ( ! function_exists( 'fb360_output_schema' ) ) {
 
 			$works_for = array();
 			$doctor_address = array();
+			$telephone = '';
 			if ( $clinic_ids ) {
 				foreach ( $clinic_ids as $clinic_id ) {
 					if ( get_post_type( $clinic_id ) !== 'clinic' ) {
 						continue;
 					}
+
+					if ( '' === $telephone ) {
+						$telephone = $first_non_empty( array(
+							$clean_phone( $get_acf_or_meta( 'phone', $clinic_id ) ),
+							$clean_phone( get_post_meta( $clinic_id, '_cpt360_clinic_phone', true ) ),
+							$clean_phone( get_post_meta( $clinic_id, 'clinic_phone', true ) ),
+						) );
+					}
+
 					$clinic_url = esc_url_raw( get_permalink( $clinic_id ) );
 					$clinic_name = $clean_text( get_the_title( $clinic_id ) );
 					if ( ! $clinic_name ) {
@@ -1818,6 +1837,10 @@ if ( ! function_exists( 'fb360_output_schema' ) ) {
 				}
 
 				$primary_clinic_id = intval( $clinic_ids[0] );
+				$fallback_address_string = $first_non_empty( array(
+					$clean_text( get_post_meta( $primary_clinic_id, 'address', true ) ),
+					$clean_text( $get_acf_or_meta( 'address', $primary_clinic_id ) ),
+				) );
 				$addresses = get_post_meta( $primary_clinic_id, 'clinic_addresses', true );
 				if ( is_array( $addresses ) && ! empty( $addresses ) && is_array( $addresses[0] ?? null ) ) {
 					$first = $addresses[0];
@@ -1826,8 +1849,13 @@ if ( ! function_exists( 'fb360_output_schema' ) ) {
 						$first['city'] ?? '',
 						$first['state'] ?? '',
 						$first['zip'] ?? '',
-						$first['country'] ?? ''
+						$first['country'] ?? '',
+						$fallback_address_string
 					);
+				} elseif ( is_array( $addresses ) && ! empty( $addresses ) && is_string( $addresses[0] ?? null ) ) {
+					$doctor_address = $build_postal_address( '', '', '', '', '', $addresses[0] );
+				} else {
+					$doctor_address = $build_postal_address( '', '', '', '', '', $fallback_address_string );
 				}
 			}
 
@@ -1895,7 +1923,7 @@ if ( ! function_exists( 'fb360_output_schema' ) ) {
 			if ( $telephone ) {
 				$schema['telephone'] = $telephone;
 			}
-			$address_obj = $build_postal_address( $street, $city, $state, $postal, $country );
+			$address_obj = $build_postal_address( $street, $city, $state, $postal, $country, $street );
 			if ( $address_obj ) {
 				$schema['address'] = $address_obj;
 			}
