@@ -42,6 +42,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+#### v1.0.20260305135516 (2026-03-05)
+
+- Added automatic JSON-LD schema output in `wp_head` for single Doctor and Clinic pages.
+- Doctor pages now output `Physician` schema with linked `worksFor` MedicalClinic data and optional specialty/phone/address fields when available.
+- Clinic pages now output `MedicalClinic` schema with clean `PostalAddress` data when available.
+
 #### v1.0.20260224165920 (2026-02-24)
 
 - Added a proper `Version:` header to `style.css` so WordPress can read the theme version for update checks.
