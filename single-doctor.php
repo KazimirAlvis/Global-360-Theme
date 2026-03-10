@@ -10,6 +10,49 @@ if (have_posts()) : while (have_posts()) : the_post();
 
 $doctor_id = get_the_ID();
 
+if (!function_exists('extract_city_from_address')) {
+    function extract_city_from_address($address)
+    {
+        $address = trim((string) $address);
+        if ($address === '') {
+            return '';
+        }
+
+        $parts = explode(',', $address);
+        if (!isset($parts[1])) {
+            return '';
+        }
+
+        $city_state = preg_replace('/\s+/', ' ', trim((string) $parts[1]));
+        if (preg_match('/^(.+?)(?:\s+[A-Za-z]{2})?(?:\s+\d{5}(?:-\d{4})?)?$/', $city_state, $matches)) {
+            $city = trim((string) $matches[1]);
+            if ($city !== '') {
+                return $city;
+            }
+        }
+
+        return trim($city_state);
+    }
+}
+
+if (!function_exists('normalize_state_abbreviation')) {
+    function normalize_state_abbreviation($text)
+    {
+        $text = trim((string) $text);
+        if ($text === '') {
+            return '';
+        }
+
+        return preg_replace_callback(
+            '/\b([A-Za-z]{2})(?=\s+\d{5}(?:-\d{4})?\b)/',
+            function ($matches) {
+                return strtoupper($matches[1]);
+            },
+            $text
+        );
+    }
+}
+
 // Get doctor data
 $doctor_name = get_post_meta($doctor_id, 'doctor_name', true) ?: get_the_title();
 $doctor_title = get_post_meta($doctor_id, 'doctor_title', true);
@@ -49,7 +92,60 @@ if (!empty($clinic_ids)) {
     ]);
 }
 
+$opts = get_option('360_global_settings', []);
+$primary_condition = isset($opts['primary_condition']) ? trim((string) $opts['primary_condition']) : '';
+$related_conditions = isset($opts['related_conditions']) ? trim((string) $opts['related_conditions']) : '';
+$primary_treatment = isset($opts['primary_treatment']) ? trim((string) $opts['primary_treatment']) : '';
+$related_treatments = isset($opts['related_treatments']) ? trim((string) $opts['related_treatments']) : '';
+$condition_page_id = isset($opts['condition_page']) ? intval($opts['condition_page']) : 0;
+$treatment_page_id = isset($opts['treatment_page']) ? intval($opts['treatment_page']) : 0;
+
+$condition_url = $condition_page_id ? get_permalink($condition_page_id) : '';
+$treatment_url = $treatment_page_id ? get_permalink($treatment_page_id) : '';
+
+$related_condition_items = [];
+if ($related_conditions !== '') {
+    $related_parts = explode(',', $related_conditions);
+    foreach ($related_parts as $condition) {
+        $condition = trim((string) $condition);
+        if ($condition !== '') {
+            $related_condition_items[] = $condition;
+        }
+    }
+    $related_condition_items = array_values(array_unique($related_condition_items));
+}
+
 ?>
+
+<style>
+    .doctor-learn-more {
+        margin: 12px 0 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .doctor-learn-link {
+        display: inline-block;
+        color: #2e7d32;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .doctor-learn-link:visited {
+        color: #2e7d32;
+    }
+
+    .doctor-learn-link:hover,
+    .doctor-learn-link:focus {
+        text-decoration: underline;
+    }
+
+    .doctor-practice-locations .clinic-address-list {
+        margin-left: 0;
+        padding-left: 0;
+    }
+</style>
 
 <main id="primary" class="site-main">
     <div class="sm_hero">
@@ -83,6 +179,67 @@ if (!empty($clinic_ids)) {
                             ?>
                         </div>
                     </div>
+
+                    <?php if ($primary_condition): ?>
+                        <section class="doctor-conditions">
+                            <h2>Conditions Treated</h2>
+                            <p>
+                                Dr <?php echo esc_html($doctor_name); ?> treats patients suffering from
+                                <?php echo esc_html($primary_condition); ?>
+                                <?php if (!empty($related_condition_items)): ?>
+                                    and related conditions such as <?php echo esc_html(implode(', ', $related_condition_items)); ?>.
+                                <?php else: ?>
+                                    and related chronic pain conditions.
+                                <?php endif; ?>
+                            </p>
+                        </section>
+                    <?php endif; ?>
+
+                    <?php
+                    $treatment_items = [];
+                    if ($primary_treatment !== '') {
+                        $treatment_items[] = $primary_treatment;
+                    }
+
+                    if ($related_treatments !== '') {
+                        $related = explode(',', $related_treatments);
+                        foreach ($related as $treatment) {
+                            $treatment = trim((string) $treatment);
+                            if ($treatment !== '') {
+                                $treatment_items[] = $treatment;
+                            }
+                        }
+                    }
+
+                    $treatment_items = array_values(array_unique($treatment_items));
+                    ?>
+
+                    <?php if (!empty($treatment_items)): ?>
+                        <section class="doctor-treatments">
+                            <h2>Treatments Offered</h2>
+                            <ul style="margin-left: 0;">
+                                <?php foreach ($treatment_items as $treatment): ?>
+                                    <li><?php echo esc_html($treatment); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </section>
+                    <?php endif; ?>
+
+                    <?php if ($condition_url || $treatment_url): ?>
+                        <div class="doctor-learn-more">
+                            <?php if ($condition_url && $primary_condition): ?>
+                                <a class="doctor-learn-link" href="<?php echo esc_url($condition_url); ?>">
+                                    Learn more about <?php echo esc_html($primary_condition); ?> →
+                                </a>
+                            <?php endif; ?>
+
+                            <?php if ($treatment_url && $primary_treatment): ?>
+                                <a class="doctor-learn-link" href="<?php echo esc_url($treatment_url); ?>">
+                                    Learn how <?php echo esc_html($primary_treatment); ?> works →
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                     
                     <?php if (!empty($clinics)): ?>
                         <div class="doctor-practice-locations">
@@ -95,27 +252,83 @@ if (!empty($clinic_ids)) {
                                         <?php
                                         // Get clinic addresses
                                         $addresses = get_post_meta($clinic->ID, 'clinic_addresses', true);
+                                        $cities = [];
+
+                                        if (is_array($addresses) && !empty($addresses)) {
+                                            foreach ($addresses as $address) {
+                                                $full_address = '';
+                                                $street_only = '';
+
+                                                if (is_string($address)) {
+                                                    $full_address = normalize_state_abbreviation($address);
+                                                    $street_only = trim((string) explode(',', $full_address)[0]);
+                                                } elseif (is_array($address)) {
+                                                    $street = isset($address['street']) ? trim((string) $address['street']) : '';
+                                                    $city = isset($address['city']) ? trim((string) $address['city']) : '';
+                                                    $state = isset($address['state']) ? strtoupper(trim((string) $address['state'])) : '';
+                                                    $zip = isset($address['zip']) ? trim((string) $address['zip']) : '';
+
+                                                    $street_only = $street;
+
+                                                    if ($street !== '' && $city !== '') {
+                                                        $full_address = $street . ', ' . $city;
+                                                        if ($state !== '') {
+                                                            $full_address .= ' ' . $state;
+                                                        }
+                                                        if ($zip !== '') {
+                                                            $full_address .= ' ' . $zip;
+                                                        }
+                                                    } elseif ($street !== '') {
+                                                        $full_address = $street;
+                                                    }
+                                                }
+
+                                                if ($full_address === '') {
+                                                    continue;
+                                                }
+
+                                                $city_name = extract_city_from_address($full_address);
+                                                if ($city_name === '') {
+                                                    continue;
+                                                }
+
+                                                if (!isset($cities[$city_name])) {
+                                                    $cities[$city_name] = [];
+                                                }
+
+                                                $address_for_list = $street_only !== '' ? $street_only : $full_address;
+                                                $cities[$city_name][] = $address_for_list;
+                                            }
+
+                                            foreach ($cities as $city_key => $city_addresses) {
+                                                $cities[$city_key] = array_values(array_unique(array_filter(array_map('trim', $city_addresses))));
+                                            }
+                                        }
+
                                         if (is_array($addresses) && !empty($addresses)):
                                         ?>
                                             <div class="clinic-addresses">
-                                                <?php foreach ($addresses as $address): ?>
-                                                    <div class="clinic-address">
-                                                        <?php 
-                                                        $full_address = $address['street'];
-                                                        if (!empty($address['city'])) {
-                                                            $full_address .= ', ' . $address['city'];
-                                                        }
-                                                        if (!empty($address['state'])) {
-                                                            $full_address .= ', ' . $address['state'];
-                                                        }
-                                                        if (!empty($address['zip'])) {
-                                                            $full_address .= ' ' . $address['zip'];
-                                                        }
-                                                        $maps_url = 'https://maps.google.com/maps?q=' . urlencode($full_address);
+                                                <?php if (!empty($cities)): ?>
+                                                    <?php foreach ($cities as $city => $city_addresses): ?>
+                                                        <div class="clinic-city-block">
+                                                            <h4><?php echo esc_html($city); ?></h4>
+                                                            <ul class="clinic-address-list" style="margin-left: 0; padding-left: 0;">
+                                                                <?php foreach ($city_addresses as $address_line): ?>
+                                                                    <li><?php echo esc_html($address_line); ?></li>
+                                                                <?php endforeach; ?>
+                                                            </ul>
+                                                        </div>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <?php foreach ($addresses as $address): ?>
+                                                        <?php
+                                                        $fallback_line = is_array($address)
+                                                            ? (isset($address['street']) ? $address['street'] : '')
+                                                            : (string) $address;
                                                         ?>
-                                                        <p><a href="<?php echo esc_url($maps_url); ?>" target="_blank" rel="noopener"><?php echo esc_html($address['street']); ?></a></p>
-                                                    </div>
-                                                <?php endforeach; ?>
+                                                        <p><?php echo esc_html(normalize_state_abbreviation($fallback_line)); ?></p>
+                                                    <?php endforeach; ?>
+                                                <?php endif; ?>
                                             </div>
                                         <?php endif; ?>
 

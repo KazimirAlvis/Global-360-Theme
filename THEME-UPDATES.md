@@ -43,6 +43,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260310154325 (2026-03-10)
+
+- Styled Doctor page "Learn More" links and removed visited color shift to keep link color consistent.
+- Removed left-indent from Doctor practice location address lists for cleaner alignment.
+- Normalized Doctor practice location display to remove redundant state in city headings and uppercase state abbreviations in address lines (e.g., `CA`).
+
 #### v1.0.20260310142238 (2026-03-10)
 
 - Updated Doctor JSON-LD `@type` to include `Person` + `Physician` so `worksFor` validates cleanly in schema testing tools.
