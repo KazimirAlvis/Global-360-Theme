@@ -43,6 +43,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260310155124 (2026-03-10)
+
+- Included missing Schema Settings page selectors (`Condition Page` and `Treatment Page`) in the packaged update by syncing the latest `inc/settings.php` changes.
+- Ensures the dropdown fields for condition/treatment linking appear in **360 Settings → Schema Settings** after update.
+
 #### v1.0.20260310154325 (2026-03-10)
 
 - Styled Doctor page "Learn More" links and removed visited color shift to keep link color consistent.

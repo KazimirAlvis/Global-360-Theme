@@ -789,6 +789,14 @@ if (! class_exists('_360_Global_Settings')) {
                 $output['related_treatments'] = sanitize_textarea_field($input['related_treatments']);
             }
 
+            if (isset($input['condition_page']) && is_numeric($input['condition_page'])) {
+                $output['condition_page'] = intval($input['condition_page']);
+            }
+
+            if (isset($input['treatment_page']) && is_numeric($input['treatment_page'])) {
+                $output['treatment_page'] = intval($input['treatment_page']);
+            }
+
             return $output;
         }
 
@@ -974,6 +982,8 @@ if (! class_exists('_360_Global_Settings')) {
                             $related_conditions = isset($opts['related_conditions']) ? $opts['related_conditions'] : '';
                             $primary_treatment = isset($opts['primary_treatment']) ? $opts['primary_treatment'] : '';
                             $related_treatments = isset($opts['related_treatments']) ? $opts['related_treatments'] : '';
+                            $condition_page = isset($opts['condition_page']) ? (int) $opts['condition_page'] : 0;
+                            $treatment_page = isset($opts['treatment_page']) ? (int) $opts['treatment_page'] : 0;
                             $medical_specialty_options = [
                                 'http://schema.org/Neurologic' => 'Neurologic (recommended default)',
                                 'http://schema.org/Anesthesia' => 'Anesthesia',
@@ -1067,6 +1077,34 @@ if (! class_exists('_360_Global_Settings')) {
                                     <label for="related_treatments"><strong><?php esc_html_e('Related Treatments', 'cpt360'); ?></strong></label><br>
                                     <textarea id="related_treatments" name="360_global_settings[related_treatments]" rows="3" class="large-text"><?php echo esc_textarea($related_treatments); ?></textarea>
                                     <p class="description"><?php esc_html_e('Comma-separated list (e.g. Treatment A, Treatment B).', 'cpt360'); ?></p>
+                                </div>
+
+                                <div style="margin-bottom: 15px;">
+                                    <label for="condition_page"><strong><?php esc_html_e('Condition Page', 'cpt360'); ?></strong></label><br>
+                                    <?php
+                                    wp_dropdown_pages([
+                                        'name' => '360_global_settings[condition_page]',
+                                        'id' => 'condition_page',
+                                        'selected' => $condition_page,
+                                        'show_option_none' => __('Select Condition Page', 'cpt360'),
+                                        'option_none_value' => '',
+                                        'post_status' => 'publish',
+                                    ]);
+                                    ?>
+                                </div>
+
+                                <div style="margin-bottom: 15px;">
+                                    <label for="treatment_page"><strong><?php esc_html_e('Treatment Page', 'cpt360'); ?></strong></label><br>
+                                    <?php
+                                    wp_dropdown_pages([
+                                        'name' => '360_global_settings[treatment_page]',
+                                        'id' => 'treatment_page',
+                                        'selected' => $treatment_page,
+                                        'show_option_none' => __('Select Treatment Page', 'cpt360'),
+                                        'option_none_value' => '',
+                                        'post_status' => 'publish',
+                                    ]);
+                                    ?>
                                 </div>
 
                                 <div style="margin-bottom: 15px;">
