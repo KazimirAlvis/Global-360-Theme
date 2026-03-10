@@ -43,6 +43,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260310155821 (2026-03-10)
+
+- Updated Doctor page "Learn More" links to use the 360 Settings Primary Color CSS variable instead of a hardcoded color.
+- Kept visited link color consistent with Primary Color by styling the `:visited` state with the same variable.
+
 #### v1.0.20260310155124 (2026-03-10)
 
 - Included missing Schema Settings page selectors (`Condition Page` and `Treatment Page`) in the packaged update by syncing the latest `inc/settings.php` changes.

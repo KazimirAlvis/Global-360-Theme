@@ -127,13 +127,13 @@ if ($related_conditions !== '') {
 
     .doctor-learn-link {
         display: inline-block;
-        color: #2e7d32;
+        color: var(--cpt360-primary);
         text-decoration: none;
         font-weight: 600;
     }
 
     .doctor-learn-link:visited {
-        color: #2e7d32;
+        color: var(--cpt360-primary);
     }
 
     .doctor-learn-link:hover,
