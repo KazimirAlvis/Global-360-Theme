@@ -43,6 +43,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260310133711 (2026-03-10)
+
+- Fixed a theme updater bug where post-install package sync could rewrite `_S_VERSION` to a stale hardcoded value, causing repeated "update available" notices.
+- Updated updater sync logic to write the actual detected remote target version.
+
 #### v1.0.20260310131227 (2026-03-10)
 
 - Added a new Schema Settings section in 360 Settings for global medical schema metadata.

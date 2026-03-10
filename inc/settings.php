@@ -697,7 +697,26 @@ if (! class_exists('_360_Global_Settings')) {
 
             // Schema settings
             if (isset($input['medical_specialty'])) {
-                $output['medical_specialty'] = sanitize_text_field($input['medical_specialty']);
+                $allowed_medical_specialties = [
+                    'http://schema.org/PainManagement',
+                    'http://schema.org/Orthopedic',
+                    'http://schema.org/Neurologic',
+                    'http://schema.org/Cardiovascular',
+                    'http://schema.org/Emergency',
+                    'http://schema.org/Dermatology',
+                    'http://schema.org/Endocrine',
+                    'http://schema.org/Gastroenterologic',
+                    'http://schema.org/Geriatric',
+                    'http://schema.org/Gynecologic',
+                    'http://schema.org/Hematologic',
+                    'http://schema.org/Infectious',
+                    'http://schema.org/LaboratoryScience',
+                ];
+
+                $specialty = sanitize_text_field($input['medical_specialty']);
+                if (in_array($specialty, $allowed_medical_specialties, true)) {
+                    $output['medical_specialty'] = $specialty;
+                }
             }
             if (isset($input['primary_condition'])) {
                 $output['primary_condition'] = sanitize_text_field($input['primary_condition']);
@@ -884,11 +903,28 @@ if (! class_exists('_360_Global_Settings')) {
                         <div id="tab-schema" class="cpt360-settings-tab" style="display:none;">
                             <?php
                             $opts = get_option(self::OPTION_KEY, []);
-                            $medical_specialty = isset($opts['medical_specialty']) ? $opts['medical_specialty'] : '';
+                            $medical_specialty = isset($opts['medical_specialty']) && !empty($opts['medical_specialty'])
+                                ? $opts['medical_specialty']
+                                : 'http://schema.org/PainManagement';
                             $primary_condition = isset($opts['primary_condition']) ? $opts['primary_condition'] : '';
                             $related_conditions = isset($opts['related_conditions']) ? $opts['related_conditions'] : '';
                             $primary_treatment = isset($opts['primary_treatment']) ? $opts['primary_treatment'] : '';
                             $related_treatments = isset($opts['related_treatments']) ? $opts['related_treatments'] : '';
+                            $medical_specialty_options = [
+                                'http://schema.org/PainManagement' => 'Pain Management',
+                                'http://schema.org/Orthopedic' => 'Orthopedic',
+                                'http://schema.org/Neurologic' => 'Neurologic',
+                                'http://schema.org/Cardiovascular' => 'Cardiovascular',
+                                'http://schema.org/Emergency' => 'Emergency',
+                                'http://schema.org/Dermatology' => 'Dermatology',
+                                'http://schema.org/Endocrine' => 'Endocrine',
+                                'http://schema.org/Gastroenterologic' => 'Gastroenterologic',
+                                'http://schema.org/Geriatric' => 'Geriatric',
+                                'http://schema.org/Gynecologic' => 'Gynecologic',
+                                'http://schema.org/Hematologic' => 'Hematologic',
+                                'http://schema.org/Infectious' => 'Infectious',
+                                'http://schema.org/LaboratoryScience' => 'LaboratoryScience',
+                            ];
 
                             $linkedin_url = '';
                             if (!empty($opts['social_links']) && is_array($opts['social_links'])) {
@@ -909,7 +945,13 @@ if (! class_exists('_360_Global_Settings')) {
 
                                 <div style="margin-bottom: 15px;">
                                     <label for="medical_specialty"><strong><?php esc_html_e('Medical Specialty', 'cpt360'); ?></strong></label><br>
-                                    <input type="text" id="medical_specialty" name="360_global_settings[medical_specialty]" value="<?php echo esc_attr($medical_specialty); ?>" class="regular-text" />
+                                    <select id="medical_specialty" name="360_global_settings[medical_specialty]" class="regular-text">
+                                        <?php foreach ($medical_specialty_options as $specialty_value => $specialty_label) : ?>
+                                            <option value="<?php echo esc_attr($specialty_value); ?>" <?php selected($medical_specialty, $specialty_value); ?>>
+                                                <?php echo esc_html($specialty_label); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
 
                                 <div style="margin-bottom: 15px;">
