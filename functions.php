@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260310141644' );
+	define( '_S_VERSION', '1.0.20260310142238' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -2117,7 +2117,7 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 
 			$phone = $doctor_phone ? $doctor_phone : $clinic_fallback_phone;
 
-			$schema['@type'] = 'Physician';
+			$schema['@type'] = array( 'Person', 'Physician' );
 			if ( $post_url ) {
 				$schema['@id'] = $post_url . '#physician';
 				$schema['url'] = $post_url;

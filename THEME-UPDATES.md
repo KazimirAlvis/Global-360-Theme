@@ -43,6 +43,10 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260310142238 (2026-03-10)
+
+- Updated Doctor JSON-LD `@type` to include `Person` + `Physician` so `worksFor` validates cleanly in schema testing tools.
+
 #### v1.0.20260310141644 (2026-03-10)
 
 - Expanded Medical Specialty handling to support the full Schema.org `MedicalSpecialty` enum set in 360 Settings and schema validation.
