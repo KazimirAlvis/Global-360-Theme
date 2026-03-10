@@ -695,6 +695,23 @@ if (! class_exists('_360_Global_Settings')) {
                 }
             }
 
+            // Schema settings
+            if (isset($input['medical_specialty'])) {
+                $output['medical_specialty'] = sanitize_text_field($input['medical_specialty']);
+            }
+            if (isset($input['primary_condition'])) {
+                $output['primary_condition'] = sanitize_text_field($input['primary_condition']);
+            }
+            if (isset($input['related_conditions'])) {
+                $output['related_conditions'] = sanitize_textarea_field($input['related_conditions']);
+            }
+            if (isset($input['primary_treatment'])) {
+                $output['primary_treatment'] = sanitize_text_field($input['primary_treatment']);
+            }
+            if (isset($input['related_treatments'])) {
+                $output['related_treatments'] = sanitize_textarea_field($input['related_treatments']);
+            }
+
             return $output;
         }
 
@@ -713,6 +730,7 @@ if (! class_exists('_360_Global_Settings')) {
                     <nav class="nav-tab-wrapper">
                         <a href="#" class="nav-tab nav-tab-active" data-tab="fonts-colors">Fonts & Colors</a>
                         <a href="#" class="nav-tab" data-tab="header-footer">Header & Footer</a>
+                        <a href="#" class="nav-tab" data-tab="schema">Schema Settings</a>
                         <a href="#" class="nav-tab" data-tab="apis">APIs</a>
                         <a href="#" class="nav-tab" data-tab="assessment">Assessment ID</a>
                     </nav>
@@ -860,6 +878,66 @@ if (! class_exists('_360_Global_Settings')) {
                                 <div style="background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; padding: 15px; margin-top: 15px;">
                                     <p style="margin: 0;"><strong><?php esc_html_e('Required for Maps:', 'cpt360'); ?></strong> <?php esc_html_e('Map functionality, clinic geocoding, location services, and embedded maps.', 'cpt360'); ?></p>
                                     <p style="margin: 10px 0 0 0;"><strong><?php esc_html_e('Required for Reviews:', 'cpt360'); ?></strong> <?php esc_html_e('Places Details API powers the Google reviews block on clinic pages.', 'cpt360'); ?></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tab-schema" class="cpt360-settings-tab" style="display:none;">
+                            <?php
+                            $opts = get_option(self::OPTION_KEY, []);
+                            $medical_specialty = isset($opts['medical_specialty']) ? $opts['medical_specialty'] : '';
+                            $primary_condition = isset($opts['primary_condition']) ? $opts['primary_condition'] : '';
+                            $related_conditions = isset($opts['related_conditions']) ? $opts['related_conditions'] : '';
+                            $primary_treatment = isset($opts['primary_treatment']) ? $opts['primary_treatment'] : '';
+                            $related_treatments = isset($opts['related_treatments']) ? $opts['related_treatments'] : '';
+
+                            $linkedin_url = '';
+                            if (!empty($opts['social_links']) && is_array($opts['social_links'])) {
+                                foreach ($opts['social_links'] as $row) {
+                                    $platform = isset($row['platform']) ? strtolower(trim((string) $row['platform'])) : '';
+                                    $url = isset($row['url']) ? esc_url($row['url']) : '';
+                                    if ($platform === 'linkedin' && !empty($url)) {
+                                        $linkedin_url = $url;
+                                        break;
+                                    }
+                                }
+                            }
+                            ?>
+
+                            <h2><?php esc_html_e('Schema Settings', 'cpt360'); ?></h2>
+                            <div style="max-width: 700px;">
+                                <p style="margin-bottom: 20px;"><?php esc_html_e('These values are used globally in Doctor and Clinic JSON-LD schema output.', 'cpt360'); ?></p>
+
+                                <div style="margin-bottom: 15px;">
+                                    <label for="medical_specialty"><strong><?php esc_html_e('Medical Specialty', 'cpt360'); ?></strong></label><br>
+                                    <input type="text" id="medical_specialty" name="360_global_settings[medical_specialty]" value="<?php echo esc_attr($medical_specialty); ?>" class="regular-text" />
+                                </div>
+
+                                <div style="margin-bottom: 15px;">
+                                    <label for="primary_condition"><strong><?php esc_html_e('Primary Condition', 'cpt360'); ?></strong></label><br>
+                                    <input type="text" id="primary_condition" name="360_global_settings[primary_condition]" value="<?php echo esc_attr($primary_condition); ?>" class="regular-text" />
+                                </div>
+
+                                <div style="margin-bottom: 15px;">
+                                    <label for="related_conditions"><strong><?php esc_html_e('Related Conditions', 'cpt360'); ?></strong></label><br>
+                                    <textarea id="related_conditions" name="360_global_settings[related_conditions]" rows="3" class="large-text"><?php echo esc_textarea($related_conditions); ?></textarea>
+                                    <p class="description"><?php esc_html_e('Comma-separated list (e.g. Condition A, Condition B).', 'cpt360'); ?></p>
+                                </div>
+
+                                <div style="margin-bottom: 15px;">
+                                    <label for="primary_treatment"><strong><?php esc_html_e('Primary Treatment', 'cpt360'); ?></strong></label><br>
+                                    <input type="text" id="primary_treatment" name="360_global_settings[primary_treatment]" value="<?php echo esc_attr($primary_treatment); ?>" class="regular-text" />
+                                </div>
+
+                                <div style="margin-bottom: 15px;">
+                                    <label for="related_treatments"><strong><?php esc_html_e('Related Treatments', 'cpt360'); ?></strong></label><br>
+                                    <textarea id="related_treatments" name="360_global_settings[related_treatments]" rows="3" class="large-text"><?php echo esc_textarea($related_treatments); ?></textarea>
+                                    <p class="description"><?php esc_html_e('Comma-separated list (e.g. Treatment A, Treatment B).', 'cpt360'); ?></p>
+                                </div>
+
+                                <div style="margin-bottom: 15px;">
+                                    <label for="schema_linkedin_url"><strong><?php esc_html_e('LinkedIn URL', 'cpt360'); ?></strong></label><br>
+                                    <input type="url" id="schema_linkedin_url" value="<?php echo esc_attr($linkedin_url); ?>" class="regular-text" readonly />
+                                    <p class="description"><?php esc_html_e('Reused from Header & Footer → Social Media Links (LinkedIn). To update this value, edit the existing LinkedIn social link there.', 'cpt360'); ?></p>
                                 </div>
                             </div>
                         </div>
@@ -1217,7 +1295,12 @@ if (! class_exists('_360_Global_Settings')) {
                             'contact_email' => 'Contact Email',
                             'contact_phone' => 'Contact Phone',
                             'google_maps_api_key' => 'Google Maps API',
-                            'social_links' => 'Social Media Links'
+                            'social_links' => 'Social Media Links',
+                            'medical_specialty' => 'Schema: Medical Specialty',
+                            'primary_condition' => 'Schema: Primary Condition',
+                            'related_conditions' => 'Schema: Related Conditions',
+                            'primary_treatment' => 'Schema: Primary Treatment',
+                            'related_treatments' => 'Schema: Related Treatments'
                         ];
                         
                         foreach ($setting_labels as $key => $label) {

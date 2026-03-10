@@ -42,6 +42,14 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20260310131227 (2026-03-10)
+
+- Added a new Schema Settings section in 360 Settings for global medical schema metadata.
+- Extended Doctor JSON-LD to use global `medicalSpecialty` and `knowsAbout` values (including comma-separated related items).
+- Extended Clinic JSON-LD to include lightweight `knowsAbout` (primary condition + primary treatment).
+- Reused existing LinkedIn social setting and output `sameAs` on Clinic schema when present.
+
 #### v1.0.20260305143844 (2026-03-05)
 
 - Refined Doctor JSON-LD so `telephone` inherits from associated clinic phone data (no separate doctor phone field).
@@ -66,7 +74,6 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 - Lazy-load Contact Form 7 in the footer modal (loads only on click via AJAX), reducing initial JS/CSS on pages that do not use CF7.
 
-
 #### v1.0.20260219160027 (2026-02-19)
 
 - Synced updated header.php head loader markup for PR360 (single unpinned loader, header-only).
@@ -90,12 +97,10 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - Added an HTML sitemap page template that lists public content types and pages.
 - Linked the footer Sitemap link to the actual Sitemap page permalink with a safe fallback.
 
-
 #### v1.0.20260216135639 (2026-02-16)
 
 - Updated Find-a-Doctor state tiles so states without clinics open the PR360 assessment using the global assessment ID instead of linking to the default clinic page.
 - Normalized the PR360 tile styling to avoid focus borders and prevent the state grid from overflowing its container.
-
 
 #### v1.0.20260204224500 (2026-02-04)
 
