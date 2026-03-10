@@ -698,7 +698,7 @@ if (! class_exists('_360_Global_Settings')) {
             // Schema settings
             if (isset($input['medical_specialty'])) {
                 $allowed_medical_specialties = [
-                    'http://schema.org/PainManagement',
+                    'http://schema.org/Anesthesia',
                     'http://schema.org/Orthopedic',
                     'http://schema.org/Neurologic',
                     'http://schema.org/Cardiovascular',
@@ -714,6 +714,10 @@ if (! class_exists('_360_Global_Settings')) {
                 ];
 
                 $specialty = sanitize_text_field($input['medical_specialty']);
+                // Backward compatibility: normalize old invalid value.
+                if ($specialty === 'http://schema.org/PainManagement') {
+                    $specialty = 'http://schema.org/Anesthesia';
+                }
                 if (in_array($specialty, $allowed_medical_specialties, true)) {
                     $output['medical_specialty'] = $specialty;
                 }
@@ -905,13 +909,16 @@ if (! class_exists('_360_Global_Settings')) {
                             $opts = get_option(self::OPTION_KEY, []);
                             $medical_specialty = isset($opts['medical_specialty']) && !empty($opts['medical_specialty'])
                                 ? $opts['medical_specialty']
-                                : 'http://schema.org/PainManagement';
+                                : 'http://schema.org/Anesthesia';
+                            if ($medical_specialty === 'http://schema.org/PainManagement') {
+                                $medical_specialty = 'http://schema.org/Anesthesia';
+                            }
                             $primary_condition = isset($opts['primary_condition']) ? $opts['primary_condition'] : '';
                             $related_conditions = isset($opts['related_conditions']) ? $opts['related_conditions'] : '';
                             $primary_treatment = isset($opts['primary_treatment']) ? $opts['primary_treatment'] : '';
                             $related_treatments = isset($opts['related_treatments']) ? $opts['related_treatments'] : '';
                             $medical_specialty_options = [
-                                'http://schema.org/PainManagement' => 'Pain Management',
+                                'http://schema.org/Anesthesia' => 'Pain Management',
                                 'http://schema.org/Orthopedic' => 'Orthopedic',
                                 'http://schema.org/Neurologic' => 'Neurologic',
                                 'http://schema.org/Cardiovascular' => 'Cardiovascular',

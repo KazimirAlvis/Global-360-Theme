@@ -43,6 +43,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260310135226 (2026-03-10)
+
+- Corrected `medicalSpecialty` handling to output valid Schema.org enum URLs accepted by Google Rich Results.
+- Normalized legacy `http://schema.org/PainManagement` values to a valid value (`http://schema.org/Anesthesia`) in settings and schema output.
+- Restricted Medical Specialty save/output to a validated allowlist to prevent invalid enum values from being emitted.
+
 #### v1.0.20260310133711 (2026-03-10)
 
 - Fixed a theme updater bug where post-install package sync could rewrite `_S_VERSION` to a stale hardcoded value, causing repeated "update available" notices.

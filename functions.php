@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260310133711' );
+	define( '_S_VERSION', '1.0.20260310135226' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -1678,6 +1678,35 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 			return $out;
 		};
 
+		$normalize_medical_specialty = static function( $value ) use ( $clean_text ) {
+			$value = $clean_text( $value );
+			if ( '' === $value ) {
+				return '';
+			}
+
+			if ( 'http://schema.org/PainManagement' === $value ) {
+				$value = 'http://schema.org/Anesthesia';
+			}
+
+			$allowed = array(
+				'http://schema.org/Anesthesia',
+				'http://schema.org/Orthopedic',
+				'http://schema.org/Neurologic',
+				'http://schema.org/Cardiovascular',
+				'http://schema.org/Emergency',
+				'http://schema.org/Dermatology',
+				'http://schema.org/Endocrine',
+				'http://schema.org/Gastroenterologic',
+				'http://schema.org/Geriatric',
+				'http://schema.org/Gynecologic',
+				'http://schema.org/Hematologic',
+				'http://schema.org/Infectious',
+				'http://schema.org/LaboratoryScience',
+			);
+
+			return in_array( $value, $allowed, true ) ? $value : '';
+		};
+
 		$get_global_schema_settings = static function() use ( $clean_text ) {
 			$opts = get_option( '360_global_settings', array() );
 			if ( ! is_array( $opts ) ) {
@@ -1977,10 +2006,10 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 			) );
 
 			$specialty = $first_non_empty( array(
-				$clean_text( $global_schema['medical_specialty'] ?? '' ),
-				$clean_text( $get_acf_or_meta( 'specialty', $post_id ) ),
-				$clean_text( $get_acf_or_meta( 'doctor_specialty', $post_id ) ),
-				$clean_text( get_post_meta( $post_id, 'specialty', true ) ),
+				$normalize_medical_specialty( $global_schema['medical_specialty'] ?? '' ),
+				$normalize_medical_specialty( $get_acf_or_meta( 'specialty', $post_id ) ),
+				$normalize_medical_specialty( $get_acf_or_meta( 'doctor_specialty', $post_id ) ),
+				$normalize_medical_specialty( get_post_meta( $post_id, 'specialty', true ) ),
 			) );
 
 			$clinic_ids = (array) get_post_meta( $post_id, 'clinic_id', true );
