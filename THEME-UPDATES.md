@@ -43,6 +43,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260310141644 (2026-03-10)
+
+- Expanded Medical Specialty handling to support the full Schema.org `MedicalSpecialty` enum set in 360 Settings and schema validation.
+- Switched default Medical Specialty to `Neurologic` for FBSS-focused sites.
+- Added legacy value normalization (`PainManagement` and old `Orthopedic` URL mappings) to prevent invalid `medicalSpecialty` output.
+
 #### v1.0.20260310135226 (2026-03-10)
 
 - Corrected `medicalSpecialty` handling to output valid Schema.org enum URLs accepted by Google Rich Results.

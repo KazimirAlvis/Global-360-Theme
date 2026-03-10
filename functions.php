@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260310135226' );
+	define( '_S_VERSION', '1.0.20260310141644' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -1685,23 +1685,55 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 			}
 
 			if ( 'http://schema.org/PainManagement' === $value ) {
-				$value = 'http://schema.org/Anesthesia';
+				$value = 'http://schema.org/Neurologic';
+			}
+
+			if ( 'http://schema.org/Orthopedic' === $value ) {
+				$value = 'http://schema.org/Musculoskeletal';
 			}
 
 			$allowed = array(
 				'http://schema.org/Anesthesia',
-				'http://schema.org/Orthopedic',
-				'http://schema.org/Neurologic',
 				'http://schema.org/Cardiovascular',
-				'http://schema.org/Emergency',
+				'http://schema.org/CommunityHealth',
+				'http://schema.org/Dentistry',
 				'http://schema.org/Dermatology',
+				'http://schema.org/DietNutrition',
+				'http://schema.org/Emergency',
 				'http://schema.org/Endocrine',
 				'http://schema.org/Gastroenterologic',
+				'http://schema.org/Genetic',
 				'http://schema.org/Geriatric',
 				'http://schema.org/Gynecologic',
 				'http://schema.org/Hematologic',
 				'http://schema.org/Infectious',
 				'http://schema.org/LaboratoryScience',
+				'http://schema.org/Midwifery',
+				'http://schema.org/Musculoskeletal',
+				'http://schema.org/Neurologic',
+				'http://schema.org/Nursing',
+				'http://schema.org/Obstetric',
+				'http://schema.org/Oncologic',
+				'http://schema.org/Optometric',
+				'http://schema.org/Otolaryngologic',
+				'http://schema.org/Pathology',
+				'http://schema.org/Pediatric',
+				'http://schema.org/PharmacySpecialty',
+				'http://schema.org/Physiotherapy',
+				'http://schema.org/PlasticSurgery',
+				'http://schema.org/Podiatric',
+				'http://schema.org/PrimaryCare',
+				'http://schema.org/Psychiatric',
+				'http://schema.org/PublicHealth',
+				'http://schema.org/Pulmonary',
+				'http://schema.org/Radiography',
+				'http://schema.org/Renal',
+				'http://schema.org/RespiratoryTherapy',
+				'http://schema.org/Rheumatologic',
+				'http://schema.org/SpeechPathology',
+				'http://schema.org/Surgical',
+				'http://schema.org/Toxicologic',
+				'http://schema.org/Urologic',
 			);
 
 			return in_array( $value, $allowed, true ) ? $value : '';

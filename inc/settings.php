@@ -29,6 +29,7 @@ if (! class_exists('_360_Global_Settings')) {
             add_action('admin_menu',                [$this, 'add_admin_page']);
             add_action('admin_init',                [$this, 'register_settings']);
             add_action('admin_init',                [$this, 'handle_import_export']);
+            add_action('init',                      [$this, 'migrate_legacy_schema_settings'], 5);
             add_action('admin_enqueue_scripts',     [$this, 'enqueue_color_picker']);
             add_action('wp_head',                   [$this, 'print_global_css_variables']);
             add_action('wp_head',                   [$this, 'output_site_icons'], 5);
@@ -46,6 +47,28 @@ if (! class_exists('_360_Global_Settings')) {
             
             // Cleanup temporary export posts
             add_action('export_wp_finish',          [$this, 'cleanup_temp_export_post']);
+        }
+
+        /**
+         * Normalize legacy schema setting values so all schema emitters read valid enum URLs.
+         */
+        public function migrate_legacy_schema_settings()
+        {
+            $opts = get_option(self::OPTION_KEY, []);
+            if (!is_array($opts) || empty($opts['medical_specialty'])) {
+                return;
+            }
+
+            if ($opts['medical_specialty'] === 'http://schema.org/PainManagement') {
+                $opts['medical_specialty'] = 'http://schema.org/Neurologic';
+                update_option(self::OPTION_KEY, $opts);
+                return;
+            }
+
+            if ($opts['medical_specialty'] === 'http://schema.org/Orthopedic') {
+                $opts['medical_specialty'] = 'http://schema.org/Musculoskeletal';
+                update_option(self::OPTION_KEY, $opts);
+            }
         }
 
         /**
@@ -699,24 +722,55 @@ if (! class_exists('_360_Global_Settings')) {
             if (isset($input['medical_specialty'])) {
                 $allowed_medical_specialties = [
                     'http://schema.org/Anesthesia',
-                    'http://schema.org/Orthopedic',
-                    'http://schema.org/Neurologic',
                     'http://schema.org/Cardiovascular',
-                    'http://schema.org/Emergency',
+                    'http://schema.org/CommunityHealth',
+                    'http://schema.org/Dentistry',
                     'http://schema.org/Dermatology',
+                    'http://schema.org/DietNutrition',
+                    'http://schema.org/Emergency',
                     'http://schema.org/Endocrine',
                     'http://schema.org/Gastroenterologic',
+                    'http://schema.org/Genetic',
                     'http://schema.org/Geriatric',
                     'http://schema.org/Gynecologic',
                     'http://schema.org/Hematologic',
                     'http://schema.org/Infectious',
                     'http://schema.org/LaboratoryScience',
+                    'http://schema.org/Midwifery',
+                    'http://schema.org/Musculoskeletal',
+                    'http://schema.org/Neurologic',
+                    'http://schema.org/Nursing',
+                    'http://schema.org/Obstetric',
+                    'http://schema.org/Oncologic',
+                    'http://schema.org/Optometric',
+                    'http://schema.org/Otolaryngologic',
+                    'http://schema.org/Pathology',
+                    'http://schema.org/Pediatric',
+                    'http://schema.org/PharmacySpecialty',
+                    'http://schema.org/Physiotherapy',
+                    'http://schema.org/PlasticSurgery',
+                    'http://schema.org/Podiatric',
+                    'http://schema.org/PrimaryCare',
+                    'http://schema.org/Psychiatric',
+                    'http://schema.org/PublicHealth',
+                    'http://schema.org/Pulmonary',
+                    'http://schema.org/Radiography',
+                    'http://schema.org/Renal',
+                    'http://schema.org/RespiratoryTherapy',
+                    'http://schema.org/Rheumatologic',
+                    'http://schema.org/SpeechPathology',
+                    'http://schema.org/Surgical',
+                    'http://schema.org/Toxicologic',
+                    'http://schema.org/Urologic',
                 ];
 
                 $specialty = sanitize_text_field($input['medical_specialty']);
                 // Backward compatibility: normalize old invalid value.
                 if ($specialty === 'http://schema.org/PainManagement') {
-                    $specialty = 'http://schema.org/Anesthesia';
+                    $specialty = 'http://schema.org/Neurologic';
+                }
+                if ($specialty === 'http://schema.org/Orthopedic') {
+                    $specialty = 'http://schema.org/Musculoskeletal';
                 }
                 if (in_array($specialty, $allowed_medical_specialties, true)) {
                     $output['medical_specialty'] = $specialty;
@@ -909,28 +963,60 @@ if (! class_exists('_360_Global_Settings')) {
                             $opts = get_option(self::OPTION_KEY, []);
                             $medical_specialty = isset($opts['medical_specialty']) && !empty($opts['medical_specialty'])
                                 ? $opts['medical_specialty']
-                                : 'http://schema.org/Anesthesia';
+                                : 'http://schema.org/Neurologic';
                             if ($medical_specialty === 'http://schema.org/PainManagement') {
-                                $medical_specialty = 'http://schema.org/Anesthesia';
+                                $medical_specialty = 'http://schema.org/Neurologic';
+                            }
+                            if ($medical_specialty === 'http://schema.org/Orthopedic') {
+                                $medical_specialty = 'http://schema.org/Musculoskeletal';
                             }
                             $primary_condition = isset($opts['primary_condition']) ? $opts['primary_condition'] : '';
                             $related_conditions = isset($opts['related_conditions']) ? $opts['related_conditions'] : '';
                             $primary_treatment = isset($opts['primary_treatment']) ? $opts['primary_treatment'] : '';
                             $related_treatments = isset($opts['related_treatments']) ? $opts['related_treatments'] : '';
                             $medical_specialty_options = [
-                                'http://schema.org/Anesthesia' => 'Pain Management',
-                                'http://schema.org/Orthopedic' => 'Orthopedic',
-                                'http://schema.org/Neurologic' => 'Neurologic',
+                                'http://schema.org/Neurologic' => 'Neurologic (recommended default)',
+                                'http://schema.org/Anesthesia' => 'Anesthesia',
                                 'http://schema.org/Cardiovascular' => 'Cardiovascular',
-                                'http://schema.org/Emergency' => 'Emergency',
+                                'http://schema.org/CommunityHealth' => 'Community Health',
+                                'http://schema.org/Dentistry' => 'Dentistry',
                                 'http://schema.org/Dermatology' => 'Dermatology',
+                                'http://schema.org/DietNutrition' => 'Diet & Nutrition',
+                                'http://schema.org/Emergency' => 'Emergency',
                                 'http://schema.org/Endocrine' => 'Endocrine',
                                 'http://schema.org/Gastroenterologic' => 'Gastroenterologic',
+                                'http://schema.org/Genetic' => 'Genetic',
                                 'http://schema.org/Geriatric' => 'Geriatric',
                                 'http://schema.org/Gynecologic' => 'Gynecologic',
                                 'http://schema.org/Hematologic' => 'Hematologic',
                                 'http://schema.org/Infectious' => 'Infectious',
-                                'http://schema.org/LaboratoryScience' => 'LaboratoryScience',
+                                'http://schema.org/LaboratoryScience' => 'Laboratory Science',
+                                'http://schema.org/Midwifery' => 'Midwifery',
+                                'http://schema.org/Musculoskeletal' => 'Musculoskeletal',
+                                'http://schema.org/Neurologic' => 'Neurologic',
+                                'http://schema.org/Nursing' => 'Nursing',
+                                'http://schema.org/Obstetric' => 'Obstetric',
+                                'http://schema.org/Oncologic' => 'Oncologic',
+                                'http://schema.org/Optometric' => 'Optometric',
+                                'http://schema.org/Otolaryngologic' => 'Otolaryngologic',
+                                'http://schema.org/Pathology' => 'Pathology',
+                                'http://schema.org/Pediatric' => 'Pediatric',
+                                'http://schema.org/PharmacySpecialty' => 'Pharmacy Specialty',
+                                'http://schema.org/Physiotherapy' => 'Physiotherapy',
+                                'http://schema.org/PlasticSurgery' => 'Plastic Surgery',
+                                'http://schema.org/Podiatric' => 'Podiatric',
+                                'http://schema.org/PrimaryCare' => 'Primary Care',
+                                'http://schema.org/Psychiatric' => 'Psychiatric',
+                                'http://schema.org/PublicHealth' => 'Public Health',
+                                'http://schema.org/Pulmonary' => 'Pulmonary',
+                                'http://schema.org/Radiography' => 'Radiography',
+                                'http://schema.org/Renal' => 'Renal',
+                                'http://schema.org/RespiratoryTherapy' => 'Respiratory Therapy',
+                                'http://schema.org/Rheumatologic' => 'Rheumatologic',
+                                'http://schema.org/SpeechPathology' => 'Speech Pathology',
+                                'http://schema.org/Surgical' => 'Surgical',
+                                'http://schema.org/Toxicologic' => 'Toxicologic',
+                                'http://schema.org/Urologic' => 'Urologic',
                             ];
 
                             $linkedin_url = '';
