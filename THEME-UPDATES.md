@@ -43,6 +43,13 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260310173833 (2026-03-10)
+
+- Added Find A Doctor internal linking block (Condition, Treatment, FAQ, Blog) with dynamic URL resolution and conditional output.
+- Added Find A Doctor `ItemList` JSON-LD in `wp_head`, scoped to the Find A Doctor page only, populated from published Doctor CPT entries.
+- Adjusted Find A Doctor rendering order for block-authored hero/SEO content and placed Learn More below the dynamic state grid.
+- Updated Find A Doctor Learn More and state-link styling: no left indent on links list, visited links use Primary Color variable, removed state link underlines, and centered Learn More section layout.
+
 #### v1.0.20260310155821 (2026-03-10)
 
 - Updated Doctor page "Learn More" links to use the 360 Settings Primary Color CSS variable instead of a hardcoded color.

@@ -6,6 +6,31 @@ Template Name: Find a Doctor
 get_header();
 ?>
 
+<style>
+    .doctor-directory-learn-more {
+        text-align: center;
+    }
+
+    .doctor-directory-links {
+        margin-left: 0;
+        padding-left: 0;
+        display: inline-block;
+        text-align: left;
+    }
+
+    .doctor-directory-links a,
+    .doctor-directory-links a:visited {
+        color: var(--cpt360-primary);
+    }
+
+    .state-grid li a,
+    .state-grid li a:visited,
+    .state-grid li a:hover,
+    .state-grid li a:focus {
+        text-decoration: none;
+    }
+</style>
+
 	<main id="primary" class="site-main">
 
         <?php
@@ -103,7 +128,54 @@ get_header();
             echo '</ul>';
             echo '</div>';
             $grid = ob_get_clean();
-            echo $grid . $content;
+
+            $condition_page_id = (int) get_option( 'primary_condition_page' );
+            if ( ! $condition_page_id && isset( $globals['primary_condition_page'] ) ) {
+                $condition_page_id = (int) $globals['primary_condition_page'];
+            }
+            if ( ! $condition_page_id && isset( $globals['condition_page'] ) ) {
+                $condition_page_id = (int) $globals['condition_page'];
+            }
+            $condition_url = $condition_page_id ? get_permalink( $condition_page_id ) : '';
+
+            $treatment_page_id = (int) get_option( 'primary_treatment_page' );
+            if ( ! $treatment_page_id && isset( $globals['primary_treatment_page'] ) ) {
+                $treatment_page_id = (int) $globals['primary_treatment_page'];
+            }
+            if ( ! $treatment_page_id && isset( $globals['treatment_page'] ) ) {
+                $treatment_page_id = (int) $globals['treatment_page'];
+            }
+            $treatment_url = $treatment_page_id ? get_permalink( $treatment_page_id ) : '';
+
+            $faq_page = get_page_by_path( 'faq' );
+            $faq_url = ( $faq_page instanceof WP_Post ) ? get_permalink( $faq_page ) : '';
+
+            $posts_page_id = (int) get_option( 'page_for_posts' );
+            $blog_url = $posts_page_id ? get_permalink( $posts_page_id ) : '';
+
+            $directory_links = array();
+            if ( $condition_url ) {
+                $directory_links[] = '<li><a href="' . esc_url( $condition_url ) . '">Learn more about this condition</a></li>';
+            }
+            if ( $treatment_url ) {
+                $directory_links[] = '<li><a href="' . esc_url( $treatment_url ) . '">Learn about available treatment options</a></li>';
+            }
+            if ( $faq_url ) {
+                $directory_links[] = '<li><a href="' . esc_url( $faq_url ) . '">Frequently asked questions</a></li>';
+            }
+            if ( $blog_url ) {
+                $directory_links[] = '<li><a href="' . esc_url( $blog_url ) . '">Read our latest articles</a></li>';
+            }
+
+            echo $content;
+            echo $grid;
+
+            if ( ! empty( $directory_links ) ) {
+                echo '<section class="doctor-directory-learn-more max_width_content_body" style="order: 4;">';
+                echo '<h2>Learn More</h2>';
+                echo '<ul class="doctor-directory-links">' . implode( '', $directory_links ) . '</ul>';
+                echo '</section>';
+            }
 
         endwhile; // End of the loop.
         

@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260310155821' );
+	define( '_S_VERSION', '1.0.20260310173833' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -2174,3 +2174,80 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 }
 
 add_action( 'wp_head', 'global360_output_schema', 99 );
+
+if ( ! function_exists( 'global360_output_find_a_doctor_itemlist_schema' ) ) {
+	/**
+	 * Output ItemList schema for the Find a Doctor directory page.
+	 */
+	function global360_output_find_a_doctor_itemlist_schema() {
+		if ( is_admin() || ! is_page( 'find-a-doctor' ) ) {
+			return;
+		}
+
+		$post_types = array();
+		if ( post_type_exists( 'doctors' ) ) {
+			$post_types[] = 'doctors';
+		}
+		if ( post_type_exists( 'doctor' ) ) {
+			$post_types[] = 'doctor';
+		}
+
+		if ( empty( $post_types ) ) {
+			return;
+		}
+
+		$doctors = new WP_Query(
+			array(
+				'post_type'      => count( $post_types ) === 1 ? $post_types[0] : $post_types,
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+			)
+		);
+
+		if ( empty( $doctors->posts ) ) {
+			return;
+		}
+
+		$item_list = array();
+		$position = 1;
+
+		foreach ( $doctors->posts as $doctor_id ) {
+			$url = get_permalink( $doctor_id );
+			if ( ! $url ) {
+				continue;
+			}
+
+			$item_list[] = array(
+				'@type'    => 'ListItem',
+				'position' => $position,
+				'url'      => esc_url_raw( $url ),
+			);
+			$position++;
+		}
+
+		if ( empty( $item_list ) ) {
+			return;
+		}
+
+		$schema = array(
+			'@context'         => 'https://schema.org',
+			'@type'            => 'ItemList',
+			'name'             => 'Medical Specialists',
+			'description'      => 'Doctors specializing in treatment of this condition',
+			'itemListElement'  => $item_list,
+		);
+
+		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+		if ( ! $json ) {
+			return;
+		}
+
+		echo "\n";
+		echo '<script type="application/ld+json">' . $json . '</script>';
+		echo "\n";
+	}
+}
+
+add_action( 'wp_head', 'global360_output_find_a_doctor_itemlist_schema', 100 );
