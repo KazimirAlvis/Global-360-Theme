@@ -13,25 +13,12 @@ $doctor_id = get_the_ID();
 if (!function_exists('extract_city_from_address')) {
     function extract_city_from_address($address)
     {
-        $address = trim((string) $address);
-        if ($address === '') {
+        if (!function_exists('parse_address_for_display')) {
             return '';
         }
 
-        $parts = explode(',', $address);
-        if (!isset($parts[1])) {
-            return '';
-        }
-
-        $city_state = preg_replace('/\s+/', ' ', trim((string) $parts[1]));
-        if (preg_match('/^(.+?)(?:\s+[A-Za-z]{2})?(?:\s+\d{5}(?:-\d{4})?)?$/', $city_state, $matches)) {
-            $city = trim((string) $matches[1]);
-            if ($city !== '') {
-                return $city;
-            }
-        }
-
-        return trim($city_state);
+        $parsed = parse_address_for_display($address);
+        return isset($parsed['city']) ? (string) $parsed['city'] : '';
     }
 }
 
@@ -50,6 +37,79 @@ if (!function_exists('normalize_state_abbreviation')) {
             },
             $text
         );
+    }
+}
+
+if (!function_exists('parse_address_for_display')) {
+    function parse_address_for_display($address)
+    {
+        $address = normalize_state_abbreviation($address);
+        if ($address === '') {
+            return [
+                'city' => '',
+                'street' => '',
+            ];
+        }
+
+        $parts = array_values(array_filter(array_map('trim', explode(',', $address)), function ($part) {
+            return $part !== '';
+        }));
+
+        if (empty($parts)) {
+            return [
+                'city' => '',
+                'street' => $address,
+            ];
+        }
+
+        $city = '';
+        $city_index = -1;
+
+        for ($i = count($parts) - 1; $i >= 0; $i--) {
+            $segment = preg_replace('/\s+/', ' ', $parts[$i]);
+
+            if (preg_match('/^(.+?)\s+[A-Za-z]{2}\s+\d{5}(?:-\d{4})?$/', $segment, $matches)) {
+                $city = trim((string) $matches[1]);
+                $city_index = $i;
+                break;
+            }
+
+            if (preg_match('/^(.+?)\s+[A-Za-z]{2}$/', $segment, $matches)) {
+                $city = trim((string) $matches[1]);
+                $city_index = $i;
+                break;
+            }
+
+            if (
+                $i < (count($parts) - 1)
+                && preg_match('/^[A-Za-z]{2}\s+\d{5}(?:-\d{4})?$/', preg_replace('/\s+/', ' ', $parts[$i + 1]))
+            ) {
+                $city = trim((string) $segment);
+                $city_index = $i;
+                break;
+            }
+        }
+
+        if ($city_index === -1 && count($parts) >= 2) {
+            $candidate = preg_replace('/\s+/', ' ', $parts[count($parts) - 1]);
+            if (!preg_match('/\d{3,}/', $candidate)) {
+                $city = trim((string) $candidate);
+                $city_index = count($parts) - 1;
+            }
+        }
+
+        $street = '';
+        if ($city_index > 0) {
+            $street = trim(implode(', ', array_slice($parts, 0, $city_index)));
+        }
+        if ($street === '' && !empty($parts[0])) {
+            $street = trim((string) $parts[0]);
+        }
+
+        return [
+            'city' => $city,
+            'street' => $street,
+        ];
     }
 }
 
@@ -258,10 +318,13 @@ if ($related_conditions !== '') {
                                             foreach ($addresses as $address) {
                                                 $full_address = '';
                                                 $street_only = '';
+                                                $city_name = '';
 
                                                 if (is_string($address)) {
                                                     $full_address = normalize_state_abbreviation($address);
-                                                    $street_only = trim((string) explode(',', $full_address)[0]);
+                                                    $parsed_address = parse_address_for_display($full_address);
+                                                    $street_only = isset($parsed_address['street']) ? trim((string) $parsed_address['street']) : '';
+                                                    $city_name = isset($parsed_address['city']) ? trim((string) $parsed_address['city']) : '';
                                                 } elseif (is_array($address)) {
                                                     $street = isset($address['street']) ? trim((string) $address['street']) : '';
                                                     $city = isset($address['city']) ? trim((string) $address['city']) : '';
@@ -269,6 +332,7 @@ if ($related_conditions !== '') {
                                                     $zip = isset($address['zip']) ? trim((string) $address['zip']) : '';
 
                                                     $street_only = $street;
+                                                    $city_name = $city;
 
                                                     if ($street !== '' && $city !== '') {
                                                         $full_address = $street . ', ' . $city;
@@ -287,7 +351,9 @@ if ($related_conditions !== '') {
                                                     continue;
                                                 }
 
-                                                $city_name = extract_city_from_address($full_address);
+                                                if ($city_name === '') {
+                                                    $city_name = extract_city_from_address($full_address);
+                                                }
                                                 if ($city_name === '') {
                                                     continue;
                                                 }

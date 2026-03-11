@@ -43,6 +43,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260310175232 (2026-03-10)
+
+- Fixed Doctor page practice-location address parsing when street lines contain comma-separated suite/unit values (e.g., "..., Ste 107, City CA ZIP").
+- Prevents suite/unit segments from being misclassified as city headings and keeps city grouping accurate.
+
 #### v1.0.20260310173833 (2026-03-10)
 
 - Added Find A Doctor internal linking block (Condition, Treatment, FAQ, Blog) with dynamic URL resolution and conditional output.
