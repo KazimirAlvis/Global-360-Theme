@@ -43,6 +43,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260311182453 (2026-03-11)
+
+- Added automatic Condition/Treatment page JSON-LD output via new module [inc/schema-condition-treatment.php](inc/schema-condition-treatment.php).
+- Outputs `MedicalCondition` schema on the selected Condition page and `MedicalProcedure` schema on the selected Treatment page.
+- Uses dynamic 360 settings values (`primary_condition`, `primary_treatment`) and page selectors with backward-compatible key support.
+
 #### v1.0.20260311182452 (2026-03-11)
 
 - Added SEO robots fallback to set archive pages to `noindex,follow` for category, tag, author, and date archives.
