@@ -43,6 +43,12 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260311182451 (2026-03-11)
+
+- Updated post archive/category pages to use the same article card/grid layout as the Blog page.
+- Added matching hero/title and pagination styling behavior for category/tag/author/date post archives.
+- Preserved default archive rendering for non-post archive types.
+
 #### v1.0.20260311112409 (2026-03-11)
 
 - Added SEOPress-aware SEO fallback logic for page titles and meta descriptions using dynamic 360 Settings values (`primary_condition`, `primary_treatment`).
