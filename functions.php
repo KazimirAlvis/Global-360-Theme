@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260311182451' );
+	define( '_S_VERSION', '1.0.20260311182452' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -1431,6 +1431,18 @@ if ( ! function_exists( 'global360_output_meta_description_fallback' ) ) {
 	}
 }
 add_action( 'wp_head', 'global360_output_meta_description_fallback', 20 );
+
+if ( ! function_exists( 'global360_set_category_archives_noindex' ) ) {
+	function global360_set_category_archives_noindex( $robots ) {
+		if ( is_category() || is_tag() || is_author() || is_date() ) {
+			$robots['noindex'] = true;
+			$robots['follow'] = true;
+		}
+
+		return $robots;
+	}
+}
+add_filter( 'wp_robots', 'global360_set_category_archives_noindex' );
 
 
 

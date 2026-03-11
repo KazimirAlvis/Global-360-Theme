@@ -43,6 +43,11 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260311182452 (2026-03-11)
+
+- Added SEO robots fallback to set archive pages to `noindex,follow` for category, tag, author, and date archives.
+- Helps reduce index bloat from archive pages while preserving crawl paths to posts.
+
 #### v1.0.20260311182451 (2026-03-11)
 
 - Updated post archive/category pages to use the same article card/grid layout as the Blog page.
