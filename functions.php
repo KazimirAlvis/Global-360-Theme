@@ -13,7 +13,7 @@ require_once get_template_directory() . '/inc/settings.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260310175232' );
+	define( '_S_VERSION', '1.0.20260311112409' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -1259,6 +1259,178 @@ add_action('template_include', function($template) {
     
     return $template;
 });
+
+/*--------------------------------------------------------------
+	SEO fallbacks (SEOPress-aware)
+	--------------------------------------------------------------*/
+
+if ( ! function_exists( 'global360_get_seo_settings_terms' ) ) {
+	function global360_get_seo_settings_terms() {
+		$settings = get_option( '360_global_settings', array() );
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+
+		return array(
+			'condition' => sanitize_text_field( $settings['primary_condition'] ?? '' ),
+			'treatment' => sanitize_text_field( $settings['primary_treatment'] ?? '' ),
+			'site_name' => get_bloginfo( 'name' ),
+		);
+	}
+}
+
+if ( ! function_exists( 'global360_get_state_name_for_seo' ) ) {
+	function global360_get_state_name_for_seo() {
+		$state_slug = strtolower( (string) get_query_var( 'find_a_doctor_state' ) );
+		if ( '' === $state_slug ) {
+			return '';
+		}
+
+		return ucwords( str_replace( '-', ' ', $state_slug ) );
+	}
+}
+
+if ( ! function_exists( 'global360_get_seopress_custom_value' ) ) {
+	function global360_get_seopress_custom_value( $meta_key ) {
+		$post_id = get_queried_object_id();
+		if ( ! $post_id ) {
+			return '';
+		}
+
+		$value = get_post_meta( $post_id, $meta_key, true );
+		return is_string( $value ) ? trim( $value ) : '';
+	}
+}
+
+if ( ! function_exists( 'global360_has_seopress_custom_title' ) ) {
+	function global360_has_seopress_custom_title() {
+		return '' !== global360_get_seopress_custom_value( '_seopress_titles_title' );
+	}
+}
+
+if ( ! function_exists( 'global360_has_seopress_custom_description' ) ) {
+	function global360_has_seopress_custom_description() {
+		return '' !== global360_get_seopress_custom_value( '_seopress_titles_desc' );
+	}
+}
+
+if ( ! function_exists( 'global360_build_fallback_title' ) ) {
+	function global360_build_fallback_title() {
+		$terms = global360_get_seo_settings_terms();
+		$condition = $terms['condition'];
+		$site_name = $terms['site_name'];
+
+		if ( is_singular( 'doctor' ) || is_singular( 'doctors' ) ) {
+			$parts = array(
+				get_the_title(),
+				$condition ? $condition . ' Specialist' : '',
+				$site_name,
+			);
+			$parts = array_values( array_filter( array_map( 'trim', $parts ) ) );
+			return ! empty( $parts ) ? implode( ' | ', $parts ) : '';
+		}
+
+		if ( is_singular( 'clinic' ) || is_singular( 'clinics' ) ) {
+			$parts = array(
+				get_the_title(),
+				$condition ? $condition . ' Treatment Clinic' : '',
+				$site_name,
+			);
+			$parts = array_values( array_filter( array_map( 'trim', $parts ) ) );
+			return ! empty( $parts ) ? implode( ' | ', $parts ) : '';
+		}
+
+		if ( is_page( 'find-a-doctor' ) ) {
+			if ( $condition && $site_name ) {
+				return 'Find a ' . $condition . ' Specialist | ' . $site_name;
+			}
+			if ( $condition ) {
+				return 'Find a ' . $condition . ' Specialist';
+			}
+			return '';
+		}
+
+		if ( get_query_var( 'find_a_doctor_state' ) ) {
+			$state_name = global360_get_state_name_for_seo();
+			if ( $condition && $state_name && $site_name ) {
+				return $condition . ' Specialists in ' . $state_name . ' | ' . $site_name;
+			}
+			if ( $condition && $state_name ) {
+				return $condition . ' Specialists in ' . $state_name;
+			}
+		}
+
+		return '';
+	}
+}
+
+if ( ! function_exists( 'global360_build_fallback_description' ) ) {
+	function global360_build_fallback_description() {
+		$terms = global360_get_seo_settings_terms();
+		$condition = $terms['condition'];
+		$treatment = $terms['treatment'];
+
+		if ( is_singular( 'doctor' ) || is_singular( 'doctors' ) ) {
+			if ( $condition && $treatment ) {
+				return get_the_title() . ' specializes in treating ' . $condition . ' using advanced therapies including ' . $treatment . '. Learn more about available treatment options and clinic locations.';
+			}
+			return '';
+		}
+
+		if ( is_singular( 'clinic' ) || is_singular( 'clinics' ) ) {
+			if ( $condition ) {
+				return get_the_title() . ' offers treatment for ' . $condition . '. View doctors, clinic locations, and treatment options available at this clinic.';
+			}
+			return '';
+		}
+
+		if ( is_page( 'find-a-doctor' ) ) {
+			if ( $condition && $treatment ) {
+				return 'Find doctors specializing in ' . $condition . ' and treatments such as ' . $treatment . '. Browse specialists by state to locate experienced physicians near you.';
+			}
+			return '';
+		}
+
+		if ( get_query_var( 'find_a_doctor_state' ) ) {
+			$state_name = global360_get_state_name_for_seo();
+			if ( $condition && $state_name && $treatment ) {
+				return 'Find ' . $condition . ' specialists in ' . $state_name . '. Browse doctors and clinics offering treatments such as ' . $treatment . '.';
+			}
+		}
+
+		return '';
+	}
+}
+
+if ( ! function_exists( 'global360_filter_document_title_fallback' ) ) {
+	function global360_filter_document_title_fallback( $title ) {
+		if ( is_admin() || global360_has_seopress_custom_title() ) {
+			return $title;
+		}
+
+		$fallback = global360_build_fallback_title();
+		return '' !== $fallback ? $fallback : $title;
+	}
+}
+add_filter( 'pre_get_document_title', 'global360_filter_document_title_fallback', 9999 );
+
+if ( ! function_exists( 'global360_output_meta_description_fallback' ) ) {
+	function global360_output_meta_description_fallback() {
+		if ( is_admin() || global360_has_seopress_custom_description() ) {
+			return;
+		}
+
+		$description = global360_build_fallback_description();
+		if ( '' === $description ) {
+			return;
+		}
+
+		echo "\n";
+		echo '<meta name="description" content="' . esc_attr( $description ) . '">';
+		echo "\n";
+	}
+}
+add_action( 'wp_head', 'global360_output_meta_description_fallback', 20 );
 
 
 

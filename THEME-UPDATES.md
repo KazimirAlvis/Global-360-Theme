@@ -43,6 +43,13 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260311112409 (2026-03-11)
+
+- Added SEOPress-aware SEO fallback logic for page titles and meta descriptions using dynamic 360 Settings values (`primary_condition`, `primary_treatment`).
+- Implemented fallbacks for Doctor, Clinic, Find A Doctor, and Find A Doctor state-directory pages.
+- Preserved priority order: SEOPress custom fields → theme fallback → WordPress defaults.
+- Left existing JSON-LD schema output unchanged.
+
 #### v1.0.20260310175232 (2026-03-10)
 
 - Fixed Doctor page practice-location address parsing when street lines contain comma-separated suite/unit values (e.g., "..., Ste 107, City CA ZIP").
