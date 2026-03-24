@@ -43,6 +43,10 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260324164151 (2026-03-24)
+
+- Release bump and deploy sync for latest Global 360 Theme updates.
+
 #### v1.0.20260311182453 (2026-03-11)
 
 - Added automatic Condition/Treatment page JSON-LD output via new module [inc/schema-condition-treatment.php](inc/schema-condition-treatment.php).
