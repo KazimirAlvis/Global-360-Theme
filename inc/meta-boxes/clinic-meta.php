@@ -309,49 +309,90 @@ add_action( 'admin_head', function() {
     </style>';
 } );
 
-// 2) Render the box (in cpt360-plugin.php)
+// 2) Render the box
+if ( ! function_exists( 'render_clinic_addresses_box' ) ) :
 function render_clinic_addresses_box( $post ) {
   wp_nonce_field( 'save_clinic_addresses', 'clinic_addresses_nonce' );
   $addresses = get_post_meta( $post->ID, 'clinic_addresses', true ) ?: [];
   ?>
+  <style>
+    .clinic-address-row { background:#f9f9f9; border:1px solid #ddd; border-radius:4px; padding:12px; margin-bottom:10px; }
+    .clinic-address-row .addr-row { display:flex; gap:8px; margin-bottom:6px; }
+    .clinic-address-row .addr-row input { flex:1; }
+    .clinic-address-row .addr-label { font-weight:600; margin-bottom:6px; font-size:13px; }
+  </style>
   <div id="clinic-addresses-container">
     <?php foreach ( $addresses as $i => $addr ): ?>
       <div class="clinic-address-row" data-index="<?php echo $i; ?>">
-        <input type="text"
-               name="clinic_addresses[<?php echo $i; ?>][street]"
-               value="<?php echo esc_attr( $addr['street'] ); ?>"
-               placeholder="Street" />
-        <!-- add other fields: city, state, zip -->
-        <button class="remove-address button">–</button>
+        <div class="addr-label">Address <?php echo $i + 1; ?> <button class="remove-address button button-small" style="float:right">Remove</button></div>
+        <div class="addr-row">
+          <input type="text"
+                 name="clinic_addresses[<?php echo $i; ?>][street]"
+                 value="<?php echo esc_attr( $addr['street'] ?? '' ); ?>"
+                 placeholder="Street" />
+        </div>
+        <div class="addr-row">
+          <input type="text"
+                 name="clinic_addresses[<?php echo $i; ?>][city]"
+                 value="<?php echo esc_attr( $addr['city'] ?? '' ); ?>"
+                 placeholder="City" />
+          <input type="text"
+                 name="clinic_addresses[<?php echo $i; ?>][state]"
+                 value="<?php echo esc_attr( $addr['state'] ?? '' ); ?>"
+                 placeholder="State" style="max-width:60px" />
+          <input type="text"
+                 name="clinic_addresses[<?php echo $i; ?>][zip]"
+                 value="<?php echo esc_attr( $addr['zip'] ?? '' ); ?>"
+                 placeholder="Zip" style="max-width:90px" />
+        </div>
+        <div class="addr-row">
+          <input type="text"
+                 name="clinic_addresses[<?php echo $i; ?>][lat]"
+                 value="<?php echo esc_attr( $addr['lat'] ?? '' ); ?>"
+                 placeholder="Latitude" style="max-width:160px" />
+          <input type="text"
+                 name="clinic_addresses[<?php echo $i; ?>][lng]"
+                 value="<?php echo esc_attr( $addr['lng'] ?? '' ); ?>"
+                 placeholder="Longitude" style="max-width:160px" />
+        </div>
       </div>
     <?php endforeach; ?>
   </div>
-  <button id="add-address" class="button">Add Address</button>
+  <button id="add-address" class="button">+ Add Address</button>
 
   <script>
   jQuery(function($){
+    function makeRow(index) {
+      return $(
+        '<div class="clinic-address-row" data-index="'+index+'">' +
+          '<div class="addr-label">Address '+(index+1)+' <button class="remove-address button button-small" style="float:right">Remove</button></div>' +
+          '<div class="addr-row"><input type="text" name="clinic_addresses['+index+'][street]" placeholder="Street" /></div>' +
+          '<div class="addr-row">' +
+            '<input type="text" name="clinic_addresses['+index+'][city]" placeholder="City" />' +
+            '<input type="text" name="clinic_addresses['+index+'][state]" placeholder="State" style="max-width:60px" />' +
+            '<input type="text" name="clinic_addresses['+index+'][zip]" placeholder="Zip" style="max-width:90px" />' +
+          '</div>' +
+          '<div class="addr-row">' +
+            '<input type="text" name="clinic_addresses['+index+'][lat]" placeholder="Latitude" style="max-width:160px" />' +
+            '<input type="text" name="clinic_addresses['+index+'][lng]" placeholder="Longitude" style="max-width:160px" />' +
+          '</div>' +
+        '</div>'
+      );
+    }
     $('#add-address').on('click', function(e){
       e.preventDefault();
       var container = $('#clinic-addresses-container');
-      var index     = container.find('.clinic-address-row').length;
-      var row = $(
-        '<div class="clinic-address-row" data-index="'+index+'">'+
-          '<input type="text" name="clinic_addresses['+index+'][street]" placeholder="Street" />'+
-          '<button class="remove-address button">–</button>'+
-        '</div>'
-      );
-      container.append(row);
+      container.append( makeRow( container.find('.clinic-address-row').length ) );
     });
-
     $(document).on('click', '.remove-address', function(e){
       e.preventDefault();
       $(this).closest('.clinic-address-row').remove();
-      // optionally re-index the remaining rows…
     });
   });
   </script>
   <?php
 }
+endif;
 add_action( 'save_post', function( $post_id, $post ) {
   if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) return;
   if ( $post->post_type !== 'clinic' )    return;
@@ -368,6 +409,8 @@ add_action( 'save_post', function( $post_id, $post ) {
       'city'   => sanitize_text_field( $addr['city']   ?? '' ),
       'state'  => sanitize_text_field( $addr['state']  ?? '' ),
       'zip'    => sanitize_text_field( $addr['zip']    ?? '' ),
+      'lat'    => sanitize_text_field( $addr['lat']    ?? '' ),
+      'lng'    => sanitize_text_field( $addr['lng']    ?? '' ),
     ];
   }
 

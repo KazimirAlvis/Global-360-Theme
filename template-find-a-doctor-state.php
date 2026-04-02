@@ -124,23 +124,29 @@ if ($state_abbr) {
                 $addresses = get_post_meta($clinic->ID, 'clinic_addresses', true);
                 if (!is_array($addresses)) continue;
                 foreach ($addresses as $addr) {
-                    $full_address = $addr['street'];
-                    // Extract state abbreviation or full name before the zip, anywhere in the address
-                    $address_state = '';
-                    $matches = [];
-                    // Find all matches for ', STATE ZIP'
-                    preg_match_all('/,\s*([A-Za-z]{2})\s*\d{5}/', $full_address, $matches);
-                    if (!empty($matches[1])) {
-                        $address_state = strtoupper(end($matches[1]));
-                    } else {
-                        // Find all matches for ', StateName ZIP'
-                        preg_match_all('/,\s*([A-Za-z ]+)\s*\d{5}/', $full_address, $matches);
+                    // Build full address string from structured fields.
+                    $addr_parts   = array_filter( [
+                        $addr['street'] ?? '',
+                        $addr['city']   ?? '',
+                        $addr['state']  ?? '',
+                        $addr['zip']    ?? '',
+                    ] );
+                    $full_address = implode( ', ', $addr_parts );
+
+                    // Use the structured state field directly instead of regex-parsing the street.
+                    $address_state = strtoupper( trim( $addr['state'] ?? '' ) );
+
+                    // Fallback: try to extract state from the full address string for legacy data.
+                    if ( ! $address_state ) {
+                        $matches = [];
+                        preg_match_all('/,\s*([A-Za-z]{2})\s*\d{5}/', $full_address, $matches);
                         if (!empty($matches[1])) {
-                            $address_state = ucwords(strtolower(trim(end($matches[1]))));
+                            $address_state = strtoupper(end($matches[1]));
                         }
                     }
+
                     // Only add if state matches current state (abbr or full name)
-                    if ($address_state && ($address_state === $state_abbr || $address_state === $state_name)) {
+                    if ($address_state && ($address_state === $state_abbr || strtoupper($address_state) === strtoupper($state_name))) {
                         $lat = $addr['lat'] ?? '';
                         $lng = $addr['lng'] ?? '';
                         if (!$lat || !$lng) {
