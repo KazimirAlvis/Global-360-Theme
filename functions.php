@@ -14,7 +14,7 @@ require_once get_template_directory() . '/inc/schema-condition-treatment.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260324164151' );
+	define( '_S_VERSION', '1.0.20260402102752' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -808,6 +808,75 @@ function global_360_theme_wpcf7_load_assets_filter( $load ) {
 add_filter( 'wpcf7_load_js', 'global_360_theme_wpcf7_load_assets_filter' );
 add_filter( 'wpcf7_load_css', 'global_360_theme_wpcf7_load_assets_filter' );
 
+function global_360_theme_resolve_cf7_form_id( $requested_form_id = '' ) {
+	$candidates = array();
+
+	if ( is_string( $requested_form_id ) ) {
+		$requested_form_id = trim( $requested_form_id );
+	}
+
+	if ( ! empty( $requested_form_id ) ) {
+		$candidates[] = $requested_form_id;
+	}
+
+	$opts = get_option( '360_global_settings', array() );
+	if ( is_array( $opts ) && ! empty( $opts['do_not_sell_form_id'] ) ) {
+		$candidates[] = trim( (string) $opts['do_not_sell_form_id'] );
+	}
+
+	if ( ! in_array( '98f6667', $candidates, true ) ) {
+		$candidates[] = '98f6667';
+	}
+
+	foreach ( $candidates as $candidate ) {
+		if ( $candidate === '' ) {
+			continue;
+		}
+
+		if ( ctype_digit( (string) $candidate ) ) {
+			$post = get_post( (int) $candidate );
+			if ( $post && $post->post_type === 'wpcf7_contact_form' && $post->post_status === 'publish' ) {
+				return (string) (int) $candidate;
+			}
+			continue;
+		}
+
+		$slug = sanitize_title( $candidate );
+		$form = get_page_by_path( $slug, OBJECT, 'wpcf7_contact_form' );
+		if ( $form instanceof WP_Post && $form->post_status === 'publish' ) {
+			return (string) $form->ID;
+		}
+
+		$forms = get_posts(
+			array(
+				'post_type'      => 'wpcf7_contact_form',
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+				'title'          => $candidate,
+			)
+		);
+		if ( ! empty( $forms ) && isset( $forms[0]->ID ) ) {
+			return (string) $forms[0]->ID;
+		}
+	}
+
+	$fallback_forms = get_posts(
+		array(
+			'post_type'      => 'wpcf7_contact_form',
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+		)
+	);
+
+	if ( ! empty( $fallback_forms ) && isset( $fallback_forms[0]->ID ) ) {
+		return (string) $fallback_forms[0]->ID;
+	}
+
+	return '';
+}
+
 function global_360_theme_ajax_lazy_cf7() {
 	$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
 	if ( ! wp_verify_nonce( $nonce, 'global_360_lazy_cf7' ) ) {
@@ -821,6 +890,11 @@ function global_360_theme_ajax_lazy_cf7() {
 
 	if ( ! shortcode_exists( 'contact-form-7' ) ) {
 		wp_send_json_error( array( 'message' => 'Contact Form 7 is not available.' ), 500 );
+	}
+
+	$form_id = global_360_theme_resolve_cf7_form_id( $form_id );
+	if ( $form_id === '' ) {
+		wp_send_json_error( array( 'message' => 'No Contact Form 7 forms are available.' ), 404 );
 	}
 
 	// Force CF7 assets for this AJAX response.

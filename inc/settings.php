@@ -403,6 +403,56 @@ if (! class_exists('_360_Global_Settings')) {
         }
 
         /**
+         * Render the Do Not Sell popup Contact Form 7 form ID input.
+         */
+        public function field_do_not_sell_form_id($args)
+        {
+            $opts = get_option(self::OPTION_KEY, []);
+            $val  = trim((string) ($opts[$args['label_for']] ?? ''));
+
+            $forms = get_posts([
+                'post_type'      => 'wpcf7_contact_form',
+                'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'orderby'        => 'title',
+                'order'          => 'ASC',
+            ]);
+
+            echo '<select id="do_not_sell_form_id_select" class="regular-text" style="max-width: 420px;">';
+            echo '<option value="">' . esc_html__('Select a Contact Form 7 form…', 'cpt360') . '</option>';
+
+            if (!empty($forms)) {
+                foreach ($forms as $form) {
+                    $form_id = (string) $form->ID;
+                    $title = get_the_title($form->ID);
+                    if ($title === '') {
+                        $title = __('(Untitled Form)', 'cpt360');
+                    }
+                    $label = sprintf('%s (ID: %s)', $title, $form_id);
+                    printf(
+                        '<option value="%1$s"%2$s>%3$s</option>',
+                        esc_attr($form_id),
+                        selected($val, $form_id, false),
+                        esc_html($label)
+                    );
+                }
+            }
+
+            echo '</select>';
+            echo '<br /><br />';
+            printf(
+                '<input type="text" id="%1$s" name="%2$s[%1$s]" value="%3$s" class="regular-text" placeholder="e.g. 1234 or do-not-sell-form" style="max-width: 420px;" />',
+                esc_attr($args['label_for']),
+                esc_attr(self::OPTION_KEY),
+                esc_attr($val)
+            );
+            echo '<script>(function(){var select=document.getElementById("do_not_sell_form_id_select");var input=document.getElementById("' . esc_js($args['label_for']) . '");if(!select||!input){return;}select.addEventListener("change",function(){if(select.value){input.value=select.value;}});}());</script>';
+            echo '<p class="description">'
+                . esc_html__('Choose a published Contact Form 7 form by name (includes ID). You can also manually enter an ID, slug, or title. Leave blank to auto-select the newest available published form.', 'cpt360')
+                . '</p>';
+        }
+
+        /**
          * Render the Header Logo input.
          */
 
@@ -674,6 +724,11 @@ if (! class_exists('_360_Global_Settings')) {
             if (isset($input['become_provider_url'])) {
                 $output['become_provider_url'] = esc_url_raw($input['become_provider_url']);
             }
+
+            // Do Not Sell popup CF7 form identifier
+            if (isset($input['do_not_sell_form_id'])) {
+                $output['do_not_sell_form_id'] = sanitize_text_field($input['do_not_sell_form_id']);
+            }
             
             if (isset($input['header_logo_id']) && is_numeric($input['header_logo_id'])) {
                 $output['header_logo_id'] = intval($input['header_logo_id']);
@@ -870,6 +925,9 @@ if (! class_exists('_360_Global_Settings')) {
                             echo '</div>';
                             echo '<div><label for="become_provider_url"><strong>Become a Provider Button URL</strong></label>';
                             $this->field_become_provider_url(['label_for' => 'become_provider_url']);
+                            echo '</div>';
+                            echo '<div style="margin-top: 15px;"><label for="do_not_sell_form_id"><strong>Do Not Sell Popup Form (CF7)</strong></label>';
+                            $this->field_do_not_sell_form_id(['label_for' => 'do_not_sell_form_id']);
                             echo '</div>';
                             echo '</div>';
                             
@@ -1467,6 +1525,7 @@ if (! class_exists('_360_Global_Settings')) {
                             'assessment_id' => 'Assessment ID',
                             'contact_email' => 'Contact Email',
                             'contact_phone' => 'Contact Phone',
+                            'do_not_sell_form_id' => 'Do Not Sell Popup Form',
                             'google_maps_api_key' => 'Google Maps API',
                             'social_links' => 'Social Media Links',
                             'medical_specialty' => 'Schema: Medical Specialty',

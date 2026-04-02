@@ -135,6 +135,7 @@
 	</div>
 
 	<!-- Do Not Sell Info Modal -->
+	<?php $do_not_sell_form_id = function_exists( 'global_360_theme_resolve_cf7_form_id' ) ? global_360_theme_resolve_cf7_form_id( '98f6667' ) : '98f6667'; ?>
 	<div id="do-not-sell-modal" class="modal-overlay" style="display: none;">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -144,7 +145,7 @@
 			<div class="modal-body">
 				<div
 					class="global-360-lazy-cf7"
-					data-cf7-form-id="98f6667"
+					data-cf7-form-id="<?php echo esc_attr( $do_not_sell_form_id ); ?>"
 					data-cf7-lazy-trigger="#do-not-sell-trigger"
 				>
 					<p>Loading form…</p>
