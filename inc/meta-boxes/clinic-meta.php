@@ -1784,10 +1784,14 @@ function render_clinic_google_reviews_meta_box($post) {
         echo '<hr>';
         echo '<h4>Live Reviews Preview:</h4>';
         echo '<div id="google-reviews-preview">';
-        
-        // Include the reviews partial to show preview
-        $theme_root = get_template_directory();
-        include $theme_root . '/clinic-partials/clinic-google-reviews.php';
+
+        if (function_exists('global_360_are_google_reviews_enabled') && global_360_are_google_reviews_enabled()) {
+            // Include the reviews partial to show preview
+            $theme_root = get_template_directory();
+            include $theme_root . '/clinic-partials/clinic-google-reviews.php';
+        } else {
+            echo '<p><em>Google reviews are temporarily disabled.</em></p>';
+        }
         
         echo '</div>';
     }

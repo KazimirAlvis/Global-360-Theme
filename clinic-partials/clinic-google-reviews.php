@@ -4,6 +4,10 @@
  * Automatically pulls real Google reviews for the clinic
  */
 
+if ( function_exists( 'global_360_are_google_reviews_enabled' ) && ! global_360_are_google_reviews_enabled() ) {
+    return;
+}
+
 // Get clinic Google Place ID (this will be set in clinic meta)
 $place_id = get_post_meta(get_the_ID(), 'google_place_id', true);
 $can_edit_posts = function_exists('current_user_can') ? call_user_func('current_user_can', 'edit_posts') : false;

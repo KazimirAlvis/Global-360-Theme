@@ -27,7 +27,9 @@ get_header();
               <?php require_once $theme_root . '/clinic-partials/clinic-logo.php'; ?>
               <h4>Clinic Information</h4>
               <?php require_once $theme_root . '/clinic-partials/clinic-address.php'; ?>
-              <?php require_once $theme_root . '/clinic-partials/clinic-google-reviews.php'; ?>
+              <?php if ( function_exists( 'global_360_are_google_reviews_enabled' ) && global_360_are_google_reviews_enabled() ) : ?>
+                <?php require_once $theme_root . '/clinic-partials/clinic-google-reviews.php'; ?>
+              <?php endif; ?>
               
             </div>
             <div class="column">

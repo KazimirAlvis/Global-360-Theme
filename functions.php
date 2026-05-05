@@ -14,7 +14,19 @@ require_once get_template_directory() . '/inc/schema-condition-treatment.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260402173145' );
+	define( '_S_VERSION', '1.0.20260402232545' );
+}
+
+if ( ! function_exists( 'global_360_are_google_reviews_enabled' ) ) {
+	/**
+	 * Temporary kill-switch for Google reviews API usage.
+	 *
+	 * Set default to false to stop Places API requests until a permanent
+	 * replacement is implemented.
+	 */
+	function global_360_are_google_reviews_enabled() {
+		return (bool) apply_filters( 'global_360_enable_google_reviews', false );
+	}
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
