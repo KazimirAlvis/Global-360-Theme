@@ -1524,8 +1524,33 @@ add_filter( 'query_vars', function( $vars ) {
 	return $vars;
 } );
 
+if ( ! function_exists( 'global360_is_state_sitemap_request' ) ) {
+	/**
+	 * Detect state sitemap requests even if pretty rewrites are stale.
+	 *
+	 * @return bool
+	 */
+	function global360_is_state_sitemap_request() {
+		if ( '1' === (string) get_query_var( 'global360_state_sitemap' ) ) {
+			return true;
+		}
+
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+		if ( '' === $request_uri ) {
+			return false;
+		}
+
+		$request_path = wp_parse_url( $request_uri, PHP_URL_PATH );
+		if ( ! is_string( $request_path ) || '' === $request_path ) {
+			return false;
+		}
+
+		return '/find-a-doctor-states-sitemap.xml' === untrailingslashit( $request_path );
+	}
+}
+
 add_action( 'template_redirect', function() {
-	if ( '1' !== (string) get_query_var( 'global360_state_sitemap' ) ) {
+	if ( ! global360_is_state_sitemap_request() ) {
 		return;
 	}
 
