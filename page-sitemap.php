@@ -36,6 +36,22 @@ $exclude    = [
 
 		<div class="sitemap">
 			<?php
+			if ( function_exists( 'global360_get_state_sitemap_entries' ) ) {
+				$state_entries = global360_get_state_sitemap_entries();
+				if ( ! empty( $state_entries ) ) {
+					echo '<h2>' . esc_html__( 'Find a Doctor by State', 'cpt360' ) . '</h2>';
+					echo '<ul>';
+					foreach ( $state_entries as $state_slug => $entry ) {
+						$state_url   = (string) ( $entry['url'] ?? '' );
+						$state_label = ucwords( str_replace( '-', ' ', (string) $state_slug ) );
+						echo '<li><a href="' . esc_url( $state_url ) . '">' . esc_html( $state_label ) . '</a></li>';
+					}
+					echo '</ul>';
+				}
+			}
+			?>
+
+			<?php
 			foreach ( $post_types as $post_type ) {
 				if ( empty( $post_type->name ) || in_array( $post_type->name, $exclude, true ) ) {
 					continue;

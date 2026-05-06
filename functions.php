@@ -1403,6 +1403,168 @@ if ( ! function_exists( 'global360_get_valid_state_slug_map' ) ) {
 	}
 }
 
+if ( ! function_exists( 'global360_get_state_sitemap_entries' ) ) {
+	/**
+	 * Build state sitemap entries for states that currently have clinics.
+	 *
+	 * @return array<string,array{url:string,lastmod:string}>
+	 */
+	function global360_get_state_sitemap_entries() {
+		$state_slug_map = global360_get_valid_state_slug_map();
+		if ( empty( $state_slug_map ) ) {
+			return array();
+		}
+
+		$abbr_to_slug = array_flip( $state_slug_map );
+		$entries      = array();
+
+		$clinic_ids = get_posts(
+			array(
+				'post_type'              => 'clinic',
+				'post_status'            => 'publish',
+				'posts_per_page'         => -1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		if ( empty( $clinic_ids ) ) {
+			return array();
+		}
+
+		foreach ( $clinic_ids as $clinic_id ) {
+			$clinic_states = get_post_meta( $clinic_id, 'clinic_states', true );
+			if ( ! is_array( $clinic_states ) ) {
+				$clinic_states = array();
+			}
+
+			$single_state = sanitize_text_field( (string) get_post_meta( $clinic_id, '_cpt360_clinic_state', true ) );
+			if ( '' !== $single_state ) {
+				$clinic_states[] = $single_state;
+			}
+
+			$clinic_lastmod = get_post_modified_time( 'c', true, (int) $clinic_id );
+			if ( ! is_string( $clinic_lastmod ) || '' === $clinic_lastmod ) {
+				$clinic_lastmod = gmdate( 'c' );
+			}
+
+			foreach ( $clinic_states as $state ) {
+				$abbr = strtoupper( sanitize_text_field( (string) $state ) );
+				if ( '' === $abbr || ! isset( $abbr_to_slug[ $abbr ] ) ) {
+					continue;
+				}
+
+				$state_slug = $abbr_to_slug[ $abbr ];
+				if ( ! isset( $entries[ $state_slug ] ) ) {
+					$entries[ $state_slug ] = array(
+						'url'     => home_url( '/find-a-doctor/' . $state_slug . '/' ),
+						'lastmod' => $clinic_lastmod,
+					);
+					continue;
+				}
+
+				if ( strtotime( $clinic_lastmod ) > strtotime( $entries[ $state_slug ]['lastmod'] ) ) {
+					$entries[ $state_slug ]['lastmod'] = $clinic_lastmod;
+				}
+			}
+		}
+
+		ksort( $entries, SORT_NATURAL | SORT_FLAG_CASE );
+
+		return $entries;
+	}
+}
+
+if ( ! function_exists( 'global360_get_state_sitemap_lastmod' ) ) {
+	/**
+	 * Derive a stable lastmod timestamp for the state sitemap.
+	 *
+	 * @return string W3C date string.
+	 */
+	function global360_get_state_sitemap_lastmod() {
+		$entries = global360_get_state_sitemap_entries();
+		if ( ! empty( $entries ) ) {
+			$timestamps = array_map(
+				static function( $entry ) {
+					return strtotime( (string) ( $entry['lastmod'] ?? '' ) );
+				},
+				$entries
+			);
+
+			$timestamps = array_filter( $timestamps, static function( $value ) {
+				return false !== $value;
+			} );
+
+			if ( ! empty( $timestamps ) ) {
+				return gmdate( 'c', max( $timestamps ) );
+			}
+		}
+
+		$find_a_doctor_page = get_page_by_path( 'find-a-doctor' );
+		if ( $find_a_doctor_page instanceof WP_Post ) {
+			$modified_gmt = get_post_modified_time( 'c', true, $find_a_doctor_page );
+			if ( is_string( $modified_gmt ) && '' !== $modified_gmt ) {
+				return $modified_gmt;
+			}
+		}
+
+		return gmdate( 'c' );
+	}
+}
+
+add_action( 'init', function() {
+	add_rewrite_rule( '^find-a-doctor-states-sitemap\.xml$', 'index.php?global360_state_sitemap=1', 'top' );
+} );
+
+add_filter( 'query_vars', function( $vars ) {
+	$vars[] = 'global360_state_sitemap';
+
+	return $vars;
+} );
+
+add_action( 'template_redirect', function() {
+	if ( '1' !== (string) get_query_var( 'global360_state_sitemap' ) ) {
+		return;
+	}
+
+	$entries = global360_get_state_sitemap_entries();
+
+	header( 'Content-Type: application/xml; charset=utf-8' );
+	status_header( 200 );
+
+	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+	echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+	if ( ! empty( $entries ) ) {
+		foreach ( $entries as $entry ) {
+			echo "\n\t<url>";
+			echo "\n\t\t<loc>" . esc_url( (string) $entry['url'] ) . '</loc>';
+			echo "\n\t\t<lastmod>" . esc_html( (string) $entry['lastmod'] ) . '</lastmod>';
+			echo "\n\t\t<changefreq>weekly</changefreq>";
+			echo "\n\t\t<priority>0.7</priority>";
+			echo "\n\t</url>";
+		}
+	}
+
+	echo "\n</urlset>";
+	exit;
+}, 1 );
+
+add_filter( 'seopress_sitemaps_external_link', function( $custom_sitemap ) {
+	if ( ! is_array( $custom_sitemap ) ) {
+		$custom_sitemap = array();
+	}
+
+	$custom_sitemap['global360_find_a_doctor_states'] = array(
+		'sitemap_url'      => home_url( '/find-a-doctor-states-sitemap.xml' ),
+		'sitemap_last_mod' => global360_get_state_sitemap_lastmod(),
+	);
+
+	return $custom_sitemap;
+} );
+
 add_action('init', function() {
     // State pages: /find-a-doctor/state-name/
     add_rewrite_rule('^find-a-doctor/([^/]+)/?$', 'index.php?find_a_doctor_state=$matches[1]', 'top');
