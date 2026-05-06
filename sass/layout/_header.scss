@@ -267,6 +267,12 @@ body.mobile-menu-open {
 	.site-header {
 		.header_inner {
 			padding: 0 10px;
+
+			.site-branding {
+				a img {
+					max-width: 280px;
+				}
+			}
 		}
 	}
 

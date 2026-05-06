@@ -4,7 +4,7 @@ Theme URI: http://underscores.me/
 Author: Underscores.me
 Author URI: http://underscores.me/
 Description: Description
-Version: 1.0.20260506181018
+Version: 1.0.0
 Tested up to: 5.4
 Requires PHP: 5.6
 License: GNU General Public License v2 or later
@@ -1378,6 +1378,9 @@ body.mobile-menu-open {
 @media (max-width: 1024px) {
   .site-header .header_inner {
     padding: 0 10px;
+  }
+  .site-header .header_inner .site-branding a img {
+    max-width: 280px;
   }
   .menu-toggle {
     display: flex;
