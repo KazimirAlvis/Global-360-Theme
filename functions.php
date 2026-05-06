@@ -2769,3 +2769,135 @@ if ( ! function_exists( 'global360_output_find_a_doctor_itemlist_schema' ) ) {
 }
 
 add_action( 'wp_head', 'global360_output_find_a_doctor_itemlist_schema', 100 );
+
+if ( ! function_exists( 'global360_output_find_a_doctor_state_schema' ) ) {
+	/**
+	 * Output BreadcrumbList and ItemList schema for dynamic state directory pages.
+	 */
+	function global360_output_find_a_doctor_state_schema() {
+		if ( is_admin() ) {
+			return;
+		}
+
+		$state_slug = sanitize_title( strtolower( (string) get_query_var( 'find_a_doctor_state' ) ) );
+		if ( '' === $state_slug ) {
+			return;
+		}
+
+		$state_slug_map = global360_get_valid_state_slug_map();
+		if ( ! isset( $state_slug_map[ $state_slug ] ) ) {
+			return;
+		}
+
+		$state_abbr = (string) $state_slug_map[ $state_slug ];
+		$state_name = ucwords( str_replace( '-', ' ', $state_slug ) );
+
+		$home_url          = home_url( '/' );
+		$directory_url     = home_url( '/find-a-doctor/' );
+		$current_state_url = home_url( '/find-a-doctor/' . $state_slug . '/' );
+
+		$graph = array(
+			array(
+				'@type'           => 'BreadcrumbList',
+				'itemListElement' => array(
+					array(
+						'@type'    => 'ListItem',
+						'position' => 1,
+						'name'     => 'Home',
+						'item'     => esc_url_raw( $home_url ),
+					),
+					array(
+						'@type'    => 'ListItem',
+						'position' => 2,
+						'name'     => 'Find a Doctor',
+						'item'     => esc_url_raw( $directory_url ),
+					),
+					array(
+						'@type'    => 'ListItem',
+						'position' => 3,
+						'name'     => $state_name,
+						'item'     => esc_url_raw( $current_state_url ),
+					),
+				),
+			),
+		);
+
+		$clinic_ids = get_posts(
+			array(
+				'post_type'      => 'clinic',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'orderby'        => 'title',
+				'order'          => 'ASC',
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+				'meta_query'     => array(
+					'relation' => 'OR',
+					array(
+						'key'     => 'clinic_states',
+						'value'   => $state_abbr,
+						'compare' => 'LIKE',
+					),
+					array(
+						'key'     => '_cpt360_clinic_state',
+						'value'   => $state_abbr,
+						'compare' => '=',
+					),
+				),
+			)
+		);
+
+		if ( ! empty( $clinic_ids ) ) {
+			$item_list = array();
+			$position  = 1;
+
+			foreach ( $clinic_ids as $clinic_id ) {
+				$clinic_url = get_permalink( (int) $clinic_id );
+				if ( ! $clinic_url ) {
+					continue;
+				}
+
+				$clinic_name = get_the_title( (int) $clinic_id );
+				if ( '' === $clinic_name ) {
+					$clinic_name = 'Clinic';
+				}
+
+				$item_list[] = array(
+					'@type'    => 'ListItem',
+					'position' => $position,
+					'item'     => array(
+						'@type' => 'MedicalClinic',
+						'name'  => $clinic_name,
+						'url'   => esc_url_raw( $clinic_url ),
+					),
+				);
+				$position++;
+			}
+
+			if ( ! empty( $item_list ) ) {
+				$graph[] = array(
+					'@type'           => 'ItemList',
+					'name'            => 'Find a Doctor in ' . $state_name,
+					'numberOfItems'   => count( $item_list ),
+					'itemListElement' => $item_list,
+				);
+			}
+		}
+
+		$schema = array(
+			'@context' => 'https://schema.org',
+			'@graph'   => $graph,
+		);
+
+		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+		if ( ! $json ) {
+			return;
+		}
+
+		echo "\n";
+		echo '<script type="application/ld+json">' . $json . '</script>';
+		echo "\n";
+	}
+}
+
+add_action( 'wp_head', 'global360_output_find_a_doctor_state_schema', 101 );
