@@ -39,3 +39,79 @@
 	margin: 0;
 	line-height: 1.2;
 }
+
+/*--------------------------------------------------------------
+ 404 page
+--------------------------------------------------------------*/
+body.error404 {
+	#page {
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+	}
+
+	#content {
+		flex: 1;
+		display: flex;
+		align-items: stretch;
+	}
+
+	#primary.site-main-404 {
+		flex: 1;
+		display: grid;
+		place-items: center;
+		padding: 110px 20px;
+		width: 100%;
+	}
+
+	.error-404.not-found {
+		max-width: 720px;
+		width: 100%;
+		text-align: center;
+		margin: 0 auto;
+	}
+
+	.error-404 .page-title {
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		line-height: 1;
+	}
+
+	.error-404 .error-code {
+		font-size: clamp(80px, 16vw, 180px);
+		font-weight: 700;
+		color: var(--cpt360-primary);
+		letter-spacing: 0.03em;
+		margin-bottom: 12px;
+	}
+
+	.error-404 .error-title {
+		font-size: clamp(28px, 4.6vw, 52px);
+		font-weight: 500;
+		line-height: 1.1;
+		color: #282e24;
+	}
+
+	.error-404 .page-content {
+		margin-top: 20px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 22px;
+	}
+
+	.error-404 .page-content p {
+		margin: 0;
+		max-width: 620px;
+		font-size: 18px;
+		line-height: 1.55;
+	}
+
+	.error-404 .btn {
+		width: auto;
+		max-width: none;
+		min-width: 180px;
+	}
+}
