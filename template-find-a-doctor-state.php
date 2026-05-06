@@ -1,7 +1,5 @@
 <?php
-get_header();
-
-$state_slug = strtolower( get_query_var('find_a_doctor_state') );
+$state_slug = sanitize_title( strtolower( (string) get_query_var('find_a_doctor_state') ) );
 $states = [
     'AL'=>'Alabama','AK'=>'Alaska','AZ'=>'Arizona','AR'=>'Arkansas',
     'CA'=>'California','CO'=>'Colorado','CT'=>'Connecticut','DE'=>'Delaware',
@@ -17,6 +15,23 @@ $states = [
     'VT'=>'Vermont','VA'=>'Virginia','WA'=>'Washington','WV'=>'West Virginia',
     'WI'=>'Wisconsin','WY'=>'Wyoming',
 ];
+
+$state_slug_map = function_exists( 'global360_get_valid_state_slug_map' )
+    ? global360_get_valid_state_slug_map()
+    : [];
+
+if ( empty( $state_slug ) || ! isset( $state_slug_map[ $state_slug ] ) ) {
+    global $wp_query;
+    if ( $wp_query ) {
+        $wp_query->set_404();
+    }
+    status_header( 404 );
+    nocache_headers();
+    include get_query_template( '404' );
+    exit;
+}
+
+get_header();
 
 // State center coordinates and zoom levels for map initialization
 $state_centers = [
@@ -72,11 +87,11 @@ $state_centers = [
     'WY' => ['lat' => 42.7559, 'lng' => -107.3025, 'zoom' => 7], // Wyoming
 ];
 
-// Find abbreviation by matching the slug to the state name
-$state_abbr = array_search(ucwords(str_replace('-', ' ', $state_slug)), $states);
-$state_name = $state_abbr ? $states[$state_abbr] : $state_slug;
+// Resolve canonical state abbreviation and name.
+$state_abbr = $state_slug_map[ $state_slug ];
+$state_name = $states[ $state_abbr ];
 
-// Get map center and zoom for this state (fallback to Texas if not found)
+// Get map center and zoom for this state.
 $map_config = isset($state_centers[$state_abbr]) ? $state_centers[$state_abbr] : $state_centers['TX'];
 ?>
 <main id="primary" class="site-main">
