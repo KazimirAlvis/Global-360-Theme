@@ -14,7 +14,7 @@ require_once get_template_directory() . '/inc/schema-condition-treatment.php';
 
 if ( ! defined( '_S_VERSION' ) ) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260402232545' );
+	define( '_S_VERSION', '1.0.20260506181018' );
 }
 
 if ( ! function_exists( 'global_360_are_google_reviews_enabled' ) ) {
@@ -757,7 +757,12 @@ function global_360_theme_get_stylesheet_asset() {
 function global_360_theme_scripts() {
 	// Enqueue main stylesheet with high priority
 	$stylesheet_uri = global_360_theme_get_stylesheet_asset();
-	wp_enqueue_style( 'global-360-theme-style', $stylesheet_uri, array(), _S_VERSION, 'all' );
+	$stylesheet_path = get_template_directory() . '/style-min.css';
+	if ( ! file_exists( $stylesheet_path ) ) {
+		$stylesheet_path = get_stylesheet_directory() . '/style.css';
+	}
+	$stylesheet_version = file_exists( $stylesheet_path ) ? (string) filemtime( $stylesheet_path ) : _S_VERSION;
+	wp_enqueue_style( 'global-360-theme-style', $stylesheet_uri, array(), $stylesheet_version, 'all' );
 	wp_style_add_data( 'global-360-theme-style', 'rtl', 'replace' );
 	
 	// Add preload for stylesheet to improve loading
