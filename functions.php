@@ -3047,3 +3047,132 @@ if ( ! function_exists( 'global360_output_content_page_schema' ) ) {
 }
 
 add_action( 'wp_head', 'global360_output_content_page_schema', 102 );
+
+if ( ! function_exists( 'global360_output_breadcrumb_schema' ) ) {
+	/**
+	 * Output fallback BreadcrumbList schema for regular pages/posts.
+	 */
+	function global360_output_breadcrumb_schema() {
+		if ( is_admin() || ! is_singular() ) {
+			return;
+		}
+
+		if ( is_singular( 'clinic' ) || is_singular( 'clinics' ) || is_singular( 'doctor' ) || is_singular( 'doctors' ) ) {
+			return;
+		}
+
+		if ( is_page_template( 'page-find-a-doctor.php' ) || get_query_var( 'find_a_doctor_state' ) ) {
+			return;
+		}
+
+		$post_id = get_queried_object_id();
+		if ( ! $post_id ) {
+			return;
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post || 'publish' !== $post->post_status ) {
+			return;
+		}
+
+		$current_url = get_permalink( $post_id );
+		$current_name = sanitize_text_field( wp_strip_all_tags( (string) get_the_title( $post_id ) ) );
+		if ( ! $current_url || '' === $current_name ) {
+			return;
+		}
+
+		$items = array();
+		$items[] = array(
+			'name' => sanitize_text_field( wp_strip_all_tags( (string) get_bloginfo( 'name' ) ) ),
+			'url'  => home_url( '/' ),
+		);
+
+		if ( is_singular( 'page' ) ) {
+			$ancestors = array_reverse( get_post_ancestors( $post_id ) );
+			foreach ( $ancestors as $ancestor_id ) {
+				$ancestor_url = get_permalink( (int) $ancestor_id );
+				$ancestor_name = sanitize_text_field( wp_strip_all_tags( (string) get_the_title( (int) $ancestor_id ) ) );
+				if ( $ancestor_url && '' !== $ancestor_name ) {
+					$items[] = array(
+						'name' => $ancestor_name,
+						'url'  => $ancestor_url,
+					);
+				}
+			}
+		} elseif ( is_singular( 'post' ) ) {
+			$posts_page_id = (int) get_option( 'page_for_posts' );
+			if ( $posts_page_id > 0 ) {
+				$posts_page_url = get_permalink( $posts_page_id );
+				$posts_page_name = sanitize_text_field( wp_strip_all_tags( (string) get_the_title( $posts_page_id ) ) );
+				if ( $posts_page_url && '' !== $posts_page_name ) {
+					$items[] = array(
+						'name' => $posts_page_name,
+						'url'  => $posts_page_url,
+					);
+				}
+			}
+		} else {
+			$post_type = get_post_type_object( get_post_type( $post_id ) );
+			if ( $post_type && ! empty( $post_type->has_archive ) ) {
+				$archive_url = get_post_type_archive_link( $post_type->name );
+				$archive_name = sanitize_text_field( wp_strip_all_tags( (string) $post_type->labels->name ) );
+				if ( $archive_url && '' !== $archive_name ) {
+					$items[] = array(
+						'name' => $archive_name,
+						'url'  => $archive_url,
+					);
+				}
+			}
+		}
+
+		$items[] = array(
+			'name' => $current_name,
+			'url'  => $current_url,
+		);
+
+		$seen_urls = array();
+		$list_items = array();
+		$position = 1;
+		foreach ( $items as $item ) {
+			$name = isset( $item['name'] ) ? trim( (string) $item['name'] ) : '';
+			$url = isset( $item['url'] ) ? trim( (string) $item['url'] ) : '';
+			if ( '' === $name || '' === $url ) {
+				continue;
+			}
+			$url_key = esc_url_raw( $url );
+			if ( isset( $seen_urls[ $url_key ] ) ) {
+				continue;
+			}
+			$seen_urls[ $url_key ] = true;
+
+			$list_items[] = array(
+				'@type'    => 'ListItem',
+				'position' => $position,
+				'name'     => sanitize_text_field( $name ),
+				'item'     => $url_key,
+			);
+			$position++;
+		}
+
+		if ( count( $list_items ) < 2 ) {
+			return;
+		}
+
+		$schema = array(
+			'@context'        => 'https://schema.org',
+			'@type'           => 'BreadcrumbList',
+			'itemListElement' => $list_items,
+		);
+
+		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+		if ( ! $json ) {
+			return;
+		}
+
+		echo "\n";
+		echo '<script type="application/ld+json">' . $json . '</script>';
+		echo "\n";
+	}
+}
+
+add_action( 'wp_head', 'global360_output_breadcrumb_schema', 103 );
