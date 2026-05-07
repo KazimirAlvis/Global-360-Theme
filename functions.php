@@ -3006,7 +3006,15 @@ if ( ! function_exists( 'global360_output_content_page_schema' ) ) {
 			}
 		}
 
-		$publisher_name = sanitize_text_field( wp_strip_all_tags( (string) get_bloginfo( 'name' ) ) );
+		$global_settings = get_option( '360_global_settings', array() );
+		$site_name_setting = '';
+		if ( is_array( $global_settings ) && ! empty( $global_settings['site_name'] ) ) {
+			$site_name_setting = sanitize_text_field( wp_strip_all_tags( (string) $global_settings['site_name'] ) );
+		}
+
+		$publisher_name = '' !== $site_name_setting
+			? $site_name_setting
+			: sanitize_text_field( wp_strip_all_tags( (string) get_bloginfo( 'name' ) ) );
 		if ( '' !== $publisher_name ) {
 			$schema['author'] = array(
 				'@type' => 'Organization',
@@ -3078,9 +3086,19 @@ if ( ! function_exists( 'global360_output_breadcrumb_schema' ) ) {
 			return;
 		}
 
+		$global_settings = get_option( '360_global_settings', array() );
+		$site_name_setting = '';
+		if ( is_array( $global_settings ) && ! empty( $global_settings['site_name'] ) ) {
+			$site_name_setting = sanitize_text_field( wp_strip_all_tags( (string) $global_settings['site_name'] ) );
+		}
+
+		$root_name = '' !== $site_name_setting
+			? $site_name_setting
+			: sanitize_text_field( wp_strip_all_tags( (string) get_bloginfo( 'name' ) ) );
+
 		$items = array();
 		$items[] = array(
-			'name' => sanitize_text_field( wp_strip_all_tags( (string) get_bloginfo( 'name' ) ) ),
+			'name' => $root_name,
 			'url'  => home_url( '/' ),
 		);
 
