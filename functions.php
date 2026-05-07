@@ -3006,16 +3006,13 @@ if ( ! function_exists( 'global360_output_content_page_schema' ) ) {
 			}
 		}
 
-		$author_name = sanitize_text_field( get_the_author_meta( 'display_name', (int) $post->post_author ) );
-		if ( '' !== $author_name ) {
-			$schema['author'] = array(
-				'@type' => 'Person',
-				'name'  => $author_name,
-			);
-		}
-
 		$publisher_name = sanitize_text_field( wp_strip_all_tags( (string) get_bloginfo( 'name' ) ) );
 		if ( '' !== $publisher_name ) {
+			$schema['author'] = array(
+				'@type' => 'Organization',
+				'name'  => $publisher_name,
+			);
+
 			$publisher = array(
 				'@type' => 'Organization',
 				'name'  => $publisher_name,
