@@ -2926,3 +2926,124 @@ if ( ! function_exists( 'global360_output_find_a_doctor_state_schema' ) ) {
 }
 
 add_action( 'wp_head', 'global360_output_find_a_doctor_state_schema', 101 );
+
+if ( ! function_exists( 'global360_output_content_page_schema' ) ) {
+	/**
+	 * Output reusable content-driven schema for regular pages/posts.
+	 */
+	function global360_output_content_page_schema() {
+		if ( is_admin() || ! is_singular() ) {
+			return;
+		}
+
+		if ( is_singular( 'clinic' ) || is_singular( 'clinics' ) || is_singular( 'doctor' ) || is_singular( 'doctors' ) ) {
+			return;
+		}
+
+		if ( is_page_template( 'page-find-a-doctor.php' ) || get_query_var( 'find_a_doctor_state' ) ) {
+			return;
+		}
+
+		$post_id = get_queried_object_id();
+		if ( ! $post_id ) {
+			return;
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post || 'publish' !== $post->post_status ) {
+			return;
+		}
+
+		$title = sanitize_text_field( wp_strip_all_tags( (string) get_the_title( $post_id ) ) );
+		if ( '' === $title ) {
+			return;
+		}
+
+		$content_raw = (string) get_post_field( 'post_content', $post_id );
+		$content_text = trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( strip_shortcodes( $content_raw ) ) ) );
+
+		$description = '';
+		if ( has_excerpt( $post_id ) ) {
+			$description = sanitize_text_field( wp_strip_all_tags( (string) get_the_excerpt( $post_id ) ) );
+		}
+		if ( '' === $description && '' !== $content_text ) {
+			$description = sanitize_text_field( wp_trim_words( $content_text, 40, '' ) );
+		}
+
+		$post_url = get_permalink( $post_id );
+		if ( ! $post_url ) {
+			return;
+		}
+
+		$schema_type = is_singular( 'post' ) ? 'Article' : 'MedicalWebPage';
+
+		$schema = array(
+			'@context'         => 'https://schema.org',
+			'@type'            => $schema_type,
+			'mainEntityOfPage' => esc_url_raw( $post_url ),
+			'url'              => esc_url_raw( $post_url ),
+			'headline'         => $title,
+			'inLanguage'       => str_replace( '_', '-', get_locale() ),
+			'datePublished'    => get_post_time( 'c', true, $post_id ),
+			'dateModified'     => get_post_modified_time( 'c', true, $post_id ),
+		);
+
+		if ( '' !== $description ) {
+			$schema['description'] = $description;
+		}
+
+		if ( '' !== $content_text ) {
+			$word_count = count( preg_split( '/\s+/', $content_text ) );
+			if ( $word_count > 0 ) {
+				$schema['wordCount'] = $word_count;
+			}
+		}
+
+		if ( has_post_thumbnail( $post_id ) ) {
+			$image_url = wp_get_attachment_image_url( (int) get_post_thumbnail_id( $post_id ), 'full' );
+			if ( $image_url ) {
+				$schema['image'] = esc_url_raw( $image_url );
+			}
+		}
+
+		$author_name = sanitize_text_field( get_the_author_meta( 'display_name', (int) $post->post_author ) );
+		if ( '' !== $author_name ) {
+			$schema['author'] = array(
+				'@type' => 'Person',
+				'name'  => $author_name,
+			);
+		}
+
+		$publisher_name = sanitize_text_field( wp_strip_all_tags( (string) get_bloginfo( 'name' ) ) );
+		if ( '' !== $publisher_name ) {
+			$publisher = array(
+				'@type' => 'Organization',
+				'name'  => $publisher_name,
+			);
+
+			$custom_logo_id = (int) get_theme_mod( 'custom_logo' );
+			if ( $custom_logo_id ) {
+				$logo_url = wp_get_attachment_image_url( $custom_logo_id, 'full' );
+				if ( $logo_url ) {
+					$publisher['logo'] = array(
+						'@type' => 'ImageObject',
+						'url'   => esc_url_raw( $logo_url ),
+					);
+				}
+			}
+
+			$schema['publisher'] = $publisher;
+		}
+
+		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+		if ( ! $json ) {
+			return;
+		}
+
+		echo "\n";
+		echo '<script type="application/ld+json">' . $json . '</script>';
+		echo "\n";
+	}
+}
+
+add_action( 'wp_head', 'global360_output_content_page_schema', 102 );
