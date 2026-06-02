@@ -46,6 +46,7 @@
 					'facebook' => 'Facebook',
 					'instagram' => 'Instagram',
 					'x' => 'X',
+					'threads' => 'Threads',
 					'youtube' => 'YouTube',
 					'tiktok' => 'TikTok',
 					'linkedin' => 'LinkedIn',

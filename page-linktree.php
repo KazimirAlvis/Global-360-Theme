@@ -79,6 +79,7 @@ $icon_map = [
     'facebook'  => 'facebook',
     'instagram' => 'instagram',
     'x'         => 'x',
+    'threads'   => 'threads',
     'youtube'   => 'youtube',
     'tiktok'    => 'tiktok',
     'linkedin'  => 'linkedin',
