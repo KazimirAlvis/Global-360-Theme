@@ -239,6 +239,7 @@ if (! class_exists('_360_Global_Settings')) {
                 'roboto'       => 'Roboto',         // Add this
                 'marcellus'    => 'Marcellus',      // Add this
                 'inter'        => 'Inter',          // Add this
+                'montserrat'   => 'Montserrat',
                 'playfair-display' => 'Playfair Display',
             ];
             $opts = get_option(self::OPTION_KEY, []);
@@ -1377,6 +1378,7 @@ if (! class_exists('_360_Global_Settings')) {
                 'roboto' => '"Roboto", sans-serif',
                 'marcellus' => '"Marcellus", serif',
                 'inter' => '"Inter", sans-serif',
+                'montserrat' => '"Montserrat", sans-serif',
                 'playfair-display' => '"Playfair Display", serif',
             ];
             
