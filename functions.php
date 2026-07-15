@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Global-360-Theme functions and definitions
  *
@@ -11,21 +12,23 @@ require_once get_template_directory() . '/inc/meta-boxes/clinic-meta.php';
 require_once get_template_directory() . '/inc/meta-boxes/doctors-meta.php';
 require_once get_template_directory() . '/inc/settings.php';
 require_once get_template_directory() . '/inc/schema-condition-treatment.php';
+require_once get_template_directory() . '/inc/disable-comments.php';
 
-if ( ! defined( '_S_VERSION' ) ) {
+if (! defined('_S_VERSION')) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260702121639' );
+	define( '_S_VERSION', '1.0.20260714172339' );
 }
 
-if ( ! function_exists( 'global_360_are_google_reviews_enabled' ) ) {
+if (! function_exists('global_360_are_google_reviews_enabled')) {
 	/**
 	 * Temporary kill-switch for Google reviews API usage.
 	 *
 	 * Set default to false to stop Places API requests until a permanent
 	 * replacement is implemented.
 	 */
-	function global_360_are_google_reviews_enabled() {
-		return (bool) apply_filters( 'global_360_enable_google_reviews', false );
+	function global_360_are_google_reviews_enabled()
+	{
+		return (bool) apply_filters('global_360_enable_google_reviews', false);
 	}
 }
 
@@ -37,7 +40,8 @@ if (!function_exists('global_360_get_icon_svg')) {
 	 * @param string $classes Optional space-separated class list to append to the SVG element.
 	 * @return string
 	 */
-	function global_360_get_icon_svg($icon, $classes = '') {
+	function global_360_get_icon_svg($icon, $classes = '')
+	{
 		static $icon_map = [
 			'facebook' => [
 				'viewBox' => '0 0 640 640',
@@ -115,15 +119,16 @@ if (!function_exists('global_360_get_icon_svg')) {
 /**
  * Enable theme updates from WordPress admin
  */
-add_filter( 'auto_update_theme', '__return_true' );
+add_filter('auto_update_theme', '__return_true');
 
 /**
  * Theme Update Checker
  * This enables the theme to be updated via WordPress admin using commit-based versioning
  * TEMPORARILY DISABLED - Use manual upload instead
  */
-class Global_360_Theme_Updater {
-	
+class Global_360_Theme_Updater
+{
+
 	private $theme_slug;
 	private $theme_version;
 	private $github_username;
@@ -131,185 +136,190 @@ class Global_360_Theme_Updater {
 	private $updater_enabled;
 	private $latest_remote_version;
 	private $remote_version_cache_key;
-	
-	function __construct() {
-		$this->theme_slug = get_option( 'template' );
+
+	function __construct()
+	{
+		$this->theme_slug = get_option('template');
 		$this->theme_version = _S_VERSION;
 		$this->github_username = 'KazimirAlvis';
 		$this->github_repo = 'Global-360-Theme';
 		$this->latest_remote_version = null;
 		$this->remote_version_cache_key = 'global_360_theme_latest_remote_version';
-		$cached_remote_version = get_transient( $this->remote_version_cache_key );
-		if ( $cached_remote_version ) {
+		$cached_remote_version = get_transient($this->remote_version_cache_key);
+		if ($cached_remote_version) {
 			$this->latest_remote_version = $cached_remote_version;
 		}
-		
+
 		// Enable auto-updater with folder name protection
 		$this->updater_enabled = true; // Re-enabled with folder name fix
-		
+
 		if ($this->updater_enabled) {
-			add_filter( 'pre_set_site_transient_update_themes', array( $this, 'check_for_update' ) );
+			add_filter('pre_set_site_transient_update_themes', array($this, 'check_for_update'));
 			// Use a unique hook priority to override any cached notices
-			add_action( 'admin_notices', array( $this, 'update_notice' ), 999 );
+			add_action('admin_notices', array($this, 'update_notice'), 999);
 		}
-		
+
 		// Force clear any old cached update notices
-		add_action( 'admin_init', array( $this, 'clear_old_notices' ), 1 );
-		
+		add_action('admin_init', array($this, 'clear_old_notices'), 1);
+
 		// Always keep the folder name fix active for manual updates
-		add_filter( 'upgrader_source_selection', array( $this, 'fix_theme_folder_name' ), 10, 4 );
-		
+		add_filter('upgrader_source_selection', array($this, 'fix_theme_folder_name'), 10, 4);
+
 		// Additional hook to catch theme installations
-		add_filter( 'wp_update_themes', array( $this, 'ensure_correct_folder_name' ), 999 );
+		add_filter('wp_update_themes', array($this, 'ensure_correct_folder_name'), 999);
 	}
-	
+
 	/**
 	 * Fix the theme folder name after download from GitHub
 	 * GitHub adds -main to the folder name, but WordPress expects the original theme folder name
 	 */
-	public function fix_theme_folder_name( $source, $remote_source, $upgrader, $extra ) {
+	public function fix_theme_folder_name($source, $remote_source, $upgrader, $extra)
+	{
 		// Log for debugging
 		error_log('Theme Folder Fix - Source: ' . $source);
 		error_log('Theme Folder Fix - Extra: ' . print_r($extra, true));
-		
+
 		// Always run for any theme that looks like our theme
-		$source_basename = basename( $source );
-		
+		$source_basename = basename($source);
+
 		// Check if this is our theme (look for Global-360-Theme variations)
-		if ( strpos( $source_basename, 'Global-360-Theme' ) === false ) {
+		if (strpos($source_basename, 'Global-360-Theme') === false) {
 			return $source;
 		}
-		
+
 		// Force rename to exactly 'Global-360-Theme'
 		$correct_name = 'Global-360-Theme';
-		$correct_source = dirname( $source ) . '/' . $correct_name;
-		
+		$correct_source = dirname($source) . '/' . $correct_name;
+
 		// Only rename if the name is different
-		if ( $source_basename !== $correct_name ) {
+		if ($source_basename !== $correct_name) {
 			error_log('Theme Folder Fix - Renaming from: ' . $source_basename . ' to: ' . $correct_name);
-			
+
 			// Remove existing target if it exists
-			if ( file_exists( $correct_source ) && $correct_source !== $source ) {
-				$this->recursive_delete( $correct_source );
+			if (file_exists($correct_source) && $correct_source !== $source) {
+				$this->recursive_delete($correct_source);
 			}
-			
+
 			// Rename the folder
-			if ( rename( $source, $correct_source ) ) {
+			if (rename($source, $correct_source)) {
 				error_log('Theme Folder Fix - Rename successful');
-				$this->sync_package_version( $correct_source );
-				return trailingslashit( $correct_source );
+				$this->sync_package_version($correct_source);
+				return trailingslashit($correct_source);
 			} else {
 				error_log('Theme Folder Fix - Rename failed');
 			}
 		}
-		
-		$this->sync_package_version( $source );
-		return trailingslashit( $source );
+
+		$this->sync_package_version($source);
+		return trailingslashit($source);
 	}
-	
+
 	/**
 	 * Recursively delete a directory
 	 */
-	private function recursive_delete( $dir ) {
-		if ( ! is_dir( $dir ) ) {
+	private function recursive_delete($dir)
+	{
+		if (! is_dir($dir)) {
 			return false;
 		}
-		
-		$files = array_diff( scandir( $dir ), array( '.', '..' ) );
-		foreach ( $files as $file ) {
+
+		$files = array_diff(scandir($dir), array('.', '..'));
+		foreach ($files as $file) {
 			$path = $dir . '/' . $file;
-			is_dir( $path ) ? $this->recursive_delete( $path ) : unlink( $path );
+			is_dir($path) ? $this->recursive_delete($path) : unlink($path);
 		}
-		
-		return rmdir( $dir );
+
+		return rmdir($dir);
 	}
 
-	private function sync_package_version( $package_root ) {
-		if ( empty( $package_root ) || ! is_dir( $package_root ) ) {
+	private function sync_package_version($package_root)
+	{
+		if (empty($package_root) || ! is_dir($package_root)) {
 			return;
 		}
 
 		$target_version = $this->latest_remote_version;
-		if ( empty( $target_version ) ) {
-			$cached_version = get_transient( $this->remote_version_cache_key );
-			if ( $cached_version ) {
+		if (empty($target_version)) {
+			$cached_version = get_transient($this->remote_version_cache_key);
+			if ($cached_version) {
 				$target_version = $cached_version;
 			}
 		}
-		if ( empty( $target_version ) ) {
+		if (empty($target_version)) {
 			return;
 		}
 
-		$package_root = rtrim( $package_root, '/\\' );
+		$package_root = rtrim($package_root, '/\\');
 		$style_file = $package_root . '/style.css';
 		$functions_file = $package_root . '/functions.php';
 
-		if ( file_exists( $style_file ) && is_readable( $style_file ) && is_writable( $style_file ) ) {
-			$style_contents = file_get_contents( $style_file );
-			if ( $style_contents !== false ) {
-				$updated_style = preg_replace( '/^Version:\s*.*$/mi', 'Version: ' . $target_version, $style_contents, 1 );
-				if ( $updated_style && $updated_style !== $style_contents ) {
-					file_put_contents( $style_file, $updated_style );
+		if (file_exists($style_file) && is_readable($style_file) && is_writable($style_file)) {
+			$style_contents = file_get_contents($style_file);
+			if ($style_contents !== false) {
+				$updated_style = preg_replace('/^Version:\s*.*$/mi', 'Version: ' . $target_version, $style_contents, 1);
+				if ($updated_style && $updated_style !== $style_contents) {
+					file_put_contents($style_file, $updated_style);
 				}
 			}
 		}
 
-		if ( file_exists( $functions_file ) && is_readable( $functions_file ) && is_writable( $functions_file ) ) {
-			$functions_contents = file_get_contents( $functions_file );
-			if ( $functions_contents !== false ) {
+		if (file_exists($functions_file) && is_readable($functions_file) && is_writable($functions_file)) {
+			$functions_contents = file_get_contents($functions_file);
+			if ($functions_contents !== false) {
 				$updated_functions = preg_replace(
 					"/define\(\s*'_S_VERSION'\s*,\s*'[^']*'\s*\);/",
 					sprintf("define( '_S_VERSION', '%s' );", $target_version),
 					$functions_contents,
 					1
 				);
-				if ( $updated_functions && $updated_functions !== $functions_contents ) {
-					file_put_contents( $functions_file, $updated_functions );
+				if ($updated_functions && $updated_functions !== $functions_contents) {
+					file_put_contents($functions_file, $updated_functions);
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Ensure the theme folder name is always correct after updates
 	 */
-	public function ensure_correct_folder_name() {
+	public function ensure_correct_folder_name()
+	{
 		$themes_dir = get_theme_root();
 		$target_name = 'Global-360-Theme';
-		
+
 		// Look for any folder that might be our theme with wrong name
-		$folders = scandir( $themes_dir );
-		foreach ( $folders as $folder ) {
-			if ( $folder === '.' || $folder === '..' || $folder === $target_name ) {
+		$folders = scandir($themes_dir);
+		foreach ($folders as $folder) {
+			if ($folder === '.' || $folder === '..' || $folder === $target_name) {
 				continue;
 			}
-			
+
 			$folder_path = $themes_dir . '/' . $folder;
-			if ( ! is_dir( $folder_path ) ) {
+			if (! is_dir($folder_path)) {
 				continue;
 			}
-			
+
 			// Check if this folder contains our theme (look for style.css with our theme name)
 			$style_css = $folder_path . '/style.css';
-			if ( file_exists( $style_css ) ) {
-				$style_content = file_get_contents( $style_css );
-				if ( strpos( $style_content, 'Theme Name: Global 360 Theme' ) !== false ) {
+			if (file_exists($style_css)) {
+				$style_content = file_get_contents($style_css);
+				if (strpos($style_content, 'Theme Name: Global 360 Theme') !== false) {
 					// This is our theme with wrong folder name - rename it
 					$correct_path = $themes_dir . '/' . $target_name;
-					
-					if ( $folder_path !== $correct_path ) {
-						error_log( 'Post-update folder fix: Renaming ' . $folder . ' to ' . $target_name );
-						
+
+					if ($folder_path !== $correct_path) {
+						error_log('Post-update folder fix: Renaming ' . $folder . ' to ' . $target_name);
+
 						// Remove target if exists
-						if ( file_exists( $correct_path ) ) {
-							$this->recursive_delete( $correct_path );
+						if (file_exists($correct_path)) {
+							$this->recursive_delete($correct_path);
 						}
-						
+
 						// Rename to correct name
-						if ( rename( $folder_path, $correct_path ) ) {
-							error_log( 'Post-update folder fix: Successfully renamed theme folder' );
+						if (rename($folder_path, $correct_path)) {
+							error_log('Post-update folder fix: Successfully renamed theme folder');
 						} else {
-							error_log( 'Post-update folder fix: Failed to rename theme folder' );
+							error_log('Post-update folder fix: Failed to rename theme folder');
 						}
 					}
 					break;
@@ -317,117 +327,122 @@ class Global_360_Theme_Updater {
 			}
 		}
 	}
-	
-	public function check_for_update( $transient ) {
-		if ( empty( $transient->checked ) ) {
+
+	public function check_for_update($transient)
+	{
+		if (empty($transient->checked)) {
 			return $transient;
 		}
-		
+
 		$remote_version = $this->get_remote_version();
-		
-		if ( $remote_version && version_compare( $this->theme_version, $remote_version, '<' ) ) {
-			$transient->response[ $this->theme_slug ] = array(
+
+		if ($remote_version && version_compare($this->theme_version, $remote_version, '<')) {
+			$transient->response[$this->theme_slug] = array(
 				'theme' => $this->theme_slug,
 				'new_version' => $remote_version,
 				'url' => 'https://github.com/' . $this->github_username . '/' . $this->github_repo,
 				'package' => $this->get_download_url()
 			);
 		}
-		
+
 		return $transient;
 	}
-	
-	private function get_remote_version() {
+
+	private function get_remote_version()
+	{
 		// Use commit-based versioning
 		$commits_url = 'https://api.github.com/repos/' . $this->github_username . '/' . $this->github_repo . '/commits';
-		
-		$request = wp_remote_get( $commits_url, array(
+
+		$request = wp_remote_get($commits_url, array(
 			'timeout' => 10,
 			'user-agent' => 'WordPress Theme Updater'
-		) );
-		
-		if ( ! is_wp_error( $request ) && wp_remote_retrieve_response_code( $request ) === 200 ) {
-			$body = wp_remote_retrieve_body( $request );
-			$commits = json_decode( $body, true );
-			
-			if ( !empty( $commits ) && isset( $commits[0]['commit']['author']['date'] ) ) {
+		));
+
+		if (! is_wp_error($request) && wp_remote_retrieve_response_code($request) === 200) {
+			$body = wp_remote_retrieve_body($request);
+			$commits = json_decode($body, true);
+
+			if (!empty($commits) && isset($commits[0]['commit']['author']['date'])) {
 				$commit_date = $commits[0]['commit']['author']['date'];
-				
+
 				try {
-					$date = new DateTime( $commit_date );
-					$formatted_datetime = $date->format( 'YmdHis' );
-					
+					$date = new DateTime($commit_date);
+					$formatted_datetime = $date->format('YmdHis');
+
 					// Generate version like 1.0.20250922153045 (date + time for uniqueness per commit)
 					$base_version = '1.0';
 					$this->latest_remote_version = $base_version . '.' . $formatted_datetime;
-					$cache_ttl = defined( 'HOUR_IN_SECONDS' ) ? HOUR_IN_SECONDS : 3600;
-					set_transient( $this->remote_version_cache_key, $this->latest_remote_version, $cache_ttl );
+					$cache_ttl = defined('HOUR_IN_SECONDS') ? HOUR_IN_SECONDS : 3600;
+					set_transient($this->remote_version_cache_key, $this->latest_remote_version, $cache_ttl);
 					return $this->latest_remote_version;
-				} catch ( Exception $e ) {
+				} catch (Exception $e) {
 					// Log error if needed
-					error_log( 'Theme updater date parsing error: ' . $e->getMessage() );
+					error_log('Theme updater date parsing error: ' . $e->getMessage());
 					return false;
 				}
 			}
 		} else {
 			// Log the error for debugging
-			if ( is_wp_error( $request ) ) {
-				error_log( 'Theme updater GitHub API error: ' . $request->get_error_message() );
+			if (is_wp_error($request)) {
+				error_log('Theme updater GitHub API error: ' . $request->get_error_message());
 			} else {
-				error_log( 'Theme updater GitHub API response code: ' . wp_remote_retrieve_response_code( $request ) );
+				error_log('Theme updater GitHub API response code: ' . wp_remote_retrieve_response_code($request));
 			}
 		}
-		
-		if ( $this->latest_remote_version ) {
+
+		if ($this->latest_remote_version) {
 			return $this->latest_remote_version;
 		}
-		
-		$cached_version = get_transient( $this->remote_version_cache_key );
-		if ( $cached_version ) {
+
+		$cached_version = get_transient($this->remote_version_cache_key);
+		if ($cached_version) {
 			$this->latest_remote_version = $cached_version;
 			return $cached_version;
 		}
-		
+
 		return false;
 	}
-	
-	private function get_download_url() {
+
+	private function get_download_url()
+	{
 		// Use a more reliable GitHub download method
 		// Option 1: Direct archive URL with proper headers
 		return 'https://api.github.com/repos/' . $this->github_username . '/' . $this->github_repo . '/zipball/main';
-		
+
 		// Fallback: Original URL (commented out)
 		// return 'https://github.com/' . $this->github_username . '/' . $this->github_repo . '/archive/refs/heads/main.zip';
 	}
-	
-	public function get_remote_version_public() {
+
+	public function get_remote_version_public()
+	{
 		$version = $this->get_remote_version();
-		if ( ! $version && $this->latest_remote_version ) {
+		if (! $version && $this->latest_remote_version) {
 			return $this->latest_remote_version;
 		}
 		return $version;
 	}
-	
-	public function update_notice() {
+
+	public function update_notice()
+	{
 		$screen = get_current_screen();
-		if ( $screen->id !== 'themes' ) {
+		if ($screen->id !== 'themes') {
 			return;
 		}
-		
+
 		$remote_version = $this->get_remote_version();
-		
-		if ( $remote_version && version_compare( $this->theme_version, $remote_version, '<' ) ) {
+
+		if ($remote_version && version_compare($this->theme_version, $remote_version, '<')) {
 			echo '<div class="notice notice-success is-dismissible" id="global-360-theme-update-notice">';
 			echo '<p><strong>🔄 FRESH UPDATE NOTICE - Global 360 Theme Update Available!</strong></p>';
-			echo '<p>Version ' . esc_html( $remote_version ) . ' is now available. You are currently using version ' . esc_html( $this->theme_version ) . '.</p>';
-			if ( $this->updater_enabled ) {
+			echo '<p>Version ' . esc_html($remote_version) . ' is now available. You are currently using version ' . esc_html($this->theme_version) . '.</p>';
+			if ($this->updater_enabled) {
 				echo '<p><strong>✅ Auto-updater is ENABLED and WORKING</strong></p>';
-				echo '<p><a href="' . admin_url( 'update-core.php?action=do-theme-upgrade' ) . '" class="button button-primary">Update Theme Now</a></p>';
+				echo '<p><a href="' . admin_url('update-core.php?action=do-theme-upgrade') . '" class="button button-primary">Update Theme Now</a></p>';
 			} else {
 				echo '<p><strong>❌ Auto-updater is disabled</strong></p>';
 			}
 			echo '</div>';
-			
+
 			// Hide any old cached notices with JavaScript
 			echo '<script>
 			jQuery(document).ready(function($) {
@@ -441,15 +456,14 @@ class Global_360_Theme_Updater {
 			</script>';
 		}
 	}
-	
-	public function clear_old_notices() {
+
+	public function clear_old_notices()
+	{
 		// Clear all possible cached update notices
 		delete_transient('global_360_theme_update_notice');
 		delete_option('global_360_theme_update_notice');
 		delete_transient('_transient_global_360_theme_notices');
 	}
-	
-
 }
 
 // Initialize the updater
@@ -458,51 +472,51 @@ new Global_360_Theme_Updater();
 /**
  * FORCE CLEAR ALL CACHES - Manual update recovery
  */
-add_action('after_setup_theme', function() {
-    // Nuclear option - clear everything theme related
-    global $wp_object_cache;
-    if ($wp_object_cache) {
-        $wp_object_cache->flush();
-    }
-    
-    // Clear all transients
-    delete_site_transient('update_themes');
-    delete_transient('update_themes');
-    delete_option('_site_transient_update_themes');
-    delete_option('_site_transient_timeout_update_themes');
-    
-    // Force WordPress to forget the old version
-    wp_clean_themes_cache();
-    
-    // Clear theme data cache
-    wp_cache_delete('themes', 'themes');
-    wp_cache_delete(get_option('stylesheet'), 'themes');
-    wp_cache_delete(get_option('template'), 'themes');
-    
-    error_log('NUCLEAR CACHE CLEAR - Version: ' . _S_VERSION);
+add_action('after_setup_theme', function () {
+	// Nuclear option - clear everything theme related
+	global $wp_object_cache;
+	if ($wp_object_cache) {
+		$wp_object_cache->flush();
+	}
+
+	// Clear all transients
+	delete_site_transient('update_themes');
+	delete_transient('update_themes');
+	delete_option('_site_transient_update_themes');
+	delete_option('_site_transient_timeout_update_themes');
+
+	// Force WordPress to forget the old version
+	wp_clean_themes_cache();
+
+	// Clear theme data cache
+	wp_cache_delete('themes', 'themes');
+	wp_cache_delete(get_option('stylesheet'), 'themes');
+	wp_cache_delete(get_option('template'), 'themes');
+
+	error_log('NUCLEAR CACHE CLEAR - Version: ' . _S_VERSION);
 }, 1);
 
 /**
  * Sync style.css version with _S_VERSION constant
  */
-add_action('init', function() {
+add_action('init', function () {
 	$style_css_path = get_template_directory() . '/style.css';
-	
+
 	if (file_exists($style_css_path)) {
 		$style_content = file_get_contents($style_css_path);
-		
+
 		// Check if version in style.css matches _S_VERSION
 		if (preg_match('/Version:\s*(.+)/i', $style_content, $matches)) {
 			$style_version = trim($matches[1]);
-			
+
 			if ($style_version !== _S_VERSION) {
 				// Update style.css version to match _S_VERSION
 				$updated_content = preg_replace(
-					'/Version:\s*(.+)/i', 
-					'Version: ' . _S_VERSION, 
+					'/Version:\s*(.+)/i',
+					'Version: ' . _S_VERSION,
 					$style_content
 				);
-				
+
 				file_put_contents($style_css_path, $updated_content);
 				error_log('Auto-synced style.css version to: ' . _S_VERSION);
 			}
@@ -513,40 +527,40 @@ add_action('init', function() {
 /**
  * Aggressive cache clearing to fix persistent old notices
  */
-add_action('init', function() {
-    // Clear ALL WordPress caches related to themes and updates
-    delete_site_transient('update_themes');
-    delete_transient('update_themes');
-    delete_option('_site_transient_update_themes');
-    delete_option('_site_transient_timeout_update_themes');
-    delete_transient('update_themes');
-    
-    // Clear theme-specific caches
-    wp_clean_themes_cache();
-    
-    // Clear all admin notices and update notices
-    delete_transient('global_360_theme_notices');
-    delete_transient('global_360_theme_update_notice');
-    delete_option('global_360_theme_update_notice');
-    
-    // Force WordPress to re-read theme data
-    if (function_exists('wp_get_theme')) {
-        wp_get_theme(get_option('template'), get_option('template'));
-    }
+add_action('init', function () {
+	// Clear ALL WordPress caches related to themes and updates
+	delete_site_transient('update_themes');
+	delete_transient('update_themes');
+	delete_option('_site_transient_update_themes');
+	delete_option('_site_transient_timeout_update_themes');
+	delete_transient('update_themes');
+
+	// Clear theme-specific caches
+	wp_clean_themes_cache();
+
+	// Clear all admin notices and update notices
+	delete_transient('global_360_theme_notices');
+	delete_transient('global_360_theme_update_notice');
+	delete_option('global_360_theme_update_notice');
+
+	// Force WordPress to re-read theme data
+	if (function_exists('wp_get_theme')) {
+		wp_get_theme(get_option('template'), get_option('template'));
+	}
 }, 1); // Run early
 
 // Additional cache clearing for admin pages
-add_action('admin_init', function() {
-    // Force refresh theme data on admin pages
-    if (function_exists('wp_clean_themes_cache')) {
-        wp_clean_themes_cache();
-    }
+add_action('admin_init', function () {
+	// Force refresh theme data on admin pages
+	if (function_exists('wp_clean_themes_cache')) {
+		wp_clean_themes_cache();
+	}
 });
 
 /**
  * Add theme update menu to admin
  */
-add_action( 'admin_menu', function() {
+add_action('admin_menu', function () {
 	add_theme_page(
 		'Theme Updates',
 		'Theme Updates',
@@ -559,38 +573,39 @@ add_action( 'admin_menu', function() {
 /**
  * Theme updates admin page
  */
-function global_360_theme_updates_page() {
+function global_360_theme_updates_page()
+{
 	$current_version = _S_VERSION;
 	$updater = new Global_360_Theme_Updater();
-	
+
 	echo '<div class="wrap">';
 	echo '<h1>Global 360 Theme Updates</h1>';
-	
+
 	// Force check for updates
-	if ( isset( $_POST['check_updates'] ) ) {
-		delete_transient( 'update_themes' );
-		delete_site_transient( 'update_themes' );
+	if (isset($_POST['check_updates'])) {
+		delete_transient('update_themes');
+		delete_site_transient('update_themes');
 		// Clear our custom transient too
-		delete_transient( '360_global_theme_update_check' );
+		delete_transient('360_global_theme_update_check');
 		wp_update_themes();
 		echo '<div class="notice notice-success"><p>Update check completed!</p></div>';
 	}
-	
+
 	echo '<div class="card">';
 	echo '<h2>Current Theme Version</h2>';
-	echo '<p><strong>Installed Version:</strong> ' . esc_html( $current_version ) . '</p>';
-	
+	echo '<p><strong>Installed Version:</strong> ' . esc_html($current_version) . '</p>';
+
 	// Debug information
-	echo '<p><em>Debug - _S_VERSION constant: ' . esc_html( _S_VERSION ) . '</em></p>';
-	echo '<p><em>Debug - WordPress theme version: ' . esc_html( wp_get_theme()->get('Version') ) . '</em></p>';
-	
+	echo '<p><em>Debug - _S_VERSION constant: ' . esc_html(_S_VERSION) . '</em></p>';
+	echo '<p><em>Debug - WordPress theme version: ' . esc_html(wp_get_theme()->get('Version')) . '</em></p>';
+
 	$remote_version = $updater->get_remote_version_public();
-	if ( $remote_version ) {
-		echo '<p><strong>Latest Available:</strong> ' . esc_html( $remote_version ) . '</p>';
-		
-		if ( version_compare( $current_version, $remote_version, '<' ) ) {
+	if ($remote_version) {
+		echo '<p><strong>Latest Available:</strong> ' . esc_html($remote_version) . '</p>';
+
+		if (version_compare($current_version, $remote_version, '<')) {
 			echo '<p style="color: #d63638;"><strong>Update Available!</strong> A new version is ready to install.</p>';
-			echo '<a href="' . admin_url( 'themes.php' ) . '" class="button button-primary">Go to Themes Page to Update</a>';
+			echo '<a href="' . admin_url('themes.php') . '" class="button button-primary">Go to Themes Page to Update</a>';
 		} else {
 			echo '<p style="color: #00a32a;"><strong>Up to Date!</strong> You have the latest version installed.</p>';
 		}
@@ -598,25 +613,25 @@ function global_360_theme_updates_page() {
 		echo '<p style="color: #d63638;">Unable to check for updates at this time.</p>';
 		echo '<p><em>This might be due to GitHub API limits or network issues. Try again in a few minutes.</em></p>';
 	}
-	
+
 	echo '</div>';
-	
+
 	echo '<div class="card" style="margin-top: 20px;">';
 	echo '<h2>Manual Update Check</h2>';
 	echo '<p>Click the button below to manually check for theme updates.</p>';
 	echo '<form method="post">';
 	echo '<input type="hidden" name="check_updates" value="1">';
-	submit_button( 'Check for Updates', 'secondary', 'submit', false );
+	submit_button('Check for Updates', 'secondary', 'submit', false);
 	echo '</form>';
 	echo '</div>';
-	
+
 	echo '<div class="card" style="margin-top: 20px;">';
 	echo '<h2>Update Information</h2>';
 	echo '<p><strong>Repository:</strong> <a href="https://github.com/KazimirAlvis/Global-360-Theme" target="_blank">GitHub Repository</a></p>';
 	echo '<p><strong>Automatic Updates:</strong> Enabled - WordPress will automatically check for and install theme updates.</p>';
 	echo '<p><strong>Update Source:</strong> GitHub Releases</p>';
 	echo '</div>';
-	
+
 	echo '</div>';
 }
 
@@ -627,17 +642,18 @@ function global_360_theme_updates_page() {
  * runs before the init hook. The init hook is too late for some features, such
  * as indicating support for post thumbnails.
  */
-function global_360_theme_setup() {
+function global_360_theme_setup()
+{
 	/*
 		* Make theme available for translation.
 		* Translations can be filed in the /languages/ directory.
 		* If you're building a theme based on Global-360-Theme, use a find and replace
 		* to change 'global-360-theme' to the name of your theme in all the template files.
 		*/
-	load_theme_textdomain( 'global-360-theme', get_template_directory() . '/languages' );
+	load_theme_textdomain('global-360-theme', get_template_directory() . '/languages');
 
 	// Add default posts and comments RSS feed links to head.
-	add_theme_support( 'automatic-feed-links' );
+	add_theme_support('automatic-feed-links');
 
 	/*
 		* Let WordPress manage the document title.
@@ -645,19 +661,19 @@ function global_360_theme_setup() {
 		* hard-coded <title> tag in the document head, and expect WordPress to
 		* provide it for us.
 		*/
-	add_theme_support( 'title-tag' );
+	add_theme_support('title-tag');
 
 	/*
 		* Enable support for Post Thumbnails on posts and pages.
 		*
 		* @link https://developer.wordpress.org/themes/functionality/featured-images-post-thumbnails/
 		*/
-	add_theme_support( 'post-thumbnails' );
+	add_theme_support('post-thumbnails');
 
 	// This theme uses wp_nav_menu() in one location.
 	register_nav_menus(
 		array(
-			'menu-1' => esc_html__( 'Primary', 'global-360-theme' ),
+			'menu-1' => esc_html__('Primary', 'global-360-theme'),
 		)
 	);
 
@@ -691,7 +707,7 @@ function global_360_theme_setup() {
 	);
 
 	// Add theme support for selective refresh for widgets.
-	add_theme_support( 'customize-selective-refresh-widgets' );
+	add_theme_support('customize-selective-refresh-widgets');
 
 	/**
 	 * Add support for core custom logo.
@@ -708,7 +724,7 @@ function global_360_theme_setup() {
 		)
 	);
 }
-add_action( 'after_setup_theme', 'global_360_theme_setup' );
+add_action('after_setup_theme', 'global_360_theme_setup');
 
 /**
  * Set the content width in pixels, based on the theme's design and stylesheet.
@@ -717,22 +733,24 @@ add_action( 'after_setup_theme', 'global_360_theme_setup' );
  *
  * @global int $content_width
  */
-function global_360_theme_content_width() {
-	$GLOBALS['content_width'] = apply_filters( 'global_360_theme_content_width', 640 );
+function global_360_theme_content_width()
+{
+	$GLOBALS['content_width'] = apply_filters('global_360_theme_content_width', 640);
 }
-add_action( 'after_setup_theme', 'global_360_theme_content_width', 0 );
+add_action('after_setup_theme', 'global_360_theme_content_width', 0);
 
 /**
  * Register widget area.
  *
  * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
  */
-function global_360_theme_widgets_init() {
+function global_360_theme_widgets_init()
+{
 	register_sidebar(
 		array(
-			'name'          => esc_html__( 'Sidebar', 'global-360-theme' ),
+			'name'          => esc_html__('Sidebar', 'global-360-theme'),
 			'id'            => 'sidebar-1',
-			'description'   => esc_html__( 'Add widgets here.', 'global-360-theme' ),
+			'description'   => esc_html__('Add widgets here.', 'global-360-theme'),
 			'before_widget' => '<section id="%1$s" class="widget %2$s">',
 			'after_widget'  => '</section>',
 			'before_title'  => '<h2 class="widget-title">',
@@ -740,15 +758,16 @@ function global_360_theme_widgets_init() {
 		)
 	);
 }
-add_action( 'widgets_init', 'global_360_theme_widgets_init' );
+add_action('widgets_init', 'global_360_theme_widgets_init');
 
 /**
  * Prefer the minified stylesheet everywhere; fall back to the standard file if needed.
  */
-function global_360_theme_get_stylesheet_asset() {
+function global_360_theme_get_stylesheet_asset()
+{
 	$minified_path = get_template_directory() . '/style-min.css';
 
-	if ( file_exists( $minified_path ) ) {
+	if (file_exists($minified_path)) {
 		return get_template_directory_uri() . '/style-min.css';
 	}
 
@@ -758,63 +777,65 @@ function global_360_theme_get_stylesheet_asset() {
 /**
  * Enqueue scripts and styles.
  */
-function global_360_theme_scripts() {
+function global_360_theme_scripts()
+{
 	// Enqueue main stylesheet with high priority
 	$stylesheet_uri = global_360_theme_get_stylesheet_asset();
 	$stylesheet_path = get_template_directory() . '/style-min.css';
-	if ( ! file_exists( $stylesheet_path ) ) {
+	if (! file_exists($stylesheet_path)) {
 		$stylesheet_path = get_stylesheet_directory() . '/style.css';
 	}
-	$stylesheet_version = file_exists( $stylesheet_path ) ? (string) filemtime( $stylesheet_path ) : _S_VERSION;
-	wp_enqueue_style( 'global-360-theme-style', $stylesheet_uri, array(), $stylesheet_version, 'all' );
-	wp_style_add_data( 'global-360-theme-style', 'rtl', 'replace' );
-	
+	$stylesheet_version = file_exists($stylesheet_path) ? (string) filemtime($stylesheet_path) : _S_VERSION;
+	wp_enqueue_style('global-360-theme-style', $stylesheet_uri, array(), $stylesheet_version, 'all');
+	wp_style_add_data('global-360-theme-style', 'rtl', 'replace');
+
 	// Add preload for stylesheet to improve loading
-	wp_enqueue_script( 'global-360-theme-navigation', get_template_directory_uri() . '/js/navigation.js', array(), _S_VERSION, true );
-	wp_enqueue_script( 'global-360-theme-lazy-cf7', get_template_directory_uri() . '/js/lazy-cf7.js', array(), _S_VERSION, true );
+	wp_enqueue_script('global-360-theme-navigation', get_template_directory_uri() . '/js/navigation.js', array(), _S_VERSION, true);
+	wp_enqueue_script('global-360-theme-lazy-cf7', get_template_directory_uri() . '/js/lazy-cf7.js', array(), _S_VERSION, true);
 	wp_localize_script(
 		'global-360-theme-lazy-cf7',
 		'Global360LazyCF7',
 		array(
-			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-			'nonce'   => wp_create_nonce( 'global_360_lazy_cf7' ),
+			'ajaxUrl' => admin_url('admin-ajax.php'),
+			'nonce'   => wp_create_nonce('global_360_lazy_cf7'),
 		)
 	);
 
-	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
-		wp_enqueue_script( 'comment-reply' );
+	if (is_singular() && comments_open() && get_option('thread_comments')) {
+		wp_enqueue_script('comment-reply');
 	}
 }
-add_action( 'wp_enqueue_scripts', 'global_360_theme_scripts', 5 ); // Higher priority
+add_action('wp_enqueue_scripts', 'global_360_theme_scripts', 5); // Higher priority
 
 /**
  * Contact Form 7: lazy-load assets + markup for footer modal.
  */
-function global_360_theme_should_load_cf7_assets() {
-	if ( is_admin() ) {
+function global_360_theme_should_load_cf7_assets()
+{
+	if (is_admin()) {
 		return true;
 	}
 
-	if ( ! empty( $GLOBALS['global_360_lazy_cf7_force_assets'] ) ) {
+	if (! empty($GLOBALS['global_360_lazy_cf7_force_assets'])) {
 		return true;
 	}
 
 	$queried_id = get_queried_object_id();
-	if ( ! $queried_id ) {
+	if (! $queried_id) {
 		return false;
 	}
 
-	$content = get_post_field( 'post_content', $queried_id );
-	if ( ! is_string( $content ) || $content === '' ) {
+	$content = get_post_field('post_content', $queried_id);
+	if (! is_string($content) || $content === '') {
 		return false;
 	}
 
-	if ( has_shortcode( $content, 'contact-form-7' ) ) {
+	if (has_shortcode($content, 'contact-form-7')) {
 		return true;
 	}
 
-	if ( function_exists( 'has_block' ) ) {
-		if ( has_block( 'contact-form-7/contact-form-selector', $content ) ) {
+	if (function_exists('has_block')) {
+		if (has_block('contact-form-7/contact-form-selector', $content)) {
 			return true;
 		}
 	}
@@ -822,49 +843,51 @@ function global_360_theme_should_load_cf7_assets() {
 	return false;
 }
 
-function global_360_theme_wpcf7_load_assets_filter( $load ) {
+function global_360_theme_wpcf7_load_assets_filter($load)
+{
 	return global_360_theme_should_load_cf7_assets();
 }
 
-add_filter( 'wpcf7_load_js', 'global_360_theme_wpcf7_load_assets_filter' );
-add_filter( 'wpcf7_load_css', 'global_360_theme_wpcf7_load_assets_filter' );
+add_filter('wpcf7_load_js', 'global_360_theme_wpcf7_load_assets_filter');
+add_filter('wpcf7_load_css', 'global_360_theme_wpcf7_load_assets_filter');
 
-function global_360_theme_resolve_cf7_form_id( $requested_form_id = '' ) {
+function global_360_theme_resolve_cf7_form_id($requested_form_id = '')
+{
 	$candidates = array();
 
-	if ( is_string( $requested_form_id ) ) {
-		$requested_form_id = trim( $requested_form_id );
+	if (is_string($requested_form_id)) {
+		$requested_form_id = trim($requested_form_id);
 	}
 
-	if ( ! empty( $requested_form_id ) ) {
+	if (! empty($requested_form_id)) {
 		$candidates[] = $requested_form_id;
 	}
 
-	$opts = get_option( '360_global_settings', array() );
-	if ( is_array( $opts ) && ! empty( $opts['do_not_sell_form_id'] ) ) {
-		$candidates[] = trim( (string) $opts['do_not_sell_form_id'] );
+	$opts = get_option('360_global_settings', array());
+	if (is_array($opts) && ! empty($opts['do_not_sell_form_id'])) {
+		$candidates[] = trim((string) $opts['do_not_sell_form_id']);
 	}
 
-	if ( ! in_array( '98f6667', $candidates, true ) ) {
+	if (! in_array('98f6667', $candidates, true)) {
 		$candidates[] = '98f6667';
 	}
 
-	foreach ( $candidates as $candidate ) {
-		if ( $candidate === '' ) {
+	foreach ($candidates as $candidate) {
+		if ($candidate === '') {
 			continue;
 		}
 
-		if ( ctype_digit( (string) $candidate ) ) {
-			$post = get_post( (int) $candidate );
-			if ( $post && $post->post_type === 'wpcf7_contact_form' && $post->post_status === 'publish' ) {
+		if (ctype_digit((string) $candidate)) {
+			$post = get_post((int) $candidate);
+			if ($post && $post->post_type === 'wpcf7_contact_form' && $post->post_status === 'publish') {
 				return (string) (int) $candidate;
 			}
 			continue;
 		}
 
-		$slug = sanitize_title( $candidate );
-		$form = get_page_by_path( $slug, OBJECT, 'wpcf7_contact_form' );
-		if ( $form instanceof WP_Post && $form->post_status === 'publish' ) {
+		$slug = sanitize_title($candidate);
+		$form = get_page_by_path($slug, OBJECT, 'wpcf7_contact_form');
+		if ($form instanceof WP_Post && $form->post_status === 'publish') {
 			return (string) $form->ID;
 		}
 
@@ -876,7 +899,7 @@ function global_360_theme_resolve_cf7_form_id( $requested_form_id = '' ) {
 				'title'          => $candidate,
 			)
 		);
-		if ( ! empty( $forms ) && isset( $forms[0]->ID ) ) {
+		if (! empty($forms) && isset($forms[0]->ID)) {
 			return (string) $forms[0]->ID;
 		}
 	}
@@ -891,50 +914,51 @@ function global_360_theme_resolve_cf7_form_id( $requested_form_id = '' ) {
 		)
 	);
 
-	if ( ! empty( $fallback_forms ) && isset( $fallback_forms[0]->ID ) ) {
+	if (! empty($fallback_forms) && isset($fallback_forms[0]->ID)) {
 		return (string) $fallback_forms[0]->ID;
 	}
 
 	return '';
 }
 
-function global_360_theme_ajax_lazy_cf7() {
-	$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
-	if ( ! wp_verify_nonce( $nonce, 'global_360_lazy_cf7' ) ) {
-		wp_send_json_error( array( 'message' => 'Invalid nonce.' ), 403 );
+function global_360_theme_ajax_lazy_cf7()
+{
+	$nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+	if (! wp_verify_nonce($nonce, 'global_360_lazy_cf7')) {
+		wp_send_json_error(array('message' => 'Invalid nonce.'), 403);
 	}
 
-	$form_id = isset( $_POST['form_id'] ) ? sanitize_text_field( wp_unslash( $_POST['form_id'] ) ) : '';
-	if ( $form_id === '' ) {
-		wp_send_json_error( array( 'message' => 'Missing form_id.' ), 400 );
+	$form_id = isset($_POST['form_id']) ? sanitize_text_field(wp_unslash($_POST['form_id'])) : '';
+	if ($form_id === '') {
+		wp_send_json_error(array('message' => 'Missing form_id.'), 400);
 	}
 
-	if ( ! shortcode_exists( 'contact-form-7' ) ) {
-		wp_send_json_error( array( 'message' => 'Contact Form 7 is not available.' ), 500 );
+	if (! shortcode_exists('contact-form-7')) {
+		wp_send_json_error(array('message' => 'Contact Form 7 is not available.'), 500);
 	}
 
-	$form_id = global_360_theme_resolve_cf7_form_id( $form_id );
-	if ( $form_id === '' ) {
-		wp_send_json_error( array( 'message' => 'No Contact Form 7 forms are available.' ), 404 );
+	$form_id = global_360_theme_resolve_cf7_form_id($form_id);
+	if ($form_id === '') {
+		wp_send_json_error(array('message' => 'No Contact Form 7 forms are available.'), 404);
 	}
 
 	// Force CF7 assets for this AJAX response.
 	$GLOBALS['global_360_lazy_cf7_force_assets'] = true;
 
-	$form_shortcode = sprintf( '[contact-form-7 id="%s"]', esc_attr( $form_id ) );
-	$form_html      = do_shortcode( $form_shortcode );
+	$form_shortcode = sprintf('[contact-form-7 id="%s"]', esc_attr($form_id));
+	$form_html      = do_shortcode($form_shortcode);
 
 	ob_start();
-	if ( function_exists( 'wpcf7_enqueue_styles' ) ) {
+	if (function_exists('wpcf7_enqueue_styles')) {
 		wpcf7_enqueue_styles();
 	}
-	if ( function_exists( 'wpcf7_enqueue_scripts' ) ) {
+	if (function_exists('wpcf7_enqueue_scripts')) {
 		wpcf7_enqueue_scripts();
 	}
 
 	// Print the CF7 handles (WordPress will include dependencies).
-	wp_print_styles( 'contact-form-7' );
-	wp_print_scripts( 'contact-form-7' );
+	wp_print_styles('contact-form-7');
+	wp_print_scripts('contact-form-7');
 	$assets_html = ob_get_clean();
 
 	wp_send_json_success(
@@ -945,17 +969,18 @@ function global_360_theme_ajax_lazy_cf7() {
 	);
 }
 
-add_action( 'wp_ajax_global_360_lazy_cf7', 'global_360_theme_ajax_lazy_cf7' );
-add_action( 'wp_ajax_nopriv_global_360_lazy_cf7', 'global_360_theme_ajax_lazy_cf7' );
+add_action('wp_ajax_global_360_lazy_cf7', 'global_360_theme_ajax_lazy_cf7');
+add_action('wp_ajax_nopriv_global_360_lazy_cf7', 'global_360_theme_ajax_lazy_cf7');
 
 /**
  * Add preload link for main stylesheet to prevent FOUC
  * Disabled to prevent duplicate loading with child themes
  */
-function global_360_theme_preload_styles() {
+function global_360_theme_preload_styles()
+{
 	// $stylesheet_uri = global_360_theme_get_stylesheet_asset();
-    // echo '<link rel="preload" href="' . esc_url($stylesheet_uri) . '" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">' . "\n";
-    // echo '<noscript><link rel="stylesheet" href="' . esc_url($stylesheet_uri) . '"></noscript>' . "\n";
+	// echo '<link rel="preload" href="' . esc_url($stylesheet_uri) . '" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">' . "\n";
+	// echo '<noscript><link rel="stylesheet" href="' . esc_url($stylesheet_uri) . '"></noscript>' . "\n";
 }
 // add_action( 'wp_head', 'global_360_theme_preload_styles', 1 );
 
@@ -982,15 +1007,16 @@ require get_template_directory() . '/inc/customizer.php';
 /**
  * Load Jetpack compatibility file.
  */
-if ( defined( 'JETPACK__VERSION' ) ) {
+if (defined('JETPACK__VERSION')) {
 	require get_template_directory() . '/inc/jetpack.php';
 }
 
 /**
  * Allow administrators to upload favicon bundle assets (SVG, ICO, and webmanifest files).
  */
-function cpt360_allow_site_icon_mimes( $mimes ) {
-	if ( ! current_user_can( 'manage_options' ) ) {
+function cpt360_allow_site_icon_mimes($mimes)
+{
+	if (! current_user_can('manage_options')) {
 		return $mimes;
 	}
 
@@ -1001,43 +1027,44 @@ function cpt360_allow_site_icon_mimes( $mimes ) {
 
 	return $mimes;
 }
-add_filter( 'upload_mimes', 'cpt360_allow_site_icon_mimes' );
+add_filter('upload_mimes', 'cpt360_allow_site_icon_mimes');
 
 /**
  * Ensure favicon bundle files pass WordPress' upload validation.
  */
-function cpt360_allow_manifest_filetype( $data, $file, $filename, $mimes, $real_mime ) {
-	if ( ! current_user_can( 'manage_options' ) ) {
+function cpt360_allow_manifest_filetype($data, $file, $filename, $mimes, $real_mime)
+{
+	if (! current_user_can('manage_options')) {
 		return $data;
 	}
 
 	$raw_filename = $filename;
-	$filename     = strtolower( $filename );
+	$filename     = strtolower($filename);
 
 	$display_name = $raw_filename;
-	if ( $display_name === '' ) {
-		if ( is_array( $file ) && isset( $file['name'] ) ) {
+	if ($display_name === '') {
+		if (is_array($file) && isset($file['name'])) {
 			$display_name = $file['name'];
-		} elseif ( is_string( $file ) ) {
-			$display_name = basename( $file );
+		} elseif (is_string($file)) {
+			$display_name = basename($file);
 		}
 	}
 
-	$sanitized_name = sanitize_file_name( $display_name );
+	$sanitized_name = sanitize_file_name($display_name);
 
-	if ( substr( $filename, -4 ) === '.ico' ) {
+	if (substr($filename, -4) === '.ico') {
 		$data['ext']  = 'ico';
 		$data['type'] = 'image/x-icon';
-		if ( empty( $data['proper_filename'] ) ) {
+		if (empty($data['proper_filename'])) {
 			$data['proper_filename'] = $sanitized_name;
 		}
 		return $data;
 	}
 
-	if ( substr( $filename, -13 ) === '.webmanifest' || substr( $filename, -13 ) === 'manifest.json' ) {
+	if (substr($filename, -13) === '.webmanifest' || substr($filename, -13) === 'manifest.json') {
 		$data['ext']  = 'webmanifest';
 		$data['type'] = 'application/json';
-		if ( empty( $data['proper_filename'] ) ) {
+		if (empty($data['proper_filename'])) {
 			$data['proper_filename'] = $sanitized_name;
 		}
 		return $data;
@@ -1045,38 +1072,40 @@ function cpt360_allow_manifest_filetype( $data, $file, $filename, $mimes, $real_
 
 	return $data;
 }
-add_filter( 'wp_check_filetype_and_ext', 'cpt360_allow_manifest_filetype', 10, 5 );
+add_filter('wp_check_filetype_and_ext', 'cpt360_allow_manifest_filetype', 10, 5);
 
 /**
  * Prevent WordPress from attempting to rasterize ICO uploads, which often fails on constrained hosts.
  */
-function cpt360_treat_ico_as_non_image( $is_image, $attachment_id ) {
-	$mime = get_post_mime_type( $attachment_id );
+function cpt360_treat_ico_as_non_image($is_image, $attachment_id)
+{
+	$mime = get_post_mime_type($attachment_id);
 
-	if ( in_array( $mime, [ 'image/x-icon', 'image/vnd.microsoft.icon' ], true ) ) {
+	if (in_array($mime, ['image/x-icon', 'image/vnd.microsoft.icon'], true)) {
 		return false;
 	}
 
 	return $is_image;
 }
-add_filter( 'wp_attachment_is_image', 'cpt360_treat_ico_as_non_image', 10, 2 );
+add_filter('wp_attachment_is_image', 'cpt360_treat_ico_as_non_image', 10, 2);
 
 /**
  * Ensure ICO uploads skip the image processing pipeline entirely.
  */
-function cpt360_flag_ico_upload_non_image( $upload, $context ) {
-	if ( isset( $upload['type'] ) && in_array( $upload['type'], [ 'image/x-icon', 'image/vnd.microsoft.icon' ], true ) ) {
+function cpt360_flag_ico_upload_non_image($upload, $context)
+{
+	if (isset($upload['type']) && in_array($upload['type'], ['image/x-icon', 'image/vnd.microsoft.icon'], true)) {
 		$upload['is_image'] = false;
 	}
 
 	return $upload;
 }
-add_filter( 'wp_handle_upload', 'cpt360_flag_ico_upload_non_image', 10, 2 );
+add_filter('wp_handle_upload', 'cpt360_flag_ico_upload_non_image', 10, 2);
 
 /**
  * Register Clinics CPT (only if not already registered by plugin)
  */
-add_action( 'init', function() {
+add_action('init', function () {
 	if (!post_type_exists('clinic')) {
 		$labels = [
 			'name'               => 'Clinics',
@@ -1090,21 +1119,21 @@ add_action( 'init', function() {
 			'not_found_in_trash' => 'No clinics in trash',
 			'all_items'          => 'All Clinics',
 		];
-		register_post_type( 'clinic', [
+		register_post_type('clinic', [
 			'labels'             => $labels,
 			'public'             => true,
 			'show_in_rest'       => false, // Disable for better classic editor experience
 			'has_archive'        => false,
-			'rewrite'            => [ 'slug' => 'clinics' ],
-			'supports'           => [ 'title', 'thumbnail' ], // Removed 'editor' since using custom meta fields
-		] );
+			'rewrite'            => ['slug' => 'clinics'],
+			'supports'           => ['title', 'thumbnail'], // Removed 'editor' since using custom meta fields
+		]);
 	}
-} );
+});
 
 /**
  * Register Doctors CPT (only if not already registered by plugin)
  */
-add_action( 'init', function() {
+add_action('init', function () {
 	if (!post_type_exists('doctor')) {
 		$labels = [
 			'name'               => 'Doctors',
@@ -1118,50 +1147,50 @@ add_action( 'init', function() {
 			'not_found_in_trash' => 'No doctors in trash',
 			'all_items'          => 'All Doctors',
 		];
-		register_post_type( 'doctor', [
+		register_post_type('doctor', [
 			'labels'             => $labels,
 			'public'             => true,
 			'show_in_rest'       => false, // Disable for better classic editor experience
 			'has_archive'        => false,
-			'rewrite'            => [ 'slug' => 'doctors' ],
-			'supports'           => [ 'title', 'thumbnail' ], // Removed 'editor' since using custom meta fields
-		] );
+			'rewrite'            => ['slug' => 'doctors'],
+			'supports'           => ['title', 'thumbnail'], // Removed 'editor' since using custom meta fields
+		]);
 	}
-} );
+});
 
 /**
  * Disable Gutenberg (Block Editor) for Clinic and Doctor CPTs
  * This provides a cleaner editing experience focused on the custom meta fields
  */
-add_filter( 'use_block_editor_for_post_type', function( $enabled, $post_type ) {
-	if ( in_array( $post_type, [ 'clinic', 'doctor' ] ) ) {
+add_filter('use_block_editor_for_post_type', function ($enabled, $post_type) {
+	if (in_array($post_type, ['clinic', 'doctor'])) {
 		return false;
 	}
 	return $enabled;
-}, 10, 2 );
+}, 10, 2);
 
 /**
  * Remove Gutenberg assets for clinic and doctor CPTs to improve performance
  */
-add_action( 'enqueue_block_editor_assets', function() {
+add_action('enqueue_block_editor_assets', function () {
 	$screen = get_current_screen();
-	if ( $screen && in_array( $screen->post_type, [ 'clinic', 'doctor' ] ) ) {
+	if ($screen && in_array($screen->post_type, ['clinic', 'doctor'])) {
 		// Dequeue block editor assets since we're using classic editor
-		wp_dequeue_script( 'wp-block-editor' );
-		wp_dequeue_script( 'wp-editor' );
-		wp_dequeue_style( 'wp-block-editor-theme' );
+		wp_dequeue_script('wp-block-editor');
+		wp_dequeue_script('wp-editor');
+		wp_dequeue_style('wp-block-editor-theme');
 	}
-} );
+});
 
 /**
  * Ensure classic editor meta boxes display properly for clinic and doctor CPTs
  */
-add_action( 'add_meta_boxes', function() {
+add_action('add_meta_boxes', function () {
 	$screen = get_current_screen();
-	if ( $screen && in_array( $screen->post_type, [ 'clinic', 'doctor' ] ) ) {
+	if ($screen && in_array($screen->post_type, ['clinic', 'doctor'])) {
 		// Remove default editor meta box since we're using classic editor
-		remove_meta_box( 'postdivrich', $screen->post_type, 'normal' );
-		
+		remove_meta_box('postdivrich', $screen->post_type, 'normal');
+
 		// Add back the classic editor if needed (optional - you can remove this if you don't want any content editor)
 		// add_meta_box( 
 		//     'postdivrich', 
@@ -1172,82 +1201,83 @@ add_action( 'add_meta_boxes', function() {
 		//     'default' 
 		// );
 	}
-} );
+});
 
 /**
  * Enqueue media uploader for clinic and doctor CPT
  */
-add_action( 'admin_enqueue_scripts', function( $hook ) {
+add_action('admin_enqueue_scripts', function ($hook) {
 	// Only run in admin area to avoid fatal error
-	if ( ! is_admin() ) {
+	if (! is_admin()) {
 		return;
 	}
 	// Only load on post edit screens for clinic or doctor CPT
 	$screen = get_current_screen();
-	if ( $screen && in_array( $screen->post_type, [ 'clinic', 'doctor' ] ) ) {
+	if ($screen && in_array($screen->post_type, ['clinic', 'doctor'])) {
 		wp_enqueue_media();
 		wp_enqueue_script(
 			'global-360-media-meta',
 			get_template_directory_uri() . '/js/media-meta-boxes.js',
-			[ 'jquery' ],
+			['jquery'],
 			_S_VERSION,
 			true
 		);
 	}
 	// Also load on the global settings page
-	if ( $hook === 'toplevel_page_360-settings' ) {
+	if ($hook === 'toplevel_page_360-settings') {
 		wp_enqueue_media();
 		wp_enqueue_script(
 			'global-360-media-meta',
 			get_template_directory_uri() . '/js/media-meta-boxes.js',
-			[ 'jquery' ],
+			['jquery'],
 			_S_VERSION,
 			true
 		);
 	}
-} );
+});
 
 /*--------------------------------------------------------------
  adds clinic class to the article tag
 --------------------------------------------------------------*/
 add_filter('post_class', function ($classes, $class, $post_id) {
-  // only on your CPT (or wherever you need it)
-  if (get_post_type($post_id) === 'clinic') {
-	$classes[] = sanitize_html_class(get_the_title($post_id), 'untitled');
-  }
+	// only on your CPT (or wherever you need it)
+	if (get_post_type($post_id) === 'clinic') {
+		$classes[] = sanitize_html_class(get_the_title($post_id), 'untitled');
+	}
 
-  return $classes;
+	return $classes;
 }, 10, 3);
 
 /*--------------------------------------------------------------
  Self-hosted fonts
 --------------------------------------------------------------*/
-add_action( 'wp_enqueue_scripts', 'global_360_theme_enqueue_self_hosted_fonts', 4 );
-function global_360_theme_enqueue_self_hosted_fonts() {
-	$settings = get_option( _360_Global_Settings::OPTION_KEY, [] );
-	$font_settings = [ 'body_font', 'heading_font' ];
+add_action('wp_enqueue_scripts', 'global_360_theme_enqueue_self_hosted_fonts', 4);
+function global_360_theme_enqueue_self_hosted_fonts()
+{
+	$settings = get_option(_360_Global_Settings::OPTION_KEY, []);
+	$font_settings = ['body_font', 'heading_font'];
 	$has_web_font = false;
 
-	foreach ( $font_settings as $key ) {
-		if ( empty( $settings[ $key ] ) ) {
+	foreach ($font_settings as $key) {
+		if (empty($settings[$key])) {
 			continue;
 		}
-		$slug = sanitize_key( $settings[ $key ] );
-		if ( $slug && $slug !== 'system-font' ) {
+		$slug = sanitize_key($settings[$key]);
+		if ($slug && $slug !== 'system-font') {
 			$has_web_font = true;
 			break;
 		}
 	}
 
-	if ( ! $has_web_font ) {
+	if (! $has_web_font) {
 		return;
 	}
 
 	$local_css_path = get_template_directory() . '/assets/fonts/fonts.css';
 	$local_css_url  = get_template_directory_uri() . '/assets/fonts/fonts.css';
 
-	if ( file_exists( $local_css_path ) ) {
-		wp_enqueue_style( 'global-360-theme-fonts', $local_css_url, [], _S_VERSION );
+	if (file_exists($local_css_path)) {
+		wp_enqueue_style('global-360-theme-fonts', $local_css_url, [], _S_VERSION);
 	}
 }
 
@@ -1257,19 +1287,19 @@ function global_360_theme_enqueue_self_hosted_fonts() {
 --------------------------------------------------------------*/
 
 add_action('wp_enqueue_scripts', function () {
-  if (! is_singular('clinic')) {
-	return;
-  }
+	if (! is_singular('clinic')) {
+		return;
+	}
 
-  // 1) Slick CSS from CDN
-  wp_enqueue_style('slick-css', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css', [], '1.8.1');
-  wp_enqueue_style('slick-theme-css', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css', ['slick-css'], '1.8.1');
+	// 1) Slick CSS from CDN
+	wp_enqueue_style('slick-css', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css', [], '1.8.1');
+	wp_enqueue_style('slick-theme-css', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css', ['slick-css'], '1.8.1');
 
-  // 2) Slick JS from CDN — depend on WP’s built-in jQuery
-  wp_enqueue_script('slick-js', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js', ['jquery'], '1.8.1', true);
+	// 2) Slick JS from CDN — depend on WP’s built-in jQuery
+	wp_enqueue_script('slick-js', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js', ['jquery'], '1.8.1', true);
 
-  // 3) Our init script
-  wp_add_inline_script('slick-js', "
+	// 3) Our init script
+	wp_add_inline_script('slick-js', "
 	jQuery(function($){
 	  $('.clinic-reviews-slider').slick({
 		slidesToShow: 1,
@@ -1289,42 +1319,42 @@ add_action('wp_enqueue_scripts', function () {
 });
 
 
-	/*--------------------------------------------------------------
+/*--------------------------------------------------------------
 	Map headings same height
 	--------------------------------------------------------------*/
 
-add_action( 'wp_footer', function(){
-  if ( ! is_singular( 'clinic' ) ) {
-	return;
-  }
-  ?>
-  <script>
-  // wait for *all* assets + HTML to be loaded
-  window.addEventListener('load', function(){
-	const headings = document.querySelectorAll('.map_heading');
-	if ( ! headings.length ) return;
+add_action('wp_footer', function () {
+	if (! is_singular('clinic')) {
+		return;
+	}
+?>
+	<script>
+		// wait for *all* assets + HTML to be loaded
+		window.addEventListener('load', function() {
+			const headings = document.querySelectorAll('.map_heading');
+			if (!headings.length) return;
 
-	// measure
-	let maxH = 0;
-	headings.forEach(el => {
-	  const h = el.offsetHeight;           // offsetHeight is simpler here
-	  if ( h > maxH ) maxH = h;
-	});
+			// measure
+			let maxH = 0;
+			headings.forEach(el => {
+				const h = el.offsetHeight; // offsetHeight is simpler here
+				if (h > maxH) maxH = h;
+			});
 
-	// apply
-	headings.forEach(el => {
-	  el.style.height = maxH + 'px';
-	});
-  });
-  </script>
-  <?php
+			// apply
+			headings.forEach(el => {
+				el.style.height = maxH + 'px';
+			});
+		});
+	</script>
+<?php
 });
 
-	/*--------------------------------------------------------------
+/*--------------------------------------------------------------
 	Admin styles
 	--------------------------------------------------------------*/
-	
-add_action('admin_enqueue_scripts', function() {
+
+add_action('admin_enqueue_scripts', function () {
 	wp_enqueue_style(
 		'global-360-admin-meta',
 		get_template_directory_uri() . '/style-admin-meta.css', // adjust path as needed
@@ -1338,13 +1368,14 @@ add_action('admin_enqueue_scripts', function() {
 	state page rewriote rules
 	--------------------------------------------------------------*/
 
-if ( ! function_exists( 'global360_get_valid_state_slug_map' ) ) {
+if (! function_exists('global360_get_valid_state_slug_map')) {
 	/**
 	 * Canonical map of valid state slugs to abbreviations.
 	 *
 	 * @return array<string,string>
 	 */
-	function global360_get_valid_state_slug_map() {
+	function global360_get_valid_state_slug_map()
+	{
 		$states = array(
 			'AL' => 'Alabama',
 			'AK' => 'Alaska',
@@ -1399,27 +1430,28 @@ if ( ! function_exists( 'global360_get_valid_state_slug_map' ) ) {
 		);
 
 		$slug_map = array();
-		foreach ( $states as $abbr => $name ) {
-			$slug_map[ sanitize_title( $name ) ] = $abbr;
+		foreach ($states as $abbr => $name) {
+			$slug_map[sanitize_title($name)] = $abbr;
 		}
 
 		return $slug_map;
 	}
 }
 
-if ( ! function_exists( 'global360_get_state_sitemap_entries' ) ) {
+if (! function_exists('global360_get_state_sitemap_entries')) {
 	/**
 	 * Build state sitemap entries for states that currently have clinics.
 	 *
 	 * @return array<string,array{url:string,lastmod:string}>
 	 */
-	function global360_get_state_sitemap_entries() {
+	function global360_get_state_sitemap_entries()
+	{
 		$state_slug_map = global360_get_valid_state_slug_map();
-		if ( empty( $state_slug_map ) ) {
+		if (empty($state_slug_map)) {
 			return array();
 		}
 
-		$abbr_to_slug = array_flip( $state_slug_map );
+		$abbr_to_slug = array_flip($state_slug_map);
 		$entries      = array();
 
 		$clinic_ids = get_posts(
@@ -1434,143 +1466,145 @@ if ( ! function_exists( 'global360_get_state_sitemap_entries' ) ) {
 			)
 		);
 
-		if ( empty( $clinic_ids ) ) {
+		if (empty($clinic_ids)) {
 			return array();
 		}
 
-		foreach ( $clinic_ids as $clinic_id ) {
-			$clinic_states = get_post_meta( $clinic_id, 'clinic_states', true );
-			if ( ! is_array( $clinic_states ) ) {
+		foreach ($clinic_ids as $clinic_id) {
+			$clinic_states = get_post_meta($clinic_id, 'clinic_states', true);
+			if (! is_array($clinic_states)) {
 				$clinic_states = array();
 			}
 
-			$single_state = sanitize_text_field( (string) get_post_meta( $clinic_id, '_cpt360_clinic_state', true ) );
-			if ( '' !== $single_state ) {
+			$single_state = sanitize_text_field((string) get_post_meta($clinic_id, '_cpt360_clinic_state', true));
+			if ('' !== $single_state) {
 				$clinic_states[] = $single_state;
 			}
 
-			$clinic_lastmod = get_post_modified_time( 'c', true, (int) $clinic_id );
-			if ( ! is_string( $clinic_lastmod ) || '' === $clinic_lastmod ) {
-				$clinic_lastmod = gmdate( 'c' );
+			$clinic_lastmod = get_post_modified_time('c', true, (int) $clinic_id);
+			if (! is_string($clinic_lastmod) || '' === $clinic_lastmod) {
+				$clinic_lastmod = gmdate('c');
 			}
 
-			foreach ( $clinic_states as $state ) {
-				$abbr = strtoupper( sanitize_text_field( (string) $state ) );
-				if ( '' === $abbr || ! isset( $abbr_to_slug[ $abbr ] ) ) {
+			foreach ($clinic_states as $state) {
+				$abbr = strtoupper(sanitize_text_field((string) $state));
+				if ('' === $abbr || ! isset($abbr_to_slug[$abbr])) {
 					continue;
 				}
 
-				$state_slug = $abbr_to_slug[ $abbr ];
-				if ( ! isset( $entries[ $state_slug ] ) ) {
-					$entries[ $state_slug ] = array(
-						'url'     => home_url( '/find-a-doctor/' . $state_slug . '/' ),
+				$state_slug = $abbr_to_slug[$abbr];
+				if (! isset($entries[$state_slug])) {
+					$entries[$state_slug] = array(
+						'url'     => home_url('/find-a-doctor/' . $state_slug . '/'),
 						'lastmod' => $clinic_lastmod,
 					);
 					continue;
 				}
 
-				if ( strtotime( $clinic_lastmod ) > strtotime( $entries[ $state_slug ]['lastmod'] ) ) {
-					$entries[ $state_slug ]['lastmod'] = $clinic_lastmod;
+				if (strtotime($clinic_lastmod) > strtotime($entries[$state_slug]['lastmod'])) {
+					$entries[$state_slug]['lastmod'] = $clinic_lastmod;
 				}
 			}
 		}
 
-		ksort( $entries, SORT_NATURAL | SORT_FLAG_CASE );
+		ksort($entries, SORT_NATURAL | SORT_FLAG_CASE);
 
 		return $entries;
 	}
 }
 
-if ( ! function_exists( 'global360_get_state_sitemap_lastmod' ) ) {
+if (! function_exists('global360_get_state_sitemap_lastmod')) {
 	/**
 	 * Derive a stable lastmod timestamp for the state sitemap.
 	 *
 	 * @return string W3C date string.
 	 */
-	function global360_get_state_sitemap_lastmod() {
+	function global360_get_state_sitemap_lastmod()
+	{
 		$entries = global360_get_state_sitemap_entries();
-		if ( ! empty( $entries ) ) {
+		if (! empty($entries)) {
 			$timestamps = array_map(
-				static function( $entry ) {
-					return strtotime( (string) ( $entry['lastmod'] ?? '' ) );
+				static function ($entry) {
+					return strtotime((string) ($entry['lastmod'] ?? ''));
 				},
 				$entries
 			);
 
-			$timestamps = array_filter( $timestamps, static function( $value ) {
+			$timestamps = array_filter($timestamps, static function ($value) {
 				return false !== $value;
-			} );
+			});
 
-			if ( ! empty( $timestamps ) ) {
-				return gmdate( 'c', max( $timestamps ) );
+			if (! empty($timestamps)) {
+				return gmdate('c', max($timestamps));
 			}
 		}
 
-		$find_a_doctor_page = get_page_by_path( 'find-a-doctor' );
-		if ( $find_a_doctor_page instanceof WP_Post ) {
-			$modified_gmt = get_post_modified_time( 'c', true, $find_a_doctor_page );
-			if ( is_string( $modified_gmt ) && '' !== $modified_gmt ) {
+		$find_a_doctor_page = get_page_by_path('find-a-doctor');
+		if ($find_a_doctor_page instanceof WP_Post) {
+			$modified_gmt = get_post_modified_time('c', true, $find_a_doctor_page);
+			if (is_string($modified_gmt) && '' !== $modified_gmt) {
 				return $modified_gmt;
 			}
 		}
 
-		return gmdate( 'c' );
+		return gmdate('c');
 	}
 }
 
-add_action( 'init', function() {
-	add_rewrite_rule( '^find-a-doctor-states-sitemap\.xml$', 'index.php?global360_state_sitemap=1', 'top' );
-} );
+add_action('init', function () {
+	add_rewrite_rule('^find-a-doctor-states-sitemap\.xml$', 'index.php?global360_state_sitemap=1', 'top');
+});
 
-add_filter( 'query_vars', function( $vars ) {
+add_filter('query_vars', function ($vars) {
 	$vars[] = 'global360_state_sitemap';
 
 	return $vars;
-} );
+});
 
-if ( ! function_exists( 'global360_is_state_sitemap_request' ) ) {
+if (! function_exists('global360_is_state_sitemap_request')) {
 	/**
 	 * Detect state sitemap requests even if pretty rewrites are stale.
 	 *
 	 * @return bool
 	 */
-	function global360_is_state_sitemap_request() {
-		if ( '1' === (string) get_query_var( 'global360_state_sitemap' ) ) {
+	function global360_is_state_sitemap_request()
+	{
+		if ('1' === (string) get_query_var('global360_state_sitemap')) {
 			return true;
 		}
 
-		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
-		if ( '' === $request_uri ) {
+		$request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+		if ('' === $request_uri) {
 			return false;
 		}
 
-		$request_path = wp_parse_url( $request_uri, PHP_URL_PATH );
-		if ( ! is_string( $request_path ) || '' === $request_path ) {
+		$request_path = wp_parse_url($request_uri, PHP_URL_PATH);
+		if (! is_string($request_path) || '' === $request_path) {
 			return false;
 		}
 
-		return '/find-a-doctor-states-sitemap.xml' === untrailingslashit( $request_path );
+		return '/find-a-doctor-states-sitemap.xml' === untrailingslashit($request_path);
 	}
 }
 
-add_action( 'template_redirect', function() {
-	if ( ! global360_is_state_sitemap_request() ) {
+add_action('template_redirect', function () {
+	if (! global360_is_state_sitemap_request()) {
 		return;
 	}
 
 	$entries = global360_get_state_sitemap_entries();
 
-	header( 'Content-Type: application/xml; charset=utf-8' );
-	status_header( 200 );
+	header('Content-Type: application/xml; charset=utf-8');
+	status_header(200);
 
 	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 	echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
-	if ( ! empty( $entries ) ) {
-		foreach ( $entries as $entry ) {
+	if (! empty($entries)) {
+		foreach ($entries as $entry) {
 			echo "\n\t<url>";
-			echo "\n\t\t<loc>" . esc_url( (string) $entry['url'] ) . '</loc>';
-			echo "\n\t\t<lastmod>" . esc_html( (string) $entry['lastmod'] ) . '</lastmod>';
+			echo "\n\t\t<loc>" . esc_url((string) $entry['url']) . '</loc>';
+			echo "\n\t\t<lastmod>" . esc_html((string) $entry['lastmod']) . '</lastmod>';
 			echo "\n\t\t<changefreq>weekly</changefreq>";
 			echo "\n\t\t<priority>0.7</priority>";
 			echo "\n\t</url>";
@@ -1579,37 +1613,37 @@ add_action( 'template_redirect', function() {
 
 	echo "\n</urlset>";
 	exit;
-}, 1 );
+}, 1);
 
-add_filter( 'seopress_sitemaps_external_link', function( $custom_sitemap ) {
-	if ( ! is_array( $custom_sitemap ) ) {
+add_filter('seopress_sitemaps_external_link', function ($custom_sitemap) {
+	if (! is_array($custom_sitemap)) {
 		$custom_sitemap = array();
 	}
 
 	$custom_sitemap['global360_find_a_doctor_states'] = array(
-		'sitemap_url'      => home_url( '/find-a-doctor-states-sitemap.xml' ),
+		'sitemap_url'      => home_url('/find-a-doctor-states-sitemap.xml'),
 		'sitemap_last_mod' => global360_get_state_sitemap_lastmod(),
 	);
 
 	return $custom_sitemap;
-} );
+});
 
-add_action('init', function() {
-    // State pages: /find-a-doctor/state-name/
-    add_rewrite_rule('^find-a-doctor/([^/]+)/?$', 'index.php?find_a_doctor_state=$matches[1]', 'top');
+add_action('init', function () {
+	// State pages: /find-a-doctor/state-name/
+	add_rewrite_rule('^find-a-doctor/([^/]+)/?$', 'index.php?find_a_doctor_state=$matches[1]', 'top');
 });
-add_filter('query_vars', function($vars) {
-    $vars[] = 'find_a_doctor_state';
-    return $vars;
+add_filter('query_vars', function ($vars) {
+	$vars[] = 'find_a_doctor_state';
+	return $vars;
 });
-add_action('template_include', function($template) {
-	$state = sanitize_title( (string) get_query_var('find_a_doctor_state') );
+add_action('template_include', function ($template) {
+	$state = sanitize_title((string) get_query_var('find_a_doctor_state'));
 
 	if ($state) {
 		$valid_state_slugs = global360_get_valid_state_slug_map();
-		if ( ! isset( $valid_state_slugs[ $state ] ) ) {
+		if (! isset($valid_state_slugs[$state])) {
 			global $wp_query;
-			if ( $wp_query ) {
+			if ($wp_query) {
 				$wp_query->set_404();
 			}
 			status_header(404);
@@ -1617,108 +1651,114 @@ add_action('template_include', function($template) {
 			return get_query_template('404');
 		}
 
-        return get_template_directory() . '/template-find-a-doctor-state.php';
-    }
-    
-    return $template;
+		return get_template_directory() . '/template-find-a-doctor-state.php';
+	}
+
+	return $template;
 });
 
 /*--------------------------------------------------------------
 	SEO fallbacks (SEOPress-aware)
 	--------------------------------------------------------------*/
 
-if ( ! function_exists( 'global360_get_seo_settings_terms' ) ) {
-	function global360_get_seo_settings_terms() {
-		$settings = get_option( '360_global_settings', array() );
-		if ( ! is_array( $settings ) ) {
+if (! function_exists('global360_get_seo_settings_terms')) {
+	function global360_get_seo_settings_terms()
+	{
+		$settings = get_option('360_global_settings', array());
+		if (! is_array($settings)) {
 			$settings = array();
 		}
 
 		return array(
-			'condition' => sanitize_text_field( $settings['primary_condition'] ?? '' ),
-			'treatment' => sanitize_text_field( $settings['primary_treatment'] ?? '' ),
-			'site_name' => get_bloginfo( 'name' ),
+			'condition' => sanitize_text_field($settings['primary_condition'] ?? ''),
+			'treatment' => sanitize_text_field($settings['primary_treatment'] ?? ''),
+			'site_name' => get_bloginfo('name'),
 		);
 	}
 }
 
-if ( ! function_exists( 'global360_get_state_name_for_seo' ) ) {
-	function global360_get_state_name_for_seo() {
-		$state_slug = strtolower( (string) get_query_var( 'find_a_doctor_state' ) );
-		if ( '' === $state_slug ) {
+if (! function_exists('global360_get_state_name_for_seo')) {
+	function global360_get_state_name_for_seo()
+	{
+		$state_slug = strtolower((string) get_query_var('find_a_doctor_state'));
+		if ('' === $state_slug) {
 			return '';
 		}
 
-		return ucwords( str_replace( '-', ' ', $state_slug ) );
+		return ucwords(str_replace('-', ' ', $state_slug));
 	}
 }
 
-if ( ! function_exists( 'global360_get_seopress_custom_value' ) ) {
-	function global360_get_seopress_custom_value( $meta_key ) {
+if (! function_exists('global360_get_seopress_custom_value')) {
+	function global360_get_seopress_custom_value($meta_key)
+	{
 		$post_id = get_queried_object_id();
-		if ( ! $post_id ) {
+		if (! $post_id) {
 			return '';
 		}
 
-		$value = get_post_meta( $post_id, $meta_key, true );
-		return is_string( $value ) ? trim( $value ) : '';
+		$value = get_post_meta($post_id, $meta_key, true);
+		return is_string($value) ? trim($value) : '';
 	}
 }
 
-if ( ! function_exists( 'global360_has_seopress_custom_title' ) ) {
-	function global360_has_seopress_custom_title() {
-		return '' !== global360_get_seopress_custom_value( '_seopress_titles_title' );
+if (! function_exists('global360_has_seopress_custom_title')) {
+	function global360_has_seopress_custom_title()
+	{
+		return '' !== global360_get_seopress_custom_value('_seopress_titles_title');
 	}
 }
 
-if ( ! function_exists( 'global360_has_seopress_custom_description' ) ) {
-	function global360_has_seopress_custom_description() {
-		return '' !== global360_get_seopress_custom_value( '_seopress_titles_desc' );
+if (! function_exists('global360_has_seopress_custom_description')) {
+	function global360_has_seopress_custom_description()
+	{
+		return '' !== global360_get_seopress_custom_value('_seopress_titles_desc');
 	}
 }
 
-if ( ! function_exists( 'global360_build_fallback_title' ) ) {
-	function global360_build_fallback_title() {
+if (! function_exists('global360_build_fallback_title')) {
+	function global360_build_fallback_title()
+	{
 		$terms = global360_get_seo_settings_terms();
 		$condition = $terms['condition'];
 		$site_name = $terms['site_name'];
 
-		if ( is_singular( 'doctor' ) || is_singular( 'doctors' ) ) {
+		if (is_singular('doctor') || is_singular('doctors')) {
 			$parts = array(
 				get_the_title(),
 				$condition ? $condition . ' Specialist' : '',
 				$site_name,
 			);
-			$parts = array_values( array_filter( array_map( 'trim', $parts ) ) );
-			return ! empty( $parts ) ? implode( ' | ', $parts ) : '';
+			$parts = array_values(array_filter(array_map('trim', $parts)));
+			return ! empty($parts) ? implode(' | ', $parts) : '';
 		}
 
-		if ( is_singular( 'clinic' ) || is_singular( 'clinics' ) ) {
+		if (is_singular('clinic') || is_singular('clinics')) {
 			$parts = array(
 				get_the_title(),
 				$condition ? $condition . ' Treatment Clinic' : '',
 				$site_name,
 			);
-			$parts = array_values( array_filter( array_map( 'trim', $parts ) ) );
-			return ! empty( $parts ) ? implode( ' | ', $parts ) : '';
+			$parts = array_values(array_filter(array_map('trim', $parts)));
+			return ! empty($parts) ? implode(' | ', $parts) : '';
 		}
 
-		if ( is_page( 'find-a-doctor' ) ) {
-			if ( $condition && $site_name ) {
+		if (is_page('find-a-doctor')) {
+			if ($condition && $site_name) {
 				return 'Find a ' . $condition . ' Specialist | ' . $site_name;
 			}
-			if ( $condition ) {
+			if ($condition) {
 				return 'Find a ' . $condition . ' Specialist';
 			}
 			return '';
 		}
 
-		if ( get_query_var( 'find_a_doctor_state' ) ) {
+		if (get_query_var('find_a_doctor_state')) {
 			$state_name = global360_get_state_name_for_seo();
-			if ( $condition && $state_name && $site_name ) {
+			if ($condition && $state_name && $site_name) {
 				return $condition . ' Specialists in ' . $state_name . ' | ' . $site_name;
 			}
-			if ( $condition && $state_name ) {
+			if ($condition && $state_name) {
 				return $condition . ' Specialists in ' . $state_name;
 			}
 		}
@@ -1727,36 +1767,37 @@ if ( ! function_exists( 'global360_build_fallback_title' ) ) {
 	}
 }
 
-if ( ! function_exists( 'global360_build_fallback_description' ) ) {
-	function global360_build_fallback_description() {
+if (! function_exists('global360_build_fallback_description')) {
+	function global360_build_fallback_description()
+	{
 		$terms = global360_get_seo_settings_terms();
 		$condition = $terms['condition'];
 		$treatment = $terms['treatment'];
 
-		if ( is_singular( 'doctor' ) || is_singular( 'doctors' ) ) {
-			if ( $condition && $treatment ) {
+		if (is_singular('doctor') || is_singular('doctors')) {
+			if ($condition && $treatment) {
 				return get_the_title() . ' specializes in treating ' . $condition . ' using advanced therapies including ' . $treatment . '. Learn more about available treatment options and clinic locations.';
 			}
 			return '';
 		}
 
-		if ( is_singular( 'clinic' ) || is_singular( 'clinics' ) ) {
-			if ( $condition ) {
+		if (is_singular('clinic') || is_singular('clinics')) {
+			if ($condition) {
 				return get_the_title() . ' offers treatment for ' . $condition . '. View doctors, clinic locations, and treatment options available at this clinic.';
 			}
 			return '';
 		}
 
-		if ( is_page( 'find-a-doctor' ) ) {
-			if ( $condition && $treatment ) {
+		if (is_page('find-a-doctor')) {
+			if ($condition && $treatment) {
 				return 'Find doctors specializing in ' . $condition . ' and treatments such as ' . $treatment . '. Browse specialists by state to locate experienced physicians near you.';
 			}
 			return '';
 		}
 
-		if ( get_query_var( 'find_a_doctor_state' ) ) {
+		if (get_query_var('find_a_doctor_state')) {
 			$state_name = global360_get_state_name_for_seo();
-			if ( $condition && $state_name && $treatment ) {
+			if ($condition && $state_name && $treatment) {
 				return 'Find ' . $condition . ' specialists in ' . $state_name . '. Browse doctors and clinics offering treatments such as ' . $treatment . '.';
 			}
 		}
@@ -1765,9 +1806,10 @@ if ( ! function_exists( 'global360_build_fallback_description' ) ) {
 	}
 }
 
-if ( ! function_exists( 'global360_filter_document_title_fallback' ) ) {
-	function global360_filter_document_title_fallback( $title ) {
-		if ( is_admin() || global360_has_seopress_custom_title() ) {
+if (! function_exists('global360_filter_document_title_fallback')) {
+	function global360_filter_document_title_fallback($title)
+	{
+		if (is_admin() || global360_has_seopress_custom_title()) {
 			return $title;
 		}
 
@@ -1775,29 +1817,31 @@ if ( ! function_exists( 'global360_filter_document_title_fallback' ) ) {
 		return '' !== $fallback ? $fallback : $title;
 	}
 }
-add_filter( 'pre_get_document_title', 'global360_filter_document_title_fallback', 9999 );
+add_filter('pre_get_document_title', 'global360_filter_document_title_fallback', 9999);
 
-if ( ! function_exists( 'global360_output_meta_description_fallback' ) ) {
-	function global360_output_meta_description_fallback() {
-		if ( is_admin() || global360_has_seopress_custom_description() ) {
+if (! function_exists('global360_output_meta_description_fallback')) {
+	function global360_output_meta_description_fallback()
+	{
+		if (is_admin() || global360_has_seopress_custom_description()) {
 			return;
 		}
 
 		$description = global360_build_fallback_description();
-		if ( '' === $description ) {
+		if ('' === $description) {
 			return;
 		}
 
 		echo "\n";
-		echo '<meta name="description" content="' . esc_attr( $description ) . '">';
+		echo '<meta name="description" content="' . esc_attr($description) . '">';
 		echo "\n";
 	}
 }
-add_action( 'wp_head', 'global360_output_meta_description_fallback', 20 );
+add_action('wp_head', 'global360_output_meta_description_fallback', 20);
 
-if ( ! function_exists( 'global360_set_category_archives_noindex' ) ) {
-	function global360_set_category_archives_noindex( $robots ) {
-		if ( is_category() || is_tag() || is_author() || is_date() ) {
+if (! function_exists('global360_set_category_archives_noindex')) {
+	function global360_set_category_archives_noindex($robots)
+	{
+		if (is_category() || is_tag() || is_author() || is_date()) {
 			$robots['noindex'] = true;
 			$robots['follow'] = true;
 		}
@@ -1805,7 +1849,7 @@ if ( ! function_exists( 'global360_set_category_archives_noindex' ) ) {
 		return $robots;
 	}
 }
-add_filter( 'wp_robots', 'global360_set_category_archives_noindex' );
+add_filter('wp_robots', 'global360_set_category_archives_noindex');
 
 
 
@@ -1814,23 +1858,24 @@ add_filter( 'wp_robots', 'global360_set_category_archives_noindex' );
 --------------------------------------------------------------*/
 
 // Add to your theme's functions.php
-function add_custom_block_classes($block_content, $block) {
-    // Add wrapper to paragraph blocks
-    if ($block['blockName'] === 'core/paragraph') {
-        $block_content = '<div class="main-paragraph-con max_width_content">' . $block_content . '</div>';
-    }
-    
-    // Add wrapper to heading blocks
-    if ($block['blockName'] === 'core/heading') {
-        $block_content = '<div class="main-heading-con max_width_content">' . $block_content . '</div>';
-    }
-    
-    // Add wrapper to list blocks
-    if ($block['blockName'] === 'core/list') {
-        $block_content = '<div class="main-list-con max_width_content">' . $block_content . '</div>';
-    }
-    
-    return $block_content;
+function add_custom_block_classes($block_content, $block)
+{
+	// Add wrapper to paragraph blocks
+	if ($block['blockName'] === 'core/paragraph') {
+		$block_content = '<div class="main-paragraph-con max_width_content">' . $block_content . '</div>';
+	}
+
+	// Add wrapper to heading blocks
+	if ($block['blockName'] === 'core/heading') {
+		$block_content = '<div class="main-heading-con max_width_content">' . $block_content . '</div>';
+	}
+
+	// Add wrapper to list blocks
+	if ($block['blockName'] === 'core/list') {
+		$block_content = '<div class="main-list-con max_width_content">' . $block_content . '</div>';
+	}
+
+	return $block_content;
 }
 add_filter('render_block', 'add_custom_block_classes', 10, 2);
 
@@ -1838,256 +1883,265 @@ add_filter('render_block', 'add_custom_block_classes', 10, 2);
  * Social Sharing Function
  * Display social sharing buttons for posts
  */
-function global_360_social_sharing($post_id = null) {
-    if (!$post_id) {
-        global $post;
-        $post_id = $post->ID;
-    }
-    
-    // Get post data
-    $post_title = get_the_title($post_id);
-    $post_url = get_permalink($post_id);
-    $post_excerpt = get_the_excerpt($post_id);
-    
-    // Clean up text for sharing - don't double encode
-    $share_title = wp_strip_all_tags($post_title);
-    $share_excerpt = wp_trim_words(wp_strip_all_tags($post_excerpt), 20, '...');
-    
-    // Social media URLs - use rawurlencode for better compatibility
-    $facebook_url = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode($post_url);
-    $twitter_url = 'https://twitter.com/intent/tweet?url=' . rawurlencode($post_url) . '&text=' . rawurlencode($share_title);
-    $linkedin_url = 'https://www.linkedin.com/sharing/share-offsite/?url=' . rawurlencode($post_url);
-    $email_url = 'mailto:?subject=' . rawurlencode($share_title) . '&body=' . rawurlencode($share_excerpt . ' ' . $post_url);
-    
-    ob_start();
-    ?>
-    <div class="social-sharing">
-        <h4 class="sharing-title">Share this article:</h4>
-        <div class="sharing-buttons">
-            <a href="<?php echo $facebook_url; ?>" target="_blank" rel="noopener" class="share-button facebook" aria-label="Share on Facebook">
-				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('facebook', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+function global_360_social_sharing($post_id = null)
+{
+	if (!$post_id) {
+		global $post;
+		$post_id = $post->ID;
+	}
+
+	// Get post data
+	$post_title = get_the_title($post_id);
+	$post_url = get_permalink($post_id);
+	$post_excerpt = get_the_excerpt($post_id);
+
+	// Clean up text for sharing - don't double encode
+	$share_title = wp_strip_all_tags($post_title);
+	$share_excerpt = wp_trim_words(wp_strip_all_tags($post_excerpt), 20, '...');
+
+	// Social media URLs - use rawurlencode for better compatibility
+	$facebook_url = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode($post_url);
+	$twitter_url = 'https://twitter.com/intent/tweet?url=' . rawurlencode($post_url) . '&text=' . rawurlencode($share_title);
+	$linkedin_url = 'https://www.linkedin.com/sharing/share-offsite/?url=' . rawurlencode($post_url);
+	$email_url = 'mailto:?subject=' . rawurlencode($share_title) . '&body=' . rawurlencode($share_excerpt . ' ' . $post_url);
+
+	ob_start();
+?>
+	<div class="social-sharing">
+		<h4 class="sharing-title">Share this article:</h4>
+		<div class="sharing-buttons">
+			<a href="<?php echo $facebook_url; ?>" target="_blank" rel="noopener" class="share-button facebook" aria-label="Share on Facebook">
+				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('facebook', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+															?></span>
 				<span class="share-label">Facebook</span>
-            </a>
-            <a href="<?php echo $twitter_url; ?>" target="_blank" rel="noopener" class="share-button twitter" aria-label="Share on Twitter/X">
-				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('x', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			</a>
+			<a href="<?php echo $twitter_url; ?>" target="_blank" rel="noopener" class="share-button twitter" aria-label="Share on Twitter/X">
+				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('x', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+															?></span>
 				<span class="share-label">Twitter</span>
-            </a>
-            <a href="<?php echo $linkedin_url; ?>" target="_blank" rel="noopener" class="share-button linkedin" aria-label="Share on LinkedIn">
-				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('linkedin', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			</a>
+			<a href="<?php echo $linkedin_url; ?>" target="_blank" rel="noopener" class="share-button linkedin" aria-label="Share on LinkedIn">
+				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('linkedin', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+															?></span>
 				<span class="share-label">LinkedIn</span>
-            </a>
-            <a href="<?php echo $email_url; ?>" class="share-button email" aria-label="Share via Email">
-				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('email', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			</a>
+			<a href="<?php echo $email_url; ?>" class="share-button email" aria-label="Share via Email">
+				<span class="share-icon" aria-hidden="true"><?php echo global_360_get_icon_svg('email', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+															?></span>
 				<span class="share-label">Email</span>
-            </a>
+			</a>
 			<button type="button" class="share-button copy-link" onclick="copyToClipboard('<?php echo esc_js($post_url); ?>')" aria-label="Copy Link">
-				<span class="share-icon share-icon--default" aria-hidden="true"><?php echo global_360_get_icon_svg('link', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-				<span class="share-icon share-icon--success" aria-hidden="true" hidden><?php echo global_360_get_icon_svg('check', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<span class="share-icon share-icon--default" aria-hidden="true"><?php echo global_360_get_icon_svg('link', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+																				?></span>
+				<span class="share-icon share-icon--success" aria-hidden="true" hidden><?php echo global_360_get_icon_svg('check', 'share-icon__svg'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+																						?></span>
 				<span class="share-label copy-label">Copy Link</span>
-            </button>
-        </div>
-    </div>
-    
-    <script>
-    function copyToClipboard(url) {
-        if (navigator.clipboard && window.isSecureContext) {
-            // Use modern clipboard API
-            navigator.clipboard.writeText(url).then(function() {
-                showCopyMessage();
-            }).catch(function(err) {
-                console.error('Failed to copy: ', err);
-                fallbackCopy(url);
-            });
-        } else {
-            // Fallback for older browsers
-            fallbackCopy(url);
-        }
-    }
-    
-    function fallbackCopy(url) {
-        const textArea = document.createElement('textarea');
-        textArea.value = url;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            showCopyMessage();
-        } catch (err) {
-            console.error('Fallback copy failed: ', err);
-        }
-        textArea.remove();
-    }
-    
-    function showCopyMessage() {
-		const button = document.querySelector('.share-button.copy-link');
-		if (!button) {
-			return;
-		}
-		const label = button.querySelector('.copy-label');
-		const defaultIcon = button.querySelector('.share-icon--default');
-		const successIcon = button.querySelector('.share-icon--success');
-		if (!label) {
-			return;
-		}
-		const originalText = label.innerText;
-        
-        // Change button to show success
-		label.innerText = 'Copied!';
-		if (defaultIcon && successIcon) {
-			defaultIcon.hidden = true;
-			successIcon.hidden = false;
-		}
-        button.style.backgroundColor = '#28a745';
-        button.style.borderColor = '#28a745';
-        
-        // Reset after 2 seconds
-        setTimeout(() => {
-			label.innerText = originalText;
-			if (defaultIcon && successIcon) {
-				defaultIcon.hidden = false;
-				successIcon.hidden = true;
+			</button>
+		</div>
+	</div>
+
+	<script>
+		function copyToClipboard(url) {
+			if (navigator.clipboard && window.isSecureContext) {
+				// Use modern clipboard API
+				navigator.clipboard.writeText(url).then(function() {
+					showCopyMessage();
+				}).catch(function(err) {
+					console.error('Failed to copy: ', err);
+					fallbackCopy(url);
+				});
+			} else {
+				// Fallback for older browsers
+				fallbackCopy(url);
 			}
-            button.style.backgroundColor = '';
-            button.style.borderColor = '';
-        }, 2000);
-    }
-    </script>
-    <?php
-    return ob_get_clean();
+		}
+
+		function fallbackCopy(url) {
+			const textArea = document.createElement('textarea');
+			textArea.value = url;
+			textArea.style.position = 'fixed';
+			textArea.style.left = '-999999px';
+			textArea.style.top = '-999999px';
+			document.body.appendChild(textArea);
+			textArea.focus();
+			textArea.select();
+			try {
+				document.execCommand('copy');
+				showCopyMessage();
+			} catch (err) {
+				console.error('Fallback copy failed: ', err);
+			}
+			textArea.remove();
+		}
+
+		function showCopyMessage() {
+			const button = document.querySelector('.share-button.copy-link');
+			if (!button) {
+				return;
+			}
+			const label = button.querySelector('.copy-label');
+			const defaultIcon = button.querySelector('.share-icon--default');
+			const successIcon = button.querySelector('.share-icon--success');
+			if (!label) {
+				return;
+			}
+			const originalText = label.innerText;
+
+			// Change button to show success
+			label.innerText = 'Copied!';
+			if (defaultIcon && successIcon) {
+				defaultIcon.hidden = true;
+				successIcon.hidden = false;
+			}
+			button.style.backgroundColor = '#28a745';
+			button.style.borderColor = '#28a745';
+
+			// Reset after 2 seconds
+			setTimeout(() => {
+				label.innerText = originalText;
+				if (defaultIcon && successIcon) {
+					defaultIcon.hidden = false;
+					successIcon.hidden = true;
+				}
+				button.style.backgroundColor = '';
+				button.style.borderColor = '';
+			}, 2000);
+		}
+	</script>
+<?php
+	return ob_get_clean();
 }
 
 /*--------------------------------------------------------------
 # Yoast SEO integration for Clinics and Doctors
 --------------------------------------------------------------*/
 
-add_action( 'plugins_loaded', function () {
-	if ( ! defined( 'WPSEO_VERSION' ) ) {
+add_action('plugins_loaded', function () {
+	if (! defined('WPSEO_VERSION')) {
 		return;
 	}
 
-	add_filter( 'wpseo_pre_analysis_post_content', 'global_360_theme_yoast_append_meta', 10, 2 );
-} );
+	add_filter('wpseo_pre_analysis_post_content', 'global_360_theme_yoast_append_meta', 10, 2);
+});
 
-function global_360_theme_yoast_append_meta( $content, $post ) {
-	if ( ! ( $post instanceof WP_Post ) ) {
+function global_360_theme_yoast_append_meta($content, $post)
+{
+	if (! ($post instanceof WP_Post)) {
 		return $content;
 	}
 
-	if ( ! in_array( $post->post_type, array( 'clinic', 'doctor' ), true ) ) {
+	if (! in_array($post->post_type, array('clinic', 'doctor'), true)) {
 		return $content;
 	}
 
 	$extras = array();
 
-	if ( 'clinic' === $post->post_type ) {
-		$extras = array_merge( $extras, global_360_theme_collect_clinic_meta_for_yoast( $post->ID ) );
+	if ('clinic' === $post->post_type) {
+		$extras = array_merge($extras, global_360_theme_collect_clinic_meta_for_yoast($post->ID));
 	}
 
-	if ( 'doctor' === $post->post_type ) {
-		$extras = array_merge( $extras, global_360_theme_collect_doctor_meta_for_yoast( $post->ID ) );
+	if ('doctor' === $post->post_type) {
+		$extras = array_merge($extras, global_360_theme_collect_doctor_meta_for_yoast($post->ID));
 	}
 
-	$extras = array_filter( $extras );
+	$extras = array_filter($extras);
 
-	if ( empty( $extras ) ) {
+	if (empty($extras)) {
 		return $content;
 	}
 
-	return $content . "\n\n" . implode( "\n\n", $extras );
+	return $content . "\n\n" . implode("\n\n", $extras);
 }
 
-function global_360_theme_collect_clinic_meta_for_yoast( $post_id ) {
+function global_360_theme_collect_clinic_meta_for_yoast($post_id)
+{
 	$pieces = array();
 
-	$bio = get_post_meta( $post_id, '_cpt360_clinic_bio', true );
-	if ( $bio ) {
-		$pieces[] = '<section class="yoast-clinic-bio"><h2>Clinic Bio</h2>' . wpautop( wp_kses_post( $bio ) ) . '</section>';
+	$bio = get_post_meta($post_id, '_cpt360_clinic_bio', true);
+	if ($bio) {
+		$pieces[] = '<section class="yoast-clinic-bio"><h2>Clinic Bio</h2>' . wpautop(wp_kses_post($bio)) . '</section>';
 	}
 
-	$phone = get_post_meta( $post_id, '_cpt360_clinic_phone', true );
-	if ( $phone ) {
-		$pieces[] = '<p class="yoast-clinic-phone"><strong>Clinic Phone Number:</strong> ' . esc_html( $phone ) . '</p>';
+	$phone = get_post_meta($post_id, '_cpt360_clinic_phone', true);
+	if ($phone) {
+		$pieces[] = '<p class="yoast-clinic-phone"><strong>Clinic Phone Number:</strong> ' . esc_html($phone) . '</p>';
 	}
 
-	$website = get_post_meta( $post_id, '_clinic_website_url', true );
-	if ( $website ) {
-		$pieces[] = '<p class="yoast-clinic-website"><strong>Clinic Website:</strong> <a href="' . esc_url( $website ) . '" rel="nofollow noopener">Visit Clinic Website</a></p>';
+	$website = get_post_meta($post_id, '_clinic_website_url', true);
+	if ($website) {
+		$pieces[] = '<p class="yoast-clinic-website"><strong>Clinic Website:</strong> <a href="' . esc_url($website) . '" rel="nofollow noopener">Visit Clinic Website</a></p>';
 	}
 
-	$addresses = get_post_meta( $post_id, 'clinic_addresses', true );
-	if ( is_array( $addresses ) && ! empty( $addresses ) ) {
+	$addresses = get_post_meta($post_id, 'clinic_addresses', true);
+	if (is_array($addresses) && ! empty($addresses)) {
 		$rows = array();
-		foreach ( $addresses as $address ) {
-			$line = array_filter( array(
+		foreach ($addresses as $address) {
+			$line = array_filter(array(
 				$address['street'] ?? '',
 				$address['city'] ?? '',
 				$address['state'] ?? '',
 				$address['zip'] ?? '',
-			) );
+			));
 
-			if ( $line ) {
-				$rows[] = '<li>' . esc_html( implode( ', ', $line ) ) . '</li>';
+			if ($line) {
+				$rows[] = '<li>' . esc_html(implode(', ', $line)) . '</li>';
 			}
 		}
 
-		if ( $rows ) {
-			$pieces[] = '<section class="yoast-clinic-addresses"><h2>Clinic Addresses</h2><ul>' . implode( '', $rows ) . '</ul></section>';
+		if ($rows) {
+			$pieces[] = '<section class="yoast-clinic-addresses"><h2>Clinic Addresses</h2><ul>' . implode('', $rows) . '</ul></section>';
 		}
 	}
 
-	$info_items = get_post_meta( $post_id, 'clinic_info', true );
-	if ( is_array( $info_items ) ) {
+	$info_items = get_post_meta($post_id, 'clinic_info', true);
+	if (is_array($info_items)) {
 		$rows = array();
-		foreach ( $info_items as $item ) {
-			$title = isset( $item['title'] ) ? sanitize_text_field( $item['title'] ) : '';
-			$desc  = isset( $item['description'] ) ? sanitize_textarea_field( $item['description'] ) : '';
-			if ( $title || $desc ) {
-				$rows[] = '<p><strong>' . esc_html( $title ) . ':</strong> ' . esc_html( $desc ) . '</p>';
+		foreach ($info_items as $item) {
+			$title = isset($item['title']) ? sanitize_text_field($item['title']) : '';
+			$desc  = isset($item['description']) ? sanitize_textarea_field($item['description']) : '';
+			if ($title || $desc) {
+				$rows[] = '<p><strong>' . esc_html($title) . ':</strong> ' . esc_html($desc) . '</p>';
 			}
 		}
 
-		if ( $rows ) {
-			$pieces[] = '<section class="yoast-clinic-info"><h2>Clinic Information</h2>' . implode( '', $rows ) . '</section>';
+		if ($rows) {
+			$pieces[] = '<section class="yoast-clinic-info"><h2>Clinic Information</h2>' . implode('', $rows) . '</section>';
 		}
 	}
 
-	$reviews = get_post_meta( $post_id, 'clinic_reviews', true );
-	if ( is_array( $reviews ) ) {
+	$reviews = get_post_meta($post_id, 'clinic_reviews', true);
+	if (is_array($reviews)) {
 		$rows = array();
-		foreach ( $reviews as $review ) {
-			$reviewer = isset( $review['reviewer'] ) ? sanitize_text_field( $review['reviewer'] ) : '';
-			$text     = isset( $review['review'] ) ? sanitize_textarea_field( $review['review'] ) : '';
+		foreach ($reviews as $review) {
+			$reviewer = isset($review['reviewer']) ? sanitize_text_field($review['reviewer']) : '';
+			$text     = isset($review['review']) ? sanitize_textarea_field($review['review']) : '';
 
-			if ( $reviewer || $text ) {
-				$rows[] = '<blockquote><p>' . esc_html( $text ) . '</p><cite>' . esc_html( $reviewer ) . '</cite></blockquote>';
+			if ($reviewer || $text) {
+				$rows[] = '<blockquote><p>' . esc_html($text) . '</p><cite>' . esc_html($reviewer) . '</cite></blockquote>';
 			}
 		}
 
-		if ( $rows ) {
-			$pieces[] = '<section class="yoast-clinic-reviews"><h2>Clinic Reviews</h2>' . implode( '', $rows ) . '</section>';
+		if ($rows) {
+			$pieces[] = '<section class="yoast-clinic-reviews"><h2>Clinic Reviews</h2>' . implode('', $rows) . '</section>';
 		}
 	}
 
-	$states = cpt360_get_clinic_state_names( $post_id, true );
-	if ( $states ) {
-		$pieces[] = '<p class="yoast-clinic-states"><strong>States Served:</strong> ' . esc_html( implode( ', ', $states ) ) . '</p>';
+	$states = cpt360_get_clinic_state_names($post_id, true);
+	if ($states) {
+		$pieces[] = '<p class="yoast-clinic-states"><strong>States Served:</strong> ' . esc_html(implode(', ', $states)) . '</p>';
 	}
 
-	$assessment = cpt360_get_assessment_id( $post_id );
-	if ( $assessment ) {
-		$pieces[] = '<p class="yoast-clinic-assessment"><strong>Clinic Assessment ID:</strong> ' . esc_html( $assessment ) . '</p>';
+	$assessment = cpt360_get_assessment_id($post_id);
+	if ($assessment) {
+		$pieces[] = '<p class="yoast-clinic-assessment"><strong>Clinic Assessment ID:</strong> ' . esc_html($assessment) . '</p>';
 	}
 
-	$google_place = get_post_meta( $post_id, 'google_place_id', true );
-	if ( $google_place ) {
-		$pieces[] = '<p class="yoast-clinic-google"><strong>Google Place ID:</strong> ' . esc_html( $google_place ) . '</p>';
+	$google_place = get_post_meta($post_id, 'google_place_id', true);
+	if ($google_place) {
+		$pieces[] = '<p class="yoast-clinic-google"><strong>Google Place ID:</strong> ' . esc_html($google_place) . '</p>';
 	}
 
-	$associated_doctors = (array) get_posts( array(
+	$associated_doctors = (array) get_posts(array(
 		'post_type'      => 'doctor',
 		'posts_per_page' => -1,
 		'fields'         => 'ids',
@@ -2098,126 +2152,128 @@ function global_360_theme_collect_clinic_meta_for_yoast( $post_id ) {
 				'compare' => 'LIKE',
 			),
 		),
-	) );
+	));
 
-	if ( $associated_doctors ) {
+	if ($associated_doctors) {
 		$links = array();
-		foreach ( $associated_doctors as $doctor_id ) {
-			$links[] = '<li><a href="' . esc_url( get_permalink( $doctor_id ) ) . '">' . esc_html( get_the_title( $doctor_id ) ) . '</a></li>';
+		foreach ($associated_doctors as $doctor_id) {
+			$links[] = '<li><a href="' . esc_url(get_permalink($doctor_id)) . '">' . esc_html(get_the_title($doctor_id)) . '</a></li>';
 		}
 
-		if ( $links ) {
-			$pieces[] = '<section class="yoast-clinic-doctors"><h2>Associated Doctors</h2><ul>' . implode( '', $links ) . '</ul></section>';
+		if ($links) {
+			$pieces[] = '<section class="yoast-clinic-doctors"><h2>Associated Doctors</h2><ul>' . implode('', $links) . '</ul></section>';
 		}
 	}
 
 	return $pieces;
 }
 
-function global_360_theme_collect_doctor_meta_for_yoast( $post_id ) {
+function global_360_theme_collect_doctor_meta_for_yoast($post_id)
+{
 	$pieces = array();
 
-	$name = get_post_meta( $post_id, 'doctor_name', true );
-	if ( $name ) {
-		$pieces[] = '<p class="yoast-doctor-name"><strong>Doctor Name:</strong> ' . esc_html( $name ) . '</p>';
+	$name = get_post_meta($post_id, 'doctor_name', true);
+	if ($name) {
+		$pieces[] = '<p class="yoast-doctor-name"><strong>Doctor Name:</strong> ' . esc_html($name) . '</p>';
 	}
 
-	$title = get_post_meta( $post_id, 'doctor_title', true );
-	if ( $title ) {
-		$pieces[] = '<p class="yoast-doctor-title"><strong>Doctor Title:</strong> ' . esc_html( $title ) . '</p>';
+	$title = get_post_meta($post_id, 'doctor_title', true);
+	if ($title) {
+		$pieces[] = '<p class="yoast-doctor-title"><strong>Doctor Title:</strong> ' . esc_html($title) . '</p>';
 	}
 
-	$bio = get_post_meta( $post_id, 'doctor_bio', true );
-	if ( $bio ) {
-		$pieces[] = '<section class="yoast-doctor-bio"><h2>Doctor Bio</h2>' . wpautop( wp_kses_post( $bio ) ) . '</section>';
+	$bio = get_post_meta($post_id, 'doctor_bio', true);
+	if ($bio) {
+		$pieces[] = '<section class="yoast-doctor-bio"><h2>Doctor Bio</h2>' . wpautop(wp_kses_post($bio)) . '</section>';
 	}
 
-	$clinic_ids = (array) get_post_meta( $post_id, 'clinic_id', true );
-	if ( $clinic_ids ) {
+	$clinic_ids = (array) get_post_meta($post_id, 'clinic_id', true);
+	if ($clinic_ids) {
 		$links = array();
-		foreach ( $clinic_ids as $clinic_id ) {
-			$clinic_title = get_the_title( $clinic_id );
-			if ( $clinic_title ) {
-				$links[] = '<li><a href="' . esc_url( get_permalink( $clinic_id ) ) . '">' . esc_html( $clinic_title ) . '</a></li>';
+		foreach ($clinic_ids as $clinic_id) {
+			$clinic_title = get_the_title($clinic_id);
+			if ($clinic_title) {
+				$links[] = '<li><a href="' . esc_url(get_permalink($clinic_id)) . '">' . esc_html($clinic_title) . '</a></li>';
 			}
 		}
 
-		if ( $links ) {
-			$pieces[] = '<section class="yoast-doctor-clinics"><h2>Practice Locations</h2><ul>' . implode( '', $links ) . '</ul></section>';
+		if ($links) {
+			$pieces[] = '<section class="yoast-doctor-clinics"><h2>Practice Locations</h2><ul>' . implode('', $links) . '</ul></section>';
 		}
 	}
 
 	return $pieces;
 }
 
-if ( ! function_exists( 'global360_output_schema' ) ) {
+if (! function_exists('global360_output_schema')) {
 	/**
 	 * Output JSON-LD structured data for single Clinic and Doctor pages.
 	 */
-	function global360_output_schema() {
-		if ( is_admin() ) {
+	function global360_output_schema()
+	{
+		if (is_admin()) {
 			return;
 		}
 
-		$is_clinic = is_singular( 'clinic' ) || is_singular( 'clinics' );
-		$is_doctor = is_singular( 'doctor' ) || is_singular( 'doctors' );
-		if ( ! $is_clinic && ! $is_doctor ) {
+		$is_clinic = is_singular('clinic') || is_singular('clinics');
+		$is_doctor = is_singular('doctor') || is_singular('doctors');
+		if (! $is_clinic && ! $is_doctor) {
 			return;
 		}
 
 		$post_id = get_queried_object_id();
-		if ( ! $post_id ) {
+		if (! $post_id) {
 			return;
 		}
 
-		$get_acf_or_meta = static function( $key, $id ) {
-			if ( function_exists( 'get_field' ) ) {
-				$acf_value = get_field( $key, $id );
-				if ( ! empty( $acf_value ) ) {
+		$get_acf_or_meta = static function ($key, $id) {
+			if (function_exists('get_field')) {
+				$acf_value = get_field($key, $id);
+				if (! empty($acf_value)) {
 					return $acf_value;
 				}
 			}
-			return get_post_meta( $id, $key, true );
+			return get_post_meta($id, $key, true);
 		};
 
-		$clean_text = static function( $value ) {
-			if ( is_array( $value ) || is_object( $value ) ) {
+		$clean_text = static function ($value) {
+			if (is_array($value) || is_object($value)) {
 				return '';
 			}
-			return sanitize_text_field( wp_strip_all_tags( (string) $value ) );
+			return sanitize_text_field(wp_strip_all_tags((string) $value));
 		};
 
-		$clean_phone = static function( $value ) use ( $clean_text ) {
-			$value = $clean_text( $value );
-			if ( '' === $value ) {
+		$clean_phone = static function ($value) use ($clean_text) {
+			$value = $clean_text($value);
+			if ('' === $value) {
 				return '';
 			}
-			return preg_replace( '/[^\d\+\-\(\)\s\.]/', '', $value );
+			return preg_replace('/[^\d\+\-\(\)\s\.]/', '', $value);
 		};
 
-		$first_non_empty = static function( array $values ) {
-			foreach ( $values as $value ) {
-				if ( is_string( $value ) ) {
-					$value = trim( $value );
+		$first_non_empty = static function (array $values) {
+			foreach ($values as $value) {
+				if (is_string($value)) {
+					$value = trim($value);
 				}
-				if ( ! empty( $value ) ) {
+				if (! empty($value)) {
 					return $value;
 				}
 			}
 			return '';
 		};
 
-		$split_csv = static function( $value ) use ( $clean_text ) {
-			if ( is_array( $value ) ) {
+		$split_csv = static function ($value) use ($clean_text) {
+			if (is_array($value)) {
 				$items = $value;
 			} else {
-				$items = explode( ',', (string) $value );
+				$items = explode(',', (string) $value);
 			}
 
 			$out = array();
-			foreach ( $items as $item ) {
-				$item = $clean_text( $item );
-				if ( '' !== $item ) {
+			foreach ($items as $item) {
+				$item = $clean_text($item);
+				if ('' !== $item) {
 					$out[] = $item;
 				}
 			}
@@ -2225,17 +2281,17 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 			return $out;
 		};
 
-		$normalize_medical_specialty = static function( $value ) use ( $clean_text ) {
-			$value = $clean_text( $value );
-			if ( '' === $value ) {
+		$normalize_medical_specialty = static function ($value) use ($clean_text) {
+			$value = $clean_text($value);
+			if ('' === $value) {
 				return '';
 			}
 
-			if ( 'http://schema.org/PainManagement' === $value ) {
+			if ('http://schema.org/PainManagement' === $value) {
 				$value = 'http://schema.org/Neurologic';
 			}
 
-			if ( 'http://schema.org/Orthopedic' === $value ) {
+			if ('http://schema.org/Orthopedic' === $value) {
 				$value = 'http://schema.org/Musculoskeletal';
 			}
 
@@ -2283,31 +2339,31 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 				'http://schema.org/Urologic',
 			);
 
-			return in_array( $value, $allowed, true ) ? $value : '';
+			return in_array($value, $allowed, true) ? $value : '';
 		};
 
-		$get_global_schema_settings = static function() use ( $clean_text ) {
-			$opts = get_option( '360_global_settings', array() );
-			if ( ! is_array( $opts ) ) {
+		$get_global_schema_settings = static function () use ($clean_text) {
+			$opts = get_option('360_global_settings', array());
+			if (! is_array($opts)) {
 				$opts = array();
 			}
 
 			return array(
-				'medical_specialty'  => $clean_text( $opts['medical_specialty'] ?? '' ),
-				'primary_condition'  => $clean_text( $opts['primary_condition'] ?? '' ),
-				'related_conditions' => $clean_text( $opts['related_conditions'] ?? '' ),
-				'primary_treatment'  => $clean_text( $opts['primary_treatment'] ?? '' ),
-				'related_treatments' => $clean_text( $opts['related_treatments'] ?? '' ),
-				'social_links'       => isset( $opts['social_links'] ) && is_array( $opts['social_links'] ) ? $opts['social_links'] : array(),
+				'medical_specialty'  => $clean_text($opts['medical_specialty'] ?? ''),
+				'primary_condition'  => $clean_text($opts['primary_condition'] ?? ''),
+				'related_conditions' => $clean_text($opts['related_conditions'] ?? ''),
+				'primary_treatment'  => $clean_text($opts['primary_treatment'] ?? ''),
+				'related_treatments' => $clean_text($opts['related_treatments'] ?? ''),
+				'social_links'       => isset($opts['social_links']) && is_array($opts['social_links']) ? $opts['social_links'] : array(),
 			);
 		};
 
-		$get_linkedin_url = static function( array $global_schema ) use ( $clean_text ) {
-			if ( ! empty( $global_schema['social_links'] ) && is_array( $global_schema['social_links'] ) ) {
-				foreach ( $global_schema['social_links'] as $row ) {
-					$platform = strtolower( $clean_text( $row['platform'] ?? '' ) );
-					$url = isset( $row['url'] ) ? esc_url_raw( $row['url'] ) : '';
-					if ( 'linkedin' === $platform && ! empty( $url ) ) {
+		$get_linkedin_url = static function (array $global_schema) use ($clean_text) {
+			if (! empty($global_schema['social_links']) && is_array($global_schema['social_links'])) {
+				foreach ($global_schema['social_links'] as $row) {
+					$platform = strtolower($clean_text($row['platform'] ?? ''));
+					$url = isset($row['url']) ? esc_url_raw($row['url']) : '';
+					if ('linkedin' === $platform && ! empty($url)) {
 						return $url;
 					}
 				}
@@ -2316,31 +2372,31 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 			return '';
 		};
 
-		$normalize_country = static function( $country, $state = '', $city = '', $postal = '' ) use ( $clean_text ) {
-			$country = strtoupper( $clean_text( $country ) );
-			if ( in_array( $country, array( 'USA', 'U.S.A', 'UNITED STATES', 'UNITED STATES OF AMERICA' ), true ) ) {
+		$normalize_country = static function ($country, $state = '', $city = '', $postal = '') use ($clean_text) {
+			$country = strtoupper($clean_text($country));
+			if (in_array($country, array('USA', 'U.S.A', 'UNITED STATES', 'UNITED STATES OF AMERICA'), true)) {
 				$country = 'US';
 			}
-			if ( '' === $country && ( '' !== $clean_text( $state ) || '' !== $clean_text( $city ) || '' !== $clean_text( $postal ) ) ) {
+			if ('' === $country && ('' !== $clean_text($state) || '' !== $clean_text($city) || '' !== $clean_text($postal))) {
 				$country = 'US';
 			}
 			return $country;
 		};
 
-		$parse_address_string = static function( $full_address ) use ( $clean_text ) {
-			$full_address = $clean_text( $full_address );
-			if ( '' === $full_address ) {
+		$parse_address_string = static function ($full_address) use ($clean_text) {
+			$full_address = $clean_text($full_address);
+			if ('' === $full_address) {
 				return array();
 			}
 
 			$parts = array();
-			if ( preg_match( '/^\s*(.+?),\s*([^,]+),\s*([A-Za-z]{2})\s+(\d{5}(?:-\d{4})?)\s*(?:,\s*([A-Za-z\.\s]+))?\s*$/', $full_address, $matches ) ) {
+			if (preg_match('/^\s*(.+?),\s*([^,]+),\s*([A-Za-z]{2})\s+(\d{5}(?:-\d{4})?)\s*(?:,\s*([A-Za-z\.\s]+))?\s*$/', $full_address, $matches)) {
 				$parts = array(
-					'streetAddress'   => $clean_text( $matches[1] ),
-					'addressLocality' => $clean_text( $matches[2] ),
-					'addressRegion'   => strtoupper( $clean_text( $matches[3] ) ),
-					'postalCode'      => $clean_text( $matches[4] ),
-					'addressCountry'  => isset( $matches[5] ) ? $clean_text( $matches[5] ) : '',
+					'streetAddress'   => $clean_text($matches[1]),
+					'addressLocality' => $clean_text($matches[2]),
+					'addressRegion'   => strtoupper($clean_text($matches[3])),
+					'postalCode'      => $clean_text($matches[4]),
+					'addressCountry'  => isset($matches[5]) ? $clean_text($matches[5]) : '',
 				);
 			} else {
 				$parts = array(
@@ -2351,90 +2407,90 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 			return $parts;
 		};
 
-		$build_postal_address = static function( array $parts ) use ( $clean_text, $normalize_country ) {
-			$street = $clean_text( $parts['streetAddress'] ?? '' );
-			$city = $clean_text( $parts['addressLocality'] ?? '' );
-			$state = strtoupper( $clean_text( $parts['addressRegion'] ?? '' ) );
-			$postal = $clean_text( $parts['postalCode'] ?? '' );
-			$country = $normalize_country( $parts['addressCountry'] ?? '', $state, $city, $postal );
+		$build_postal_address = static function (array $parts) use ($clean_text, $normalize_country) {
+			$street = $clean_text($parts['streetAddress'] ?? '');
+			$city = $clean_text($parts['addressLocality'] ?? '');
+			$state = strtoupper($clean_text($parts['addressRegion'] ?? ''));
+			$postal = $clean_text($parts['postalCode'] ?? '');
+			$country = $normalize_country($parts['addressCountry'] ?? '', $state, $city, $postal);
 
-			$address = array( '@type' => 'PostalAddress' );
-			if ( '' !== $street ) {
+			$address = array('@type' => 'PostalAddress');
+			if ('' !== $street) {
 				$address['streetAddress'] = $street;
 			}
-			if ( '' !== $city ) {
+			if ('' !== $city) {
 				$address['addressLocality'] = $city;
 			}
-			if ( '' !== $state ) {
+			if ('' !== $state) {
 				$address['addressRegion'] = $state;
 			}
-			if ( '' !== $postal ) {
+			if ('' !== $postal) {
 				$address['postalCode'] = $postal;
 			}
-			if ( '' !== $country ) {
+			if ('' !== $country) {
 				$address['addressCountry'] = $country;
 			}
 
-			if ( count( $address ) <= 1 ) {
+			if (count($address) <= 1) {
 				return array();
 			}
 
 			return $address;
 		};
 
-		$get_clinic_phone = static function( $clinic_id ) use ( $first_non_empty, $clean_phone, $get_acf_or_meta ) {
-			return $first_non_empty( array(
-				$clean_phone( $get_acf_or_meta( 'clinic_phone', $clinic_id ) ),
-				$clean_phone( $get_acf_or_meta( 'phone', $clinic_id ) ),
-				$clean_phone( get_post_meta( $clinic_id, '_cpt360_clinic_phone', true ) ),
-				$clean_phone( get_post_meta( $clinic_id, 'clinic_phone', true ) ),
-			) );
+		$get_clinic_phone = static function ($clinic_id) use ($first_non_empty, $clean_phone, $get_acf_or_meta) {
+			return $first_non_empty(array(
+				$clean_phone($get_acf_or_meta('clinic_phone', $clinic_id)),
+				$clean_phone($get_acf_or_meta('phone', $clinic_id)),
+				$clean_phone(get_post_meta($clinic_id, '_cpt360_clinic_phone', true)),
+				$clean_phone(get_post_meta($clinic_id, 'clinic_phone', true)),
+			));
 		};
 
-		$get_clinic_image = static function( $clinic_id ) {
-			if ( function_exists( 'cpt360_get_clinic_logo_url' ) ) {
-				$logo_url = cpt360_get_clinic_logo_url( $clinic_id );
-				if ( $logo_url ) {
-					return esc_url_raw( $logo_url );
+		$get_clinic_image = static function ($clinic_id) {
+			if (function_exists('cpt360_get_clinic_logo_url')) {
+				$logo_url = cpt360_get_clinic_logo_url($clinic_id);
+				if ($logo_url) {
+					return esc_url_raw($logo_url);
 				}
 			}
 
-			$logo_id = get_post_meta( $clinic_id, '_clinic_logo_id', true );
-			if ( $logo_id ) {
-				$logo_url = wp_get_attachment_image_url( intval( $logo_id ), 'full' );
-				if ( $logo_url ) {
-					return esc_url_raw( $logo_url );
+			$logo_id = get_post_meta($clinic_id, '_clinic_logo_id', true);
+			if ($logo_id) {
+				$logo_url = wp_get_attachment_image_url(intval($logo_id), 'full');
+				if ($logo_url) {
+					return esc_url_raw($logo_url);
 				}
 			}
 
-			$thumb_url = get_the_post_thumbnail_url( $clinic_id, 'full' );
-			return $thumb_url ? esc_url_raw( $thumb_url ) : '';
+			$thumb_url = get_the_post_thumbnail_url($clinic_id, 'full');
+			return $thumb_url ? esc_url_raw($thumb_url) : '';
 		};
 
-		$get_doctor_image = static function( $doctor_id ) use ( $clean_text ) {
-			$thumb_url = get_the_post_thumbnail_url( $doctor_id, 'full' );
-			if ( $thumb_url ) {
-				return esc_url_raw( $thumb_url );
+		$get_doctor_image = static function ($doctor_id) use ($clean_text) {
+			$thumb_url = get_the_post_thumbnail_url($doctor_id, 'full');
+			if ($thumb_url) {
+				return esc_url_raw($thumb_url);
 			}
 
-			$photo_id = get_post_meta( $doctor_id, '_doctor_photo_id', true );
-			if ( $photo_id ) {
-				$image_url = wp_get_attachment_image_url( intval( $photo_id ), 'full' );
-				if ( $image_url ) {
-					return esc_url_raw( $image_url );
+			$photo_id = get_post_meta($doctor_id, '_doctor_photo_id', true);
+			if ($photo_id) {
+				$image_url = wp_get_attachment_image_url(intval($photo_id), 'full');
+				if ($image_url) {
+					return esc_url_raw($image_url);
 				}
 			}
 
-			$slug = $clean_text( get_post_field( 'post_name', $doctor_id ) );
-			if ( $slug ) {
+			$slug = $clean_text(get_post_field('post_name', $doctor_id));
+			if ($slug) {
 				$base_path = get_template_directory() . '/assets/doctor-images/';
 				$base_url  = get_template_directory_uri() . '/assets/doctor-images/';
-				$extensions = array( 'jpg', 'jpeg', 'png', 'webp', 'gif', 'avif' );
+				$extensions = array('jpg', 'jpeg', 'png', 'webp', 'gif', 'avif');
 
-				foreach ( $extensions as $ext ) {
+				foreach ($extensions as $ext) {
 					$file_path = $base_path . $slug . '.' . $ext;
-					if ( file_exists( $file_path ) ) {
-						return esc_url_raw( $base_url . $slug . '.' . $ext );
+					if (file_exists($file_path)) {
+						return esc_url_raw($base_url . $slug . '.' . $ext);
 					}
 				}
 			}
@@ -2442,201 +2498,201 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 			return '';
 		};
 
-		$get_clinic_address_objects = static function( $clinic_id ) use ( $get_acf_or_meta, $first_non_empty, $clean_text, $parse_address_string, $build_postal_address ) {
+		$get_clinic_address_objects = static function ($clinic_id) use ($get_acf_or_meta, $first_non_empty, $clean_text, $parse_address_string, $build_postal_address) {
 			$addresses = array();
 
 			$structured_parts = array(
-				'streetAddress'   => $first_non_empty( array(
-					$clean_text( $get_acf_or_meta( 'clinic_street', $clinic_id ) ),
-					$clean_text( $get_acf_or_meta( 'clinic_street_address', $clinic_id ) ),
-					$clean_text( $get_acf_or_meta( 'streetAddress', $clinic_id ) ),
-					$clean_text( $get_acf_or_meta( 'address', $clinic_id ) ),
-				) ),
-				'addressLocality' => $first_non_empty( array(
-					$clean_text( $get_acf_or_meta( 'clinic_city', $clinic_id ) ),
-					$clean_text( $get_acf_or_meta( 'city', $clinic_id ) ),
-				) ),
-				'addressRegion'   => $first_non_empty( array(
-					$clean_text( $get_acf_or_meta( 'clinic_state', $clinic_id ) ),
-					$clean_text( $get_acf_or_meta( 'state', $clinic_id ) ),
-				) ),
-				'postalCode'      => $first_non_empty( array(
-					$clean_text( $get_acf_or_meta( 'clinic_zip', $clinic_id ) ),
-					$clean_text( $get_acf_or_meta( 'postal_code', $clinic_id ) ),
-					$clean_text( $get_acf_or_meta( 'zip', $clinic_id ) ),
-				) ),
-				'addressCountry'  => $first_non_empty( array(
-					$clean_text( $get_acf_or_meta( 'clinic_country', $clinic_id ) ),
-					$clean_text( $get_acf_or_meta( 'country', $clinic_id ) ),
-				) ),
+				'streetAddress'   => $first_non_empty(array(
+					$clean_text($get_acf_or_meta('clinic_street', $clinic_id)),
+					$clean_text($get_acf_or_meta('clinic_street_address', $clinic_id)),
+					$clean_text($get_acf_or_meta('streetAddress', $clinic_id)),
+					$clean_text($get_acf_or_meta('address', $clinic_id)),
+				)),
+				'addressLocality' => $first_non_empty(array(
+					$clean_text($get_acf_or_meta('clinic_city', $clinic_id)),
+					$clean_text($get_acf_or_meta('city', $clinic_id)),
+				)),
+				'addressRegion'   => $first_non_empty(array(
+					$clean_text($get_acf_or_meta('clinic_state', $clinic_id)),
+					$clean_text($get_acf_or_meta('state', $clinic_id)),
+				)),
+				'postalCode'      => $first_non_empty(array(
+					$clean_text($get_acf_or_meta('clinic_zip', $clinic_id)),
+					$clean_text($get_acf_or_meta('postal_code', $clinic_id)),
+					$clean_text($get_acf_or_meta('zip', $clinic_id)),
+				)),
+				'addressCountry'  => $first_non_empty(array(
+					$clean_text($get_acf_or_meta('clinic_country', $clinic_id)),
+					$clean_text($get_acf_or_meta('country', $clinic_id)),
+				)),
 			);
 
-			$structured_address = $build_postal_address( $structured_parts );
-			if ( $structured_address ) {
+			$structured_address = $build_postal_address($structured_parts);
+			if ($structured_address) {
 				$addresses[] = $structured_address;
 			}
 
-			$stored_addresses = get_post_meta( $clinic_id, 'clinic_addresses', true );
-			if ( is_array( $stored_addresses ) ) {
-				foreach ( $stored_addresses as $row ) {
-					if ( is_array( $row ) ) {
+			$stored_addresses = get_post_meta($clinic_id, 'clinic_addresses', true);
+			if (is_array($stored_addresses)) {
+				foreach ($stored_addresses as $row) {
+					if (is_array($row)) {
 						$parts = array(
-							'streetAddress'   => $row['street'] ?? ( $row['address'] ?? '' ),
+							'streetAddress'   => $row['street'] ?? ($row['address'] ?? ''),
 							'addressLocality' => $row['city'] ?? '',
 							'addressRegion'   => $row['state'] ?? '',
-							'postalCode'      => $row['zip'] ?? ( $row['postal_code'] ?? '' ),
+							'postalCode'      => $row['zip'] ?? ($row['postal_code'] ?? ''),
 							'addressCountry'  => $row['country'] ?? '',
 						);
-						$address_obj = $build_postal_address( $parts );
-						if ( $address_obj ) {
+						$address_obj = $build_postal_address($parts);
+						if ($address_obj) {
 							$addresses[] = $address_obj;
 						}
-					} elseif ( is_string( $row ) ) {
-						$address_obj = $build_postal_address( $parse_address_string( $row ) );
-						if ( $address_obj ) {
+					} elseif (is_string($row)) {
+						$address_obj = $build_postal_address($parse_address_string($row));
+						if ($address_obj) {
 							$addresses[] = $address_obj;
 						}
 					}
 				}
 			}
 
-			if ( empty( $addresses ) ) {
-				$fallback_full = $first_non_empty( array(
-					$clean_text( get_post_meta( $clinic_id, 'address', true ) ),
-					$clean_text( $get_acf_or_meta( 'address', $clinic_id ) ),
-				) );
-				if ( $fallback_full ) {
-					$address_obj = $build_postal_address( $parse_address_string( $fallback_full ) );
-					if ( $address_obj ) {
+			if (empty($addresses)) {
+				$fallback_full = $first_non_empty(array(
+					$clean_text(get_post_meta($clinic_id, 'address', true)),
+					$clean_text($get_acf_or_meta('address', $clinic_id)),
+				));
+				if ($fallback_full) {
+					$address_obj = $build_postal_address($parse_address_string($fallback_full));
+					if ($address_obj) {
 						$addresses[] = $address_obj;
 					}
 				}
 			}
 
 			$unique = array();
-			foreach ( $addresses as $address_obj ) {
-				$unique[ wp_json_encode( $address_obj ) ] = $address_obj;
+			foreach ($addresses as $address_obj) {
+				$unique[wp_json_encode($address_obj)] = $address_obj;
 			}
 
-			return array_values( $unique );
+			return array_values($unique);
 		};
 
 		$global_schema = $get_global_schema_settings();
-		$linkedin_url = $get_linkedin_url( $global_schema );
+		$linkedin_url = $get_linkedin_url($global_schema);
 
 		$schema = array(
 			'@context' => 'https://schema.org',
 		);
 
-		$post_url = get_permalink( $post_id );
-		$post_url = $post_url ? esc_url_raw( $post_url ) : '';
+		$post_url = get_permalink($post_id);
+		$post_url = $post_url ? esc_url_raw($post_url) : '';
 
-		if ( $is_clinic ) {
-			$name = $clean_text( get_the_title( $post_id ) );
-			$phone = $get_clinic_phone( $post_id );
-			$image = $get_clinic_image( $post_id );
-			$addresses = $get_clinic_address_objects( $post_id );
-			$primary_address = ! empty( $addresses ) ? $addresses[0] : array();
+		if ($is_clinic) {
+			$name = $clean_text(get_the_title($post_id));
+			$phone = $get_clinic_phone($post_id);
+			$image = $get_clinic_image($post_id);
+			$addresses = $get_clinic_address_objects($post_id);
+			$primary_address = ! empty($addresses) ? $addresses[0] : array();
 
 			$schema['@type'] = 'MedicalClinic';
-			if ( $post_url ) {
+			if ($post_url) {
 				$schema['@id'] = $post_url . '#medicalclinic';
 				$schema['url'] = $post_url;
 			}
-			if ( $name ) {
+			if ($name) {
 				$schema['name'] = $name;
 			}
-			if ( $phone ) {
+			if ($phone) {
 				$schema['telephone'] = $phone;
 			}
-			if ( $image ) {
+			if ($image) {
 				$schema['image'] = $image;
 			}
-			if ( $linkedin_url ) {
-				$schema['sameAs'] = array( $linkedin_url );
+			if ($linkedin_url) {
+				$schema['sameAs'] = array($linkedin_url);
 			}
-			if ( $primary_address ) {
+			if ($primary_address) {
 				$schema['address'] = $primary_address;
 			}
 
 			$clinic_knows_about = array();
-			if ( ! empty( $global_schema['primary_condition'] ) ) {
+			if (! empty($global_schema['primary_condition'])) {
 				$clinic_knows_about[] = $global_schema['primary_condition'];
 			}
-			if ( ! empty( $global_schema['primary_treatment'] ) ) {
+			if (! empty($global_schema['primary_treatment'])) {
 				$clinic_knows_about[] = $global_schema['primary_treatment'];
 			}
-			$clinic_knows_about = array_values( array_unique( array_filter( $clinic_knows_about ) ) );
-			if ( ! empty( $clinic_knows_about ) ) {
+			$clinic_knows_about = array_values(array_unique(array_filter($clinic_knows_about)));
+			if (! empty($clinic_knows_about)) {
 				$schema['knowsAbout'] = $clinic_knows_about;
 			}
 		}
 
-		if ( $is_doctor ) {
-			$name = $first_non_empty( array(
-				$clean_text( get_post_meta( $post_id, 'doctor_name', true ) ),
-				$clean_text( get_the_title( $post_id ) ),
-			) );
+		if ($is_doctor) {
+			$name = $first_non_empty(array(
+				$clean_text(get_post_meta($post_id, 'doctor_name', true)),
+				$clean_text(get_the_title($post_id)),
+			));
 
-			$doctor_phone = $first_non_empty( array(
-				$clean_phone( $get_acf_or_meta( 'doctor_phone', $post_id ) ),
-				$clean_phone( $get_acf_or_meta( 'physician_phone', $post_id ) ),
-				$clean_phone( get_post_meta( $post_id, 'doctor_phone', true ) ),
-			) );
+			$doctor_phone = $first_non_empty(array(
+				$clean_phone($get_acf_or_meta('doctor_phone', $post_id)),
+				$clean_phone($get_acf_or_meta('physician_phone', $post_id)),
+				$clean_phone(get_post_meta($post_id, 'doctor_phone', true)),
+			));
 
-			$specialty = $first_non_empty( array(
-				$normalize_medical_specialty( $global_schema['medical_specialty'] ?? '' ),
-				$normalize_medical_specialty( $get_acf_or_meta( 'specialty', $post_id ) ),
-				$normalize_medical_specialty( $get_acf_or_meta( 'doctor_specialty', $post_id ) ),
-				$normalize_medical_specialty( get_post_meta( $post_id, 'specialty', true ) ),
-			) );
+			$specialty = $first_non_empty(array(
+				$normalize_medical_specialty($global_schema['medical_specialty'] ?? ''),
+				$normalize_medical_specialty($get_acf_or_meta('specialty', $post_id)),
+				$normalize_medical_specialty($get_acf_or_meta('doctor_specialty', $post_id)),
+				$normalize_medical_specialty(get_post_meta($post_id, 'specialty', true)),
+			));
 
-			$clinic_ids = (array) get_post_meta( $post_id, 'clinic_id', true );
-			if ( empty( $clinic_ids ) && function_exists( 'get_field' ) ) {
-				$acf_clinics = get_field( 'clinic', $post_id );
-				if ( empty( $acf_clinics ) ) {
-					$acf_clinics = get_field( 'clinic_id', $post_id );
+			$clinic_ids = (array) get_post_meta($post_id, 'clinic_id', true);
+			if (empty($clinic_ids) && function_exists('get_field')) {
+				$acf_clinics = get_field('clinic', $post_id);
+				if (empty($acf_clinics)) {
+					$acf_clinics = get_field('clinic_id', $post_id);
 				}
 
-				if ( $acf_clinics instanceof WP_Post ) {
-					$clinic_ids = array( $acf_clinics->ID );
-				} elseif ( is_array( $acf_clinics ) ) {
+				if ($acf_clinics instanceof WP_Post) {
+					$clinic_ids = array($acf_clinics->ID);
+				} elseif (is_array($acf_clinics)) {
 					$clinic_ids = array();
-					foreach ( $acf_clinics as $item ) {
-						if ( $item instanceof WP_Post ) {
+					foreach ($acf_clinics as $item) {
+						if ($item instanceof WP_Post) {
 							$clinic_ids[] = $item->ID;
-						} elseif ( is_numeric( $item ) ) {
-							$clinic_ids[] = intval( $item );
+						} elseif (is_numeric($item)) {
+							$clinic_ids[] = intval($item);
 						}
 					}
-				} elseif ( is_numeric( $acf_clinics ) ) {
-					$clinic_ids = array( intval( $acf_clinics ) );
+				} elseif (is_numeric($acf_clinics)) {
+					$clinic_ids = array(intval($acf_clinics));
 				}
 			}
 
-			$clinic_ids = array_values( array_filter( array_map( 'intval', $clinic_ids ) ) );
+			$clinic_ids = array_values(array_filter(array_map('intval', $clinic_ids)));
 			$works_for = array();
 			$primary_clinic_id = 0;
 			$clinic_fallback_phone = '';
 			$doctor_address = array();
 
-			if ( ! empty( $clinic_ids ) ) {
-				foreach ( $clinic_ids as $clinic_id ) {
-					if ( 'clinic' !== get_post_type( $clinic_id ) ) {
+			if (! empty($clinic_ids)) {
+				foreach ($clinic_ids as $clinic_id) {
+					if ('clinic' !== get_post_type($clinic_id)) {
 						continue;
 					}
 
-					if ( 0 === $primary_clinic_id ) {
+					if (0 === $primary_clinic_id) {
 						$primary_clinic_id = $clinic_id;
 					}
 
-					if ( '' === $clinic_fallback_phone ) {
-						$clinic_fallback_phone = $get_clinic_phone( $clinic_id );
+					if ('' === $clinic_fallback_phone) {
+						$clinic_fallback_phone = $get_clinic_phone($clinic_id);
 					}
 
-					$clinic_url = esc_url_raw( get_permalink( $clinic_id ) );
-					$clinic_name = $clean_text( get_the_title( $clinic_id ) );
-					if ( ! $clinic_name ) {
+					$clinic_url = esc_url_raw(get_permalink($clinic_id));
+					$clinic_name = $clean_text(get_the_title($clinic_id));
+					if (! $clinic_name) {
 						continue;
 					}
 
@@ -2645,7 +2701,7 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 						'name'  => $clinic_name,
 					);
 
-					if ( $clinic_url ) {
+					if ($clinic_url) {
 						$clinic_obj['@id'] = $clinic_url . '#medicalclinic';
 						$clinic_obj['url'] = $clinic_url;
 					}
@@ -2653,9 +2709,9 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 					$works_for[] = $clinic_obj;
 				}
 
-				if ( $primary_clinic_id ) {
-					$clinic_addresses = $get_clinic_address_objects( $primary_clinic_id );
-					if ( ! empty( $clinic_addresses ) ) {
+				if ($primary_clinic_id) {
+					$clinic_addresses = $get_clinic_address_objects($primary_clinic_id);
+					if (! empty($clinic_addresses)) {
 						// Primary address now; can be extended to output array later.
 						$doctor_address = $clinic_addresses[0];
 					}
@@ -2664,53 +2720,53 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 
 			$phone = $doctor_phone ? $doctor_phone : $clinic_fallback_phone;
 
-			$schema['@type'] = array( 'Person', 'Physician' );
-			if ( $post_url ) {
+			$schema['@type'] = array('Person', 'Physician');
+			if ($post_url) {
 				$schema['@id'] = $post_url . '#physician';
 				$schema['url'] = $post_url;
 			}
-			if ( $name ) {
+			if ($name) {
 				$schema['name'] = $name;
 			}
-			$image = $get_doctor_image( $post_id );
-			if ( $image ) {
+			$image = $get_doctor_image($post_id);
+			if ($image) {
 				$schema['image'] = $image;
 			}
-			if ( $phone ) {
+			if ($phone) {
 				$schema['telephone'] = $phone;
 			}
-			if ( $specialty ) {
+			if ($specialty) {
 				$schema['medicalSpecialty'] = $specialty;
 			}
 
 			$doctor_knows_about = array();
-			if ( ! empty( $global_schema['primary_condition'] ) ) {
+			if (! empty($global_schema['primary_condition'])) {
 				$doctor_knows_about[] = $global_schema['primary_condition'];
 			}
-			$doctor_knows_about = array_merge( $doctor_knows_about, $split_csv( $global_schema['related_conditions'] ?? '' ) );
-			if ( ! empty( $global_schema['primary_treatment'] ) ) {
+			$doctor_knows_about = array_merge($doctor_knows_about, $split_csv($global_schema['related_conditions'] ?? ''));
+			if (! empty($global_schema['primary_treatment'])) {
 				$doctor_knows_about[] = $global_schema['primary_treatment'];
 			}
-			$doctor_knows_about = array_merge( $doctor_knows_about, $split_csv( $global_schema['related_treatments'] ?? '' ) );
-			$doctor_knows_about = array_values( array_unique( array_filter( $doctor_knows_about ) ) );
-			if ( ! empty( $doctor_knows_about ) ) {
+			$doctor_knows_about = array_merge($doctor_knows_about, $split_csv($global_schema['related_treatments'] ?? ''));
+			$doctor_knows_about = array_values(array_unique(array_filter($doctor_knows_about)));
+			if (! empty($doctor_knows_about)) {
 				$schema['knowsAbout'] = $doctor_knows_about;
 			}
 
-			if ( ! empty( $works_for ) ) {
-				$schema['worksFor'] = count( $works_for ) === 1 ? $works_for[0] : $works_for;
+			if (! empty($works_for)) {
+				$schema['worksFor'] = count($works_for) === 1 ? $works_for[0] : $works_for;
 			}
-			if ( ! empty( $doctor_address ) ) {
+			if (! empty($doctor_address)) {
 				$schema['address'] = $doctor_address;
 			}
 		}
 
-		if ( empty( $schema['@type'] ) ) {
+		if (empty($schema['@type'])) {
 			return;
 		}
 
-		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-		if ( ! $json ) {
+		$json = wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		if (! $json) {
 			return;
 		}
 
@@ -2720,32 +2776,33 @@ if ( ! function_exists( 'global360_output_schema' ) ) {
 	}
 }
 
-add_action( 'wp_head', 'global360_output_schema', 99 );
+add_action('wp_head', 'global360_output_schema', 99);
 
-if ( ! function_exists( 'global360_output_find_a_doctor_itemlist_schema' ) ) {
+if (! function_exists('global360_output_find_a_doctor_itemlist_schema')) {
 	/**
 	 * Output ItemList schema for the Find a Doctor directory page.
 	 */
-	function global360_output_find_a_doctor_itemlist_schema() {
-		if ( is_admin() || ! is_page( 'find-a-doctor' ) ) {
+	function global360_output_find_a_doctor_itemlist_schema()
+	{
+		if (is_admin() || ! is_page('find-a-doctor')) {
 			return;
 		}
 
 		$post_types = array();
-		if ( post_type_exists( 'doctors' ) ) {
+		if (post_type_exists('doctors')) {
 			$post_types[] = 'doctors';
 		}
-		if ( post_type_exists( 'doctor' ) ) {
+		if (post_type_exists('doctor')) {
 			$post_types[] = 'doctor';
 		}
 
-		if ( empty( $post_types ) ) {
+		if (empty($post_types)) {
 			return;
 		}
 
 		$doctors = new WP_Query(
 			array(
-				'post_type'      => count( $post_types ) === 1 ? $post_types[0] : $post_types,
+				'post_type'      => count($post_types) === 1 ? $post_types[0] : $post_types,
 				'post_status'    => 'publish',
 				'posts_per_page' => -1,
 				'fields'         => 'ids',
@@ -2753,28 +2810,28 @@ if ( ! function_exists( 'global360_output_find_a_doctor_itemlist_schema' ) ) {
 			)
 		);
 
-		if ( empty( $doctors->posts ) ) {
+		if (empty($doctors->posts)) {
 			return;
 		}
 
 		$item_list = array();
 		$position = 1;
 
-		foreach ( $doctors->posts as $doctor_id ) {
-			$url = get_permalink( $doctor_id );
-			if ( ! $url ) {
+		foreach ($doctors->posts as $doctor_id) {
+			$url = get_permalink($doctor_id);
+			if (! $url) {
 				continue;
 			}
 
 			$item_list[] = array(
 				'@type'    => 'ListItem',
 				'position' => $position,
-				'url'      => esc_url_raw( $url ),
+				'url'      => esc_url_raw($url),
 			);
 			$position++;
 		}
 
-		if ( empty( $item_list ) ) {
+		if (empty($item_list)) {
 			return;
 		}
 
@@ -2786,8 +2843,8 @@ if ( ! function_exists( 'global360_output_find_a_doctor_itemlist_schema' ) ) {
 			'itemListElement'  => $item_list,
 		);
 
-		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-		if ( ! $json ) {
+		$json = wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		if (! $json) {
 			return;
 		}
 
@@ -2797,33 +2854,34 @@ if ( ! function_exists( 'global360_output_find_a_doctor_itemlist_schema' ) ) {
 	}
 }
 
-add_action( 'wp_head', 'global360_output_find_a_doctor_itemlist_schema', 100 );
+add_action('wp_head', 'global360_output_find_a_doctor_itemlist_schema', 100);
 
-if ( ! function_exists( 'global360_output_find_a_doctor_state_schema' ) ) {
+if (! function_exists('global360_output_find_a_doctor_state_schema')) {
 	/**
 	 * Output BreadcrumbList and ItemList schema for dynamic state directory pages.
 	 */
-	function global360_output_find_a_doctor_state_schema() {
-		if ( is_admin() ) {
+	function global360_output_find_a_doctor_state_schema()
+	{
+		if (is_admin()) {
 			return;
 		}
 
-		$state_slug = sanitize_title( strtolower( (string) get_query_var( 'find_a_doctor_state' ) ) );
-		if ( '' === $state_slug ) {
+		$state_slug = sanitize_title(strtolower((string) get_query_var('find_a_doctor_state')));
+		if ('' === $state_slug) {
 			return;
 		}
 
 		$state_slug_map = global360_get_valid_state_slug_map();
-		if ( ! isset( $state_slug_map[ $state_slug ] ) ) {
+		if (! isset($state_slug_map[$state_slug])) {
 			return;
 		}
 
-		$state_abbr = (string) $state_slug_map[ $state_slug ];
-		$state_name = ucwords( str_replace( '-', ' ', $state_slug ) );
+		$state_abbr = (string) $state_slug_map[$state_slug];
+		$state_name = ucwords(str_replace('-', ' ', $state_slug));
 
-		$home_url          = home_url( '/' );
-		$directory_url     = home_url( '/find-a-doctor/' );
-		$current_state_url = home_url( '/find-a-doctor/' . $state_slug . '/' );
+		$home_url          = home_url('/');
+		$directory_url     = home_url('/find-a-doctor/');
+		$current_state_url = home_url('/find-a-doctor/' . $state_slug . '/');
 
 		$graph = array(
 			array(
@@ -2833,19 +2891,19 @@ if ( ! function_exists( 'global360_output_find_a_doctor_state_schema' ) ) {
 						'@type'    => 'ListItem',
 						'position' => 1,
 						'name'     => 'Home',
-						'item'     => esc_url_raw( $home_url ),
+						'item'     => esc_url_raw($home_url),
 					),
 					array(
 						'@type'    => 'ListItem',
 						'position' => 2,
 						'name'     => 'Find a Doctor',
-						'item'     => esc_url_raw( $directory_url ),
+						'item'     => esc_url_raw($directory_url),
 					),
 					array(
 						'@type'    => 'ListItem',
 						'position' => 3,
 						'name'     => $state_name,
-						'item'     => esc_url_raw( $current_state_url ),
+						'item'     => esc_url_raw($current_state_url),
 					),
 				),
 			),
@@ -2876,18 +2934,18 @@ if ( ! function_exists( 'global360_output_find_a_doctor_state_schema' ) ) {
 			)
 		);
 
-		if ( ! empty( $clinic_ids ) ) {
+		if (! empty($clinic_ids)) {
 			$item_list = array();
 			$position  = 1;
 
-			foreach ( $clinic_ids as $clinic_id ) {
-				$clinic_url = get_permalink( (int) $clinic_id );
-				if ( ! $clinic_url ) {
+			foreach ($clinic_ids as $clinic_id) {
+				$clinic_url = get_permalink((int) $clinic_id);
+				if (! $clinic_url) {
 					continue;
 				}
 
-				$clinic_name = get_the_title( (int) $clinic_id );
-				if ( '' === $clinic_name ) {
+				$clinic_name = get_the_title((int) $clinic_id);
+				if ('' === $clinic_name) {
 					$clinic_name = 'Clinic';
 				}
 
@@ -2897,17 +2955,17 @@ if ( ! function_exists( 'global360_output_find_a_doctor_state_schema' ) ) {
 					'item'     => array(
 						'@type' => 'MedicalClinic',
 						'name'  => $clinic_name,
-						'url'   => esc_url_raw( $clinic_url ),
+						'url'   => esc_url_raw($clinic_url),
 					),
 				);
 				$position++;
 			}
 
-			if ( ! empty( $item_list ) ) {
+			if (! empty($item_list)) {
 				$graph[] = array(
 					'@type'           => 'ItemList',
 					'name'            => 'Find a Doctor in ' . $state_name,
-					'numberOfItems'   => count( $item_list ),
+					'numberOfItems'   => count($item_list),
 					'itemListElement' => $item_list,
 				);
 			}
@@ -2918,8 +2976,8 @@ if ( ! function_exists( 'global360_output_find_a_doctor_state_schema' ) ) {
 			'@graph'   => $graph,
 		);
 
-		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-		if ( ! $json ) {
+		$json = wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		if (! $json) {
 			return;
 		}
 
@@ -2929,97 +2987,98 @@ if ( ! function_exists( 'global360_output_find_a_doctor_state_schema' ) ) {
 	}
 }
 
-add_action( 'wp_head', 'global360_output_find_a_doctor_state_schema', 101 );
+add_action('wp_head', 'global360_output_find_a_doctor_state_schema', 101);
 
-if ( ! function_exists( 'global360_output_content_page_schema' ) ) {
+if (! function_exists('global360_output_content_page_schema')) {
 	/**
 	 * Output reusable content-driven schema for regular pages/posts.
 	 */
-	function global360_output_content_page_schema() {
-		if ( is_admin() || ! is_singular() ) {
+	function global360_output_content_page_schema()
+	{
+		if (is_admin() || ! is_singular()) {
 			return;
 		}
 
-		if ( is_singular( 'clinic' ) || is_singular( 'clinics' ) || is_singular( 'doctor' ) || is_singular( 'doctors' ) ) {
+		if (is_singular('clinic') || is_singular('clinics') || is_singular('doctor') || is_singular('doctors')) {
 			return;
 		}
 
-		if ( is_page_template( 'page-find-a-doctor.php' ) || get_query_var( 'find_a_doctor_state' ) ) {
+		if (is_page_template('page-find-a-doctor.php') || get_query_var('find_a_doctor_state')) {
 			return;
 		}
 
 		$post_id = get_queried_object_id();
-		if ( ! $post_id ) {
+		if (! $post_id) {
 			return;
 		}
 
-		$post = get_post( $post_id );
-		if ( ! $post || 'publish' !== $post->post_status ) {
+		$post = get_post($post_id);
+		if (! $post || 'publish' !== $post->post_status) {
 			return;
 		}
 
-		$title = sanitize_text_field( wp_strip_all_tags( (string) get_the_title( $post_id ) ) );
-		if ( '' === $title ) {
+		$title = sanitize_text_field(wp_strip_all_tags((string) get_the_title($post_id)));
+		if ('' === $title) {
 			return;
 		}
 
-		$content_raw = (string) get_post_field( 'post_content', $post_id );
-		$content_text = trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( strip_shortcodes( $content_raw ) ) ) );
+		$content_raw = (string) get_post_field('post_content', $post_id);
+		$content_text = trim(preg_replace('/\s+/', ' ', wp_strip_all_tags(strip_shortcodes($content_raw))));
 
 		$description = '';
-		if ( has_excerpt( $post_id ) ) {
-			$description = sanitize_text_field( wp_strip_all_tags( (string) get_the_excerpt( $post_id ) ) );
+		if (has_excerpt($post_id)) {
+			$description = sanitize_text_field(wp_strip_all_tags((string) get_the_excerpt($post_id)));
 		}
-		if ( '' === $description && '' !== $content_text ) {
-			$description = sanitize_text_field( wp_trim_words( $content_text, 40, '' ) );
+		if ('' === $description && '' !== $content_text) {
+			$description = sanitize_text_field(wp_trim_words($content_text, 40, ''));
 		}
 
-		$post_url = get_permalink( $post_id );
-		if ( ! $post_url ) {
+		$post_url = get_permalink($post_id);
+		if (! $post_url) {
 			return;
 		}
 
-		$schema_type = is_singular( 'post' ) ? 'Article' : 'MedicalWebPage';
+		$schema_type = is_singular('post') ? 'Article' : 'MedicalWebPage';
 
 		$schema = array(
 			'@context'         => 'https://schema.org',
 			'@type'            => $schema_type,
-			'mainEntityOfPage' => esc_url_raw( $post_url ),
-			'url'              => esc_url_raw( $post_url ),
+			'mainEntityOfPage' => esc_url_raw($post_url),
+			'url'              => esc_url_raw($post_url),
 			'headline'         => $title,
-			'inLanguage'       => str_replace( '_', '-', get_locale() ),
-			'datePublished'    => get_post_time( 'c', true, $post_id ),
-			'dateModified'     => get_post_modified_time( 'c', true, $post_id ),
+			'inLanguage'       => str_replace('_', '-', get_locale()),
+			'datePublished'    => get_post_time('c', true, $post_id),
+			'dateModified'     => get_post_modified_time('c', true, $post_id),
 		);
 
-		if ( '' !== $description ) {
+		if ('' !== $description) {
 			$schema['description'] = $description;
 		}
 
-		if ( '' !== $content_text ) {
-			$word_count = count( preg_split( '/\s+/', $content_text ) );
-			if ( $word_count > 0 ) {
+		if ('' !== $content_text) {
+			$word_count = count(preg_split('/\s+/', $content_text));
+			if ($word_count > 0) {
 				$schema['wordCount'] = $word_count;
 			}
 		}
 
-		if ( has_post_thumbnail( $post_id ) ) {
-			$image_url = wp_get_attachment_image_url( (int) get_post_thumbnail_id( $post_id ), 'full' );
-			if ( $image_url ) {
-				$schema['image'] = esc_url_raw( $image_url );
+		if (has_post_thumbnail($post_id)) {
+			$image_url = wp_get_attachment_image_url((int) get_post_thumbnail_id($post_id), 'full');
+			if ($image_url) {
+				$schema['image'] = esc_url_raw($image_url);
 			}
 		}
 
-		$global_settings = get_option( '360_global_settings', array() );
+		$global_settings = get_option('360_global_settings', array());
 		$site_name_setting = '';
-		if ( is_array( $global_settings ) && ! empty( $global_settings['site_name'] ) ) {
-			$site_name_setting = sanitize_text_field( wp_strip_all_tags( (string) $global_settings['site_name'] ) );
+		if (is_array($global_settings) && ! empty($global_settings['site_name'])) {
+			$site_name_setting = sanitize_text_field(wp_strip_all_tags((string) $global_settings['site_name']));
 		}
 
 		$publisher_name = '' !== $site_name_setting
 			? $site_name_setting
-			: sanitize_text_field( wp_strip_all_tags( (string) get_bloginfo( 'name' ) ) );
-		if ( '' !== $publisher_name ) {
+			: sanitize_text_field(wp_strip_all_tags((string) get_bloginfo('name')));
+		if ('' !== $publisher_name) {
 			$schema['author'] = array(
 				'@type' => 'Organization',
 				'name'  => $publisher_name,
@@ -3030,13 +3089,13 @@ if ( ! function_exists( 'global360_output_content_page_schema' ) ) {
 				'name'  => $publisher_name,
 			);
 
-			$custom_logo_id = (int) get_theme_mod( 'custom_logo' );
-			if ( $custom_logo_id ) {
-				$logo_url = wp_get_attachment_image_url( $custom_logo_id, 'full' );
-				if ( $logo_url ) {
+			$custom_logo_id = (int) get_theme_mod('custom_logo');
+			if ($custom_logo_id) {
+				$logo_url = wp_get_attachment_image_url($custom_logo_id, 'full');
+				if ($logo_url) {
 					$publisher['logo'] = array(
 						'@type' => 'ImageObject',
-						'url'   => esc_url_raw( $logo_url ),
+						'url'   => esc_url_raw($logo_url),
 					);
 				}
 			}
@@ -3044,8 +3103,8 @@ if ( ! function_exists( 'global360_output_content_page_schema' ) ) {
 			$schema['publisher'] = $publisher;
 		}
 
-		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-		if ( ! $json ) {
+		$json = wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		if (! $json) {
 			return;
 		}
 
@@ -3055,75 +3114,76 @@ if ( ! function_exists( 'global360_output_content_page_schema' ) ) {
 	}
 }
 
-add_action( 'wp_head', 'global360_output_content_page_schema', 102 );
+add_action('wp_head', 'global360_output_content_page_schema', 102);
 
-if ( ! function_exists( 'global360_output_breadcrumb_schema' ) ) {
+if (! function_exists('global360_output_breadcrumb_schema')) {
 	/**
 	 * Output fallback BreadcrumbList schema for regular pages/posts.
 	 */
-	function global360_output_breadcrumb_schema() {
-		if ( is_admin() || ! is_singular() ) {
+	function global360_output_breadcrumb_schema()
+	{
+		if (is_admin() || ! is_singular()) {
 			return;
 		}
 
-		if ( is_singular( 'clinic' ) || is_singular( 'clinics' ) || is_singular( 'doctor' ) || is_singular( 'doctors' ) ) {
+		if (is_singular('clinic') || is_singular('clinics') || is_singular('doctor') || is_singular('doctors')) {
 			return;
 		}
 
-		if ( is_page_template( 'page-find-a-doctor.php' ) || get_query_var( 'find_a_doctor_state' ) ) {
+		if (is_page_template('page-find-a-doctor.php') || get_query_var('find_a_doctor_state')) {
 			return;
 		}
 
 		$post_id = get_queried_object_id();
-		if ( ! $post_id ) {
+		if (! $post_id) {
 			return;
 		}
 
-		$post = get_post( $post_id );
-		if ( ! $post || 'publish' !== $post->post_status ) {
+		$post = get_post($post_id);
+		if (! $post || 'publish' !== $post->post_status) {
 			return;
 		}
 
-		$current_url = get_permalink( $post_id );
-		$current_name = sanitize_text_field( wp_strip_all_tags( (string) get_the_title( $post_id ) ) );
-		if ( ! $current_url || '' === $current_name ) {
+		$current_url = get_permalink($post_id);
+		$current_name = sanitize_text_field(wp_strip_all_tags((string) get_the_title($post_id)));
+		if (! $current_url || '' === $current_name) {
 			return;
 		}
 
-		$global_settings = get_option( '360_global_settings', array() );
+		$global_settings = get_option('360_global_settings', array());
 		$site_name_setting = '';
-		if ( is_array( $global_settings ) && ! empty( $global_settings['site_name'] ) ) {
-			$site_name_setting = sanitize_text_field( wp_strip_all_tags( (string) $global_settings['site_name'] ) );
+		if (is_array($global_settings) && ! empty($global_settings['site_name'])) {
+			$site_name_setting = sanitize_text_field(wp_strip_all_tags((string) $global_settings['site_name']));
 		}
 
 		$root_name = '' !== $site_name_setting
 			? $site_name_setting
-			: sanitize_text_field( wp_strip_all_tags( (string) get_bloginfo( 'name' ) ) );
+			: sanitize_text_field(wp_strip_all_tags((string) get_bloginfo('name')));
 
 		$items = array();
 		$items[] = array(
 			'name' => $root_name,
-			'url'  => home_url( '/' ),
+			'url'  => home_url('/'),
 		);
 
-		if ( is_singular( 'page' ) ) {
-			$ancestors = array_reverse( get_post_ancestors( $post_id ) );
-			foreach ( $ancestors as $ancestor_id ) {
-				$ancestor_url = get_permalink( (int) $ancestor_id );
-				$ancestor_name = sanitize_text_field( wp_strip_all_tags( (string) get_the_title( (int) $ancestor_id ) ) );
-				if ( $ancestor_url && '' !== $ancestor_name ) {
+		if (is_singular('page')) {
+			$ancestors = array_reverse(get_post_ancestors($post_id));
+			foreach ($ancestors as $ancestor_id) {
+				$ancestor_url = get_permalink((int) $ancestor_id);
+				$ancestor_name = sanitize_text_field(wp_strip_all_tags((string) get_the_title((int) $ancestor_id)));
+				if ($ancestor_url && '' !== $ancestor_name) {
 					$items[] = array(
 						'name' => $ancestor_name,
 						'url'  => $ancestor_url,
 					);
 				}
 			}
-		} elseif ( is_singular( 'post' ) ) {
-			$posts_page_id = (int) get_option( 'page_for_posts' );
-			if ( $posts_page_id > 0 ) {
-				$posts_page_url = get_permalink( $posts_page_id );
-				$posts_page_name = sanitize_text_field( wp_strip_all_tags( (string) get_the_title( $posts_page_id ) ) );
-				if ( $posts_page_url && '' !== $posts_page_name ) {
+		} elseif (is_singular('post')) {
+			$posts_page_id = (int) get_option('page_for_posts');
+			if ($posts_page_id > 0) {
+				$posts_page_url = get_permalink($posts_page_id);
+				$posts_page_name = sanitize_text_field(wp_strip_all_tags((string) get_the_title($posts_page_id)));
+				if ($posts_page_url && '' !== $posts_page_name) {
 					$items[] = array(
 						'name' => $posts_page_name,
 						'url'  => $posts_page_url,
@@ -3131,11 +3191,11 @@ if ( ! function_exists( 'global360_output_breadcrumb_schema' ) ) {
 				}
 			}
 		} else {
-			$post_type = get_post_type_object( get_post_type( $post_id ) );
-			if ( $post_type && ! empty( $post_type->has_archive ) ) {
-				$archive_url = get_post_type_archive_link( $post_type->name );
-				$archive_name = sanitize_text_field( wp_strip_all_tags( (string) $post_type->labels->name ) );
-				if ( $archive_url && '' !== $archive_name ) {
+			$post_type = get_post_type_object(get_post_type($post_id));
+			if ($post_type && ! empty($post_type->has_archive)) {
+				$archive_url = get_post_type_archive_link($post_type->name);
+				$archive_name = sanitize_text_field(wp_strip_all_tags((string) $post_type->labels->name));
+				if ($archive_url && '' !== $archive_name) {
 					$items[] = array(
 						'name' => $archive_name,
 						'url'  => $archive_url,
@@ -3152,28 +3212,28 @@ if ( ! function_exists( 'global360_output_breadcrumb_schema' ) ) {
 		$seen_urls = array();
 		$list_items = array();
 		$position = 1;
-		foreach ( $items as $item ) {
-			$name = isset( $item['name'] ) ? trim( (string) $item['name'] ) : '';
-			$url = isset( $item['url'] ) ? trim( (string) $item['url'] ) : '';
-			if ( '' === $name || '' === $url ) {
+		foreach ($items as $item) {
+			$name = isset($item['name']) ? trim((string) $item['name']) : '';
+			$url = isset($item['url']) ? trim((string) $item['url']) : '';
+			if ('' === $name || '' === $url) {
 				continue;
 			}
-			$url_key = esc_url_raw( $url );
-			if ( isset( $seen_urls[ $url_key ] ) ) {
+			$url_key = esc_url_raw($url);
+			if (isset($seen_urls[$url_key])) {
 				continue;
 			}
-			$seen_urls[ $url_key ] = true;
+			$seen_urls[$url_key] = true;
 
 			$list_items[] = array(
 				'@type'    => 'ListItem',
 				'position' => $position,
-				'name'     => sanitize_text_field( $name ),
+				'name'     => sanitize_text_field($name),
 				'item'     => $url_key,
 			);
 			$position++;
 		}
 
-		if ( count( $list_items ) < 2 ) {
+		if (count($list_items) < 2) {
 			return;
 		}
 
@@ -3183,8 +3243,8 @@ if ( ! function_exists( 'global360_output_breadcrumb_schema' ) ) {
 			'itemListElement' => $list_items,
 		);
 
-		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-		if ( ! $json ) {
+		$json = wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		if (! $json) {
 			return;
 		}
 
@@ -3194,4 +3254,4 @@ if ( ! function_exists( 'global360_output_breadcrumb_schema' ) ) {
 	}
 }
 
-add_action( 'wp_head', 'global360_output_breadcrumb_schema', 103 );
+add_action('wp_head', 'global360_output_breadcrumb_schema', 103);

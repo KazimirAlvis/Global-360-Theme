@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20260224145139`)
+- Current version: matches `_S_VERSION` (currently `1.0.20260714172339`)
 
 ### Release Process
 
@@ -42,6 +42,13 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20260714172339 (2026-07-14)
+
+- Synced latest local theme updates into the GitHub repo copy.
+- Added and loaded inc/disable-comments.php from functions.php.
+- Bumped theme version in functions.php and style.css for release tracking.
+
 
 #### v1.0.20260324164151 (2026-03-24)
 
