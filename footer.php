@@ -124,11 +124,11 @@
 			$opts = get_option('360_global_settings', []);
 			$site_name = isset($opts['site_name']) && !empty($opts['site_name']) ? $opts['site_name'] : get_bloginfo('name');
 			$current_year = date('Y');
-			$sitemap_page = get_page_by_path( 'sitemap' );
-			$sitemap_url = $sitemap_page ? get_permalink( $sitemap_page ) : home_url( '/sitemap/' );
+			$sitemap_page = get_page_by_path('sitemap');
+			$sitemap_url = $sitemap_page ? get_permalink($sitemap_page) : home_url('/sitemap/');
 			?>
 			<p>Copyright © <?php echo $current_year; ?> <?php echo esc_html($site_name); ?>. All Rights Reserved</p>
-			<p><a href="https://www.patientreach360.com/privacy-policy/">Privacy Policy</a> | <a href="https://www.patientreach360.com/terms-of-use/">Terms of Use Agreement</a> | <a href="<?php echo esc_url( $sitemap_url ); ?>">Sitemap</a></p>
+			<p><a href="https://www.patientreach360.com/privacy-policy/">Privacy Policy</a> | <a href="https://www.patientreach360.com/terms-of-use/">Terms of Use Agreement</a> | <a href="<?php echo esc_url($sitemap_url); ?>">Sitemap</a></p>
 		</div>
 		<div class="footer_form_pu">
 			<span id="do-not-sell-trigger" style="cursor: pointer;">Do Not Sell MY Info</span>
@@ -136,7 +136,7 @@
 	</div>
 
 	<!-- Do Not Sell Info Modal -->
-	<?php $do_not_sell_form_id = function_exists( 'global_360_theme_resolve_cf7_form_id' ) ? global_360_theme_resolve_cf7_form_id( '98f6667' ) : '98f6667'; ?>
+	<?php $do_not_sell_form_id = function_exists('global_360_theme_resolve_cf7_form_id') ? global_360_theme_resolve_cf7_form_id('98f6667') : '98f6667'; ?>
 	<div id="do-not-sell-modal" class="modal-overlay" style="display: none;">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -146,9 +146,8 @@
 			<div class="modal-body">
 				<div
 					class="global-360-lazy-cf7"
-					data-cf7-form-id="<?php echo esc_attr( $do_not_sell_form_id ); ?>"
-					data-cf7-lazy-trigger="#do-not-sell-trigger"
-				>
+					data-cf7-form-id="<?php echo esc_attr($do_not_sell_form_id); ?>"
+					data-cf7-lazy-trigger="#do-not-sell-trigger">
 					<p>Loading form…</p>
 				</div>
 			</div>
@@ -159,132 +158,134 @@
 </div><!-- #page -->
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-	const trigger = document.getElementById('do-not-sell-trigger');
-	const modal = document.getElementById('do-not-sell-modal');
-	const closeBtn = modal.querySelector('.modal-close');
+	document.addEventListener('DOMContentLoaded', function() {
+		const trigger = document.getElementById('do-not-sell-trigger');
+		const modal = document.getElementById('do-not-sell-modal');
+		const closeBtn = modal.querySelector('.modal-close');
 
-	function hideCf7HiddenFieldsets() {
-		if (!modal) {
-			return;
+		function hideCf7HiddenFieldsets() {
+			if (!modal) {
+				return;
+			}
+
+			modal.querySelectorAll('fieldset.hidden-fields-container').forEach(function(fieldset) {
+				fieldset.style.display = 'none';
+				fieldset.style.margin = '0';
+				fieldset.style.padding = '0';
+				fieldset.style.border = '0';
+				fieldset.setAttribute('hidden', 'hidden');
+			});
 		}
 
-		modal.querySelectorAll('fieldset.hidden-fields-container').forEach(function(fieldset) {
-			fieldset.style.display = 'none';
-			fieldset.style.margin = '0';
-			fieldset.style.padding = '0';
-			fieldset.style.border = '0';
-			fieldset.setAttribute('hidden', 'hidden');
-		});
-	}
+		const modalBody = modal.querySelector('.modal-body');
+		if (modalBody && window.MutationObserver) {
+			const observer = new MutationObserver(function() {
+				hideCf7HiddenFieldsets();
+			});
+			observer.observe(modalBody, {
+				childList: true,
+				subtree: true
+			});
+		}
 
-	const modalBody = modal.querySelector('.modal-body');
-	if (modalBody && window.MutationObserver) {
-		const observer = new MutationObserver(function() {
+		// Open modal
+		trigger.addEventListener('click', function() {
+			modal.style.display = 'flex';
 			hideCf7HiddenFieldsets();
+			setTimeout(() => {
+				modal.classList.add('modal-open');
+				hideCf7HiddenFieldsets();
+			}, 10);
+			document.body.style.overflow = 'hidden'; // Prevent background scrolling
 		});
-		observer.observe(modalBody, { childList: true, subtree: true });
-	}
 
-	// Open modal
-	trigger.addEventListener('click', function() {
-		modal.style.display = 'flex';
-		hideCf7HiddenFieldsets();
-		setTimeout(() => {
-			modal.classList.add('modal-open');
-			hideCf7HiddenFieldsets();
-		}, 10);
-		document.body.style.overflow = 'hidden'; // Prevent background scrolling
-	});
-
-	// Close modal
-	function closeModal() {
-		modal.classList.remove('modal-open');
-		setTimeout(() => {
-			modal.style.display = 'none';
-		}, 300);
-		document.body.style.overflow = ''; // Restore scrolling
-	}
-
-	// Close on X button click
-	closeBtn.addEventListener('click', closeModal);
-
-	// Close on overlay click
-	modal.addEventListener('click', function(e) {
-		if (e.target === modal) {
-			closeModal();
+		// Close modal
+		function closeModal() {
+			modal.classList.remove('modal-open');
+			setTimeout(() => {
+				modal.style.display = 'none';
+			}, 300);
+			document.body.style.overflow = ''; // Restore scrolling
 		}
-	});
 
-	// Close on Escape key
-	document.addEventListener('keydown', function(e) {
-		if (e.key === 'Escape' && modal.classList.contains('modal-open')) {
-			closeModal();
-		}
+		// Close on X button click
+		closeBtn.addEventListener('click', closeModal);
+
+		// Close on overlay click
+		modal.addEventListener('click', function(e) {
+			if (e.target === modal) {
+				closeModal();
+			}
+		});
+
+		// Close on Escape key
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape' && modal.classList.contains('modal-open')) {
+				closeModal();
+			}
+		});
 	});
-});
 </script>
 
-<?php 
+<?php
 // Floating assessment button - uses same logic as clinic buttons
 echo '<!-- DEBUG: Checking for floating button -->';
 if (function_exists('cpt360_get_assessment_id')) {
-    $assess_id = cpt360_get_assessment_id();
-    echo '<!-- DEBUG: Assessment ID found: "' . $assess_id . '" -->';
-    if (!empty($assess_id)) {
-        ?>
-	<div id="floating-assessment-button" class="pr360-pulse-enabled" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: block;">
-            <pr360-questionnaire 
-                url="wss://app.patientreach360.com/socket" 
-                site-id="<?php echo esc_attr($assess_id); ?>">
-                Take risk assessment now
-            </pr360-questionnaire>
-        </div>
-        <?php
-        echo '<!-- DEBUG: Button rendered -->';
-    } else {
-        echo '<!-- DEBUG: No assessment ID, not showing button -->';
-        
-        // Fallback - try global settings directly
-        $settings = get_option('360_global_settings', []);
-        $global_id = isset($settings['assessment_id']) ? $settings['assessment_id'] : '';
-        echo '<!-- DEBUG: Global settings assessment_id: "' . $global_id . '" -->';
-        
-        if (!empty($global_id)) {
-            ?>
+	$assess_id = cpt360_get_assessment_id();
+	echo '<!-- DEBUG: Assessment ID found: "' . $assess_id . '" -->';
+	if (!empty($assess_id)) {
+		$assessment_site_id = $assess_id;
+		$assessment_label = 'Take risk assessment now';
+		$assessment_partial = get_template_directory() . '/clinic-partials/assessment-questionnaire.php';
+?>
+		<div id="floating-assessment-button" class="pr360-pulse-enabled" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: block;">
+			<?php require $assessment_partial; ?>
+		</div>
+		<?php
+		echo '<!-- DEBUG: Button rendered -->';
+	} else {
+		echo '<!-- DEBUG: No assessment ID, not showing button -->';
+
+		// Fallback - try global settings directly
+		$settings = get_option('360_global_settings', []);
+		$global_id = isset($settings['assessment_id']) ? $settings['assessment_id'] : '';
+		echo '<!-- DEBUG: Global settings assessment_id: "' . $global_id . '" -->';
+
+		if (!empty($global_id)) {
+			$assessment_site_id = $global_id;
+			$assessment_label = 'Take risk assessment now';
+			$assessment_partial = get_template_directory() . '/clinic-partials/assessment-questionnaire.php';
+		?>
 			<div id="floating-assessment-button" class="pr360-pulse-enabled">
-                <pr360-questionnaire 
-                    url="wss://app.patientreach360.com/socket" 
-                    site-id="<?php echo esc_attr($global_id); ?>">
-                    Take risk assessment now
-                </pr360-questionnaire>
-            </div>
-            <?php
-            echo '<!-- DEBUG: Fallback button rendered -->';
-        }
-    }
+				<?php require $assessment_partial; ?>
+			</div>
+	<?php
+			echo '<!-- DEBUG: Fallback button rendered -->';
+		}
+	}
 } else {
-    echo '<!-- DEBUG: cpt360_get_assessment_id function not available -->';
-    // Show button with test ID for now
-    ?>
+	echo '<!-- DEBUG: cpt360_get_assessment_id function not available -->';
+	// Show button with test ID for now
+	$assessment_site_id = 'TEST-ID';
+	$assessment_label = 'Take risk assessment now';
+	$assessment_partial = get_template_directory() . '/clinic-partials/assessment-questionnaire.php';
+	?>
 	<div id="floating-assessment-button" class="pr360-pulse-enabled">
-        <pr360-questionnaire 
-            url="wss://app.patientreach360.com/socket" 
-            site-id="TEST-ID">
-            Take risk assessment now
-        </pr360-questionnaire>
-    </div>
-    <?php
+		<?php require $assessment_partial; ?>
+	</div>
+<?php
 }
 ?>
 
-	<script>
+<script>
 	(function() {
 		function ready(fn) {
 			if (document.readyState !== 'loading') {
 				fn();
 			} else {
-				document.addEventListener('DOMContentLoaded', fn, { once: true });
+				document.addEventListener('DOMContentLoaded', fn, {
+					once: true
+				});
 			}
 		}
 
@@ -313,10 +314,19 @@ if (function_exists('cpt360_get_assessment_id')) {
 						targetButton.style.filter = 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3))';
 						try {
 							if (!targetButton._pr360PulseAnimation) {
-								targetButton._pr360PulseAnimation = targetButton.animate([
-									{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0, 0, 0, 0.45)' },
-									{ transform: 'scale(1.07)', boxShadow: '0 0 26px 14px rgba(0, 0, 0, 0.25)', offset: 0.55 },
-									{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0, 0, 0, 0)' }
+								targetButton._pr360PulseAnimation = targetButton.animate([{
+										transform: 'scale(1)',
+										boxShadow: '0 0 0 0 rgba(0, 0, 0, 0.45)'
+									},
+									{
+										transform: 'scale(1.07)',
+										boxShadow: '0 0 26px 14px rgba(0, 0, 0, 0.25)',
+										offset: 0.55
+									},
+									{
+										transform: 'scale(1)',
+										boxShadow: '0 0 0 0 rgba(0, 0, 0, 0)'
+									}
 								], {
 									duration: 1800,
 									easing: 'ease-in-out',
@@ -343,7 +353,10 @@ if (function_exists('cpt360_get_assessment_id')) {
 					applyPulseEffect();
 				});
 
-				observer.observe(component.shadowRoot, { childList: true, subtree: true });
+				observer.observe(component.shadowRoot, {
+					childList: true,
+					subtree: true
+				});
 				applyPulseEffect();
 				return true;
 			};
@@ -377,7 +390,7 @@ if (function_exists('cpt360_get_assessment_id')) {
 			}
 		});
 	})();
-	</script>
+</script>
 
 <?php
 if (function_exists('wp_footer')) {

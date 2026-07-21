@@ -10,12 +10,12 @@ if (! class_exists('_360_Global_Settings')) {
     {
         const OPTION_KEY = '360_global_settings';
 
-    /**
-     * Cache for computed CSS variable rules keyed by context.
-     *
-     * @var array<string, string>
-     */
-    private $cached_css_variables = [];
+        /**
+         * Cache for computed CSS variable rules keyed by context.
+         *
+         * @var array<string, string>
+         */
+        private $cached_css_variables = [];
 
         /**
          * Track whether the inline style tag has already been output.
@@ -36,15 +36,15 @@ if (! class_exists('_360_Global_Settings')) {
             add_action('admin_head',                [$this, 'print_global_css_variables']);
             add_action('login_head',                [$this, 'print_global_css_variables']);
             add_action('wp_enqueue_scripts',        [$this, 'enqueue_global_css_variables'], 20);
-            
+
             // Add 360 settings to WordPress export/import
             add_action('export_wp',                 [$this, 'export_360_settings_to_xml']);
             add_action('import_end',                [$this, 'import_360_settings_from_xml']);
             add_filter('wp_import_post_data_processed', [$this, 'process_360_settings_import'], 10, 2);
-            
+
             // Alternative approach: Hook into the WordPress importer to parse custom fields
             add_action('wp_import_insert_post',     [$this, 'parse_360_settings_from_xml'], 10, 4);
-            
+
             // Cleanup temporary export posts
             add_action('export_wp_finish',          [$this, 'cleanup_temp_export_post']);
         }
@@ -85,7 +85,7 @@ if (! class_exists('_360_Global_Settings')) {
                 'dashicons-admin-generic',         // icon
                 60                                 // position
             );
-            
+
             // Add Export/Import submenu
             add_submenu_page(
                 '360-settings',                    // parent slug
@@ -173,6 +173,14 @@ if (! class_exists('_360_Global_Settings')) {
                 '360-settings',
                 '360_assessment_section',
                 ['label_for' => 'assessment_id']
+            );
+            add_settings_field(
+                'assessment_button_text',
+                __('Assessment Button Text', 'cpt360'),
+                [$this, 'field_assessment_button_text'],
+                '360-settings',
+                '360_assessment_section',
+                ['label_for' => 'assessment_button_text']
             );
 
             // Header Logo
@@ -271,6 +279,25 @@ if (! class_exists('_360_Global_Settings')) {
             );
             echo '<p class="description">'
                 . esc_html__('Used when a clinic has no custom Assessment ID.', 'cpt360')
+                . '</p>';
+        }
+
+        /**
+         * Render the global Assessment button text input.
+         */
+        public function field_assessment_button_text($args)
+        {
+            $opts = get_option(self::OPTION_KEY, []);
+            $val  = isset($opts[$args['label_for']]) ? (string) $opts[$args['label_for']] : '';
+            printf(
+                '<input type="text" id="%1$s" name="%2$s[%1$s]" value="%3$s" class="regular-text" placeholder="%4$s" />',
+                esc_attr($args['label_for']),
+                esc_attr(self::OPTION_KEY),
+                esc_attr($val),
+                esc_attr__('Leave blank to use default text per button location.', 'cpt360')
+            );
+            echo '<p class="description">'
+                . esc_html__('Optional global label for PR360 questionnaire buttons. Leave empty to keep existing hardcoded labels.', 'cpt360')
                 . '</p>';
         }
 
@@ -483,7 +510,7 @@ if (! class_exists('_360_Global_Settings')) {
             $opts = get_option(self::OPTION_KEY, []);
             $logo_id = $opts[$args['label_for']] ?? '';
             $logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, 'medium') : '';
-?>
+        ?>
             <div id="linktree-logo-settings-container">
                 <?php if ($logo_url): ?>
                     <img src="<?php echo esc_url($logo_url); ?>" style="max-width:200px; display:block; margin-bottom:10px;" />
@@ -690,12 +717,17 @@ if (! class_exists('_360_Global_Settings')) {
             if (isset($input['assessment_id'])) {
                 $output['assessment_id'] = sanitize_text_field($input['assessment_id']);
             }
-            
+
+            // Optional global Assessment button text
+            if (isset($input['assessment_button_text'])) {
+                $output['assessment_button_text'] = sanitize_text_field($input['assessment_button_text']);
+            }
+
             // Site Name
             if (isset($input['site_name'])) {
                 $output['site_name'] = sanitize_text_field($input['site_name']);
             }
-            
+
             // Google Maps API Key
             if (isset($input['google_maps_api_key'])) {
                 $output['google_maps_api_key'] = sanitize_text_field($input['google_maps_api_key']);
@@ -730,7 +762,7 @@ if (! class_exists('_360_Global_Settings')) {
             if (isset($input['do_not_sell_form_id'])) {
                 $output['do_not_sell_form_id'] = sanitize_text_field($input['do_not_sell_form_id']);
             }
-            
+
             if (isset($input['header_logo_id']) && is_numeric($input['header_logo_id'])) {
                 $output['header_logo_id'] = intval($input['header_logo_id']);
             }
@@ -911,7 +943,7 @@ if (! class_exists('_360_Global_Settings')) {
                             $this->field_site_name(['label_for' => 'site_name']);
                             echo '<p class="description">Name to display in footer copyright. Defaults to site title if empty.</p></div>';
                             echo '</div>';
-                            
+
                             // Contact Information Section
                             echo '<div style="margin-bottom: 30px;">';
                             echo '<h3>Contact Information</h3>';
@@ -931,7 +963,7 @@ if (! class_exists('_360_Global_Settings')) {
                             $this->field_do_not_sell_form_id(['label_for' => 'do_not_sell_form_id']);
                             echo '</div>';
                             echo '</div>';
-                            
+
                             // Header Logo Section
                             echo '<div style="margin-bottom: 30px;">';
                             echo '<h3>Header Logo</h3>';
@@ -1177,68 +1209,78 @@ if (! class_exists('_360_Global_Settings')) {
                         <div id="tab-assessment" class="cpt360-settings-tab" style="display:none;">
                             <h2><?php esc_html_e('Global Assessment ID', 'cpt360'); ?></h2>
                             <?php $this->field_assessment_id(['label_for' => 'assessment_id']); ?>
+                            <h2><?php esc_html_e('Assessment Button Text', 'cpt360'); ?></h2>
+                            <?php $this->field_assessment_button_text(['label_for' => 'assessment_button_text']); ?>
                         </div>
                         <?php submit_button(); ?>
                     </form>
                 </div>
                 <script>
-                jQuery(function($){
-                    // Tab switching
-                    $('#cpt360-settings-tabs .nav-tab').on('click', function(e){
-                        e.preventDefault();
-                        var tab = $(this).data('tab');
-                        $('#cpt360-settings-tabs .nav-tab').removeClass('nav-tab-active');
-                        $(this).addClass('nav-tab-active');
-                        $('.cpt360-settings-tab').hide();
-                        $('#tab-' + tab).show();
-                    });
-
-                    // Social repeater add/remove
-                    $('#cpt360-social-add').on('click', function(){
-                        var i = $('#cpt360-social-list .cpt360-social-row').length;
-                        var platforms = {
-                            facebook: 'Facebook',
-                            instagram: 'Instagram',
-                            x: 'X (Twitter)',
-                            threads: 'Threads',
-                            youtube: 'YouTube',
-                            tiktok: 'TikTok',
-                            linkedin: 'LinkedIn',
-                            website: 'Website'
-                        };
-                        var select = '<select name="360_global_settings[social_links]['+i+'][platform]" style="margin-right:10px;">';
-                        $.each(platforms, function(slug, label){
-                            select += '<option value="'+slug+'">'+label+'</option>';
+                    jQuery(function($) {
+                        // Tab switching
+                        $('#cpt360-settings-tabs .nav-tab').on('click', function(e) {
+                            e.preventDefault();
+                            var tab = $(this).data('tab');
+                            $('#cpt360-settings-tabs .nav-tab').removeClass('nav-tab-active');
+                            $(this).addClass('nav-tab-active');
+                            $('.cpt360-settings-tab').hide();
+                            $('#tab-' + tab).show();
                         });
-                        select += '</select>';
-                        var row = '<div class="cpt360-social-row" style="margin-bottom:10px;">'+select+'<input type="url" name="360_global_settings[social_links]['+i+'][url]" placeholder="URL" style="width:250px; margin-right:10px;" /><button type="button" class="button cpt360-social-remove">Remove</button></div>';
-                        $('#cpt360-social-list').append(row);
+
+                        // Social repeater add/remove
+                        $('#cpt360-social-add').on('click', function() {
+                            var i = $('#cpt360-social-list .cpt360-social-row').length;
+                            var platforms = {
+                                facebook: 'Facebook',
+                                instagram: 'Instagram',
+                                x: 'X (Twitter)',
+                                threads: 'Threads',
+                                youtube: 'YouTube',
+                                tiktok: 'TikTok',
+                                linkedin: 'LinkedIn',
+                                website: 'Website'
+                            };
+                            var select = '<select name="360_global_settings[social_links][' + i + '][platform]" style="margin-right:10px;">';
+                            $.each(platforms, function(slug, label) {
+                                select += '<option value="' + slug + '">' + label + '</option>';
+                            });
+                            select += '</select>';
+                            var row = '<div class="cpt360-social-row" style="margin-bottom:10px;">' + select + '<input type="url" name="360_global_settings[social_links][' + i + '][url]" placeholder="URL" style="width:250px; margin-right:10px;" /><button type="button" class="button cpt360-social-remove">Remove</button></div>';
+                            $('#cpt360-social-list').append(row);
+                        });
+                        $(document).on('click', '.cpt360-social-remove', function() {
+                            $(this).closest('.cpt360-social-row').remove();
+                        });
                     });
-                    $(document).on('click', '.cpt360-social-remove', function(){
-                        $(this).closest('.cpt360-social-row').remove();
-                    });
-                });
                 </script>
                 <style>
-                .nav-tab-wrapper { margin-bottom: 1em; }
-                .cpt360-settings-tab { margin-top: 1em; }
-                .cpt360-settings-fields-stack {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1.5em;
-                    max-width: 400px;
-                    label{
-                        margin-right: 20px;
+                    .nav-tab-wrapper {
+                        margin-bottom: 1em;
                     }
-                }
-                .cpt360-font-fields {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1em;
-                }
+
+                    .cpt360-settings-tab {
+                        margin-top: 1em;
+                    }
+
+                    .cpt360-settings-fields-stack {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1.5em;
+                        max-width: 400px;
+
+                        label {
+                            margin-right: 20px;
+                        }
+                    }
+
+                    .cpt360-font-fields {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1em;
+                    }
                 </style>
             </div>
-<?php
+        <?php
         }
 
         /**
@@ -1247,8 +1289,8 @@ if (! class_exists('_360_Global_Settings')) {
         public static function get_google_maps_api_key()
         {
             $opts = get_option(self::OPTION_KEY, []);
-            return isset($opts['google_maps_api_key']) && !empty($opts['google_maps_api_key']) 
-                ? $opts['google_maps_api_key'] 
+            return isset($opts['google_maps_api_key']) && !empty($opts['google_maps_api_key'])
+                ? $opts['google_maps_api_key']
                 : '';
         }
 
@@ -1372,7 +1414,7 @@ if (! class_exists('_360_Global_Settings')) {
                 'system-font' => '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif',
                 'anton' => '"Anton", sans-serif',
                 'arvo' => '"Arvo", serif',
-                'bodoni-moda' => '"Bodoni Moda", serif', 
+                'bodoni-moda' => '"Bodoni Moda", serif',
                 'cabin' => '"Cabin", sans-serif',
                 'chivo' => '"Chivo", sans-serif',
                 'roboto' => '"Roboto", sans-serif',
@@ -1381,7 +1423,7 @@ if (! class_exists('_360_Global_Settings')) {
                 'montserrat' => '"Montserrat", sans-serif',
                 'playfair-display' => '"Playfair Display", serif',
             ];
-            
+
             return isset($font_stacks[$font_slug]) ? $font_stacks[$font_slug] : $font_stacks['system-font'];
         }
 
@@ -1422,15 +1464,15 @@ if (! class_exists('_360_Global_Settings')) {
                     'site_url' => get_site_url(),
                     'settings' => $settings
                 ];
-                
+
                 $filename = 'global-360-settings-' . date('Y-m-d-H-i-s') . '.json';
-                
+
                 header('Content-Type: application/json');
                 header('Content-Disposition: attachment; filename="' . $filename . '"');
                 header('Cache-Control: no-cache, no-store, must-revalidate');
                 header('Pragma: no-cache');
                 header('Expires: 0');
-                
+
                 echo json_encode($export_data, JSON_PRETTY_PRINT);
                 exit;
             }
@@ -1440,17 +1482,17 @@ if (! class_exists('_360_Global_Settings')) {
                 if (isset($_FILES['import_file']) && $_FILES['import_file']['error'] === UPLOAD_ERR_OK) {
                     $file_content = file_get_contents($_FILES['import_file']['tmp_name']);
                     $import_data = json_decode($file_content, true);
-                    
+
                     if ($import_data && isset($import_data['settings'])) {
                         // Sanitize imported settings
                         $sanitized_settings = $this->sanitize($import_data['settings']);
                         update_option(self::OPTION_KEY, $sanitized_settings);
-                        
-                        add_action('admin_notices', function() {
+
+                        add_action('admin_notices', function () {
                             echo '<div class="notice notice-success is-dismissible"><p>360 Settings imported successfully!</p></div>';
                         });
                     } else {
-                        add_action('admin_notices', function() {
+                        add_action('admin_notices', function () {
                             echo '<div class="notice notice-error is-dismissible"><p>Invalid import file format.</p></div>';
                         });
                     }
@@ -1469,20 +1511,20 @@ if (! class_exists('_360_Global_Settings')) {
         ?>
             <div class="wrap">
                 <h1><?php esc_html_e('Import/Export 360 Settings', 'cpt360'); ?></h1>
-                
+
                 <div style="display: flex; gap: 30px; flex-wrap: wrap;">
                     <!-- Export Section -->
                     <div style="flex: 1; min-width: 300px; background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 4px;">
                         <h2><?php esc_html_e('Export Settings', 'cpt360'); ?></h2>
                         <p><?php esc_html_e('Download all your 360 theme settings as a JSON file. This includes colors, fonts, logos, contact information, and all other customizations.', 'cpt360'); ?></p>
-                        
+
                         <form method="post">
                             <?php wp_nonce_field('export_360_settings'); ?>
                             <p>
                                 <input type="submit" name="export_360_settings" class="button button-primary" value="<?php esc_attr_e('Download Settings File', 'cpt360'); ?>" />
                             </p>
                         </form>
-                        
+
                         <div style="background: #f0f6fc; border: 1px solid #c8e1ff; border-radius: 4px; padding: 15px; margin-top: 15px;">
                             <p style="margin: 0;"><strong><?php esc_html_e('Tip:', 'cpt360'); ?></strong> <?php esc_html_e('Save this file whenever you make significant changes to your theme settings. This creates a backup you can restore later.', 'cpt360'); ?></p>
                         </div>
@@ -1492,7 +1534,7 @@ if (! class_exists('_360_Global_Settings')) {
                     <div style="flex: 1; min-width: 300px; background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 4px;">
                         <h2><?php esc_html_e('Import Settings', 'cpt360'); ?></h2>
                         <p><?php esc_html_e('Upload a previously exported 360 settings file to restore your theme customizations.', 'cpt360'); ?></p>
-                        
+
                         <form method="post" enctype="multipart/form-data">
                             <?php wp_nonce_field('import_360_settings'); ?>
                             <p>
@@ -1503,7 +1545,7 @@ if (! class_exists('_360_Global_Settings')) {
                                 <input type="submit" name="import_360_settings" class="button button-secondary" value="<?php esc_attr_e('Import Settings', 'cpt360'); ?>" onclick="return confirm('<?php esc_attr_e('This will overwrite your current settings. Are you sure?', 'cpt360'); ?>')" />
                             </p>
                         </form>
-                        
+
                         <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 15px; margin-top: 15px;">
                             <p style="margin: 0;"><strong><?php esc_html_e('Warning:', 'cpt360'); ?></strong> <?php esc_html_e('Importing will replace all current 360 theme settings. Make sure to export your current settings first if you want to keep them.', 'cpt360'); ?></p>
                         </div>
@@ -1518,10 +1560,10 @@ if (! class_exists('_360_Global_Settings')) {
                     if (!empty($current_settings)) {
                         echo '<p>' . esc_html__('You currently have the following customizations:', 'cpt360') . '</p>';
                         echo '<ul style="columns: 2; column-gap: 30px; list-style-type: disc; padding-left: 20px;">';
-                        
+
                         $setting_labels = [
                             'primary_color' => 'Primary Color',
-                            'secondary_color' => 'Secondary Color', 
+                            'secondary_color' => 'Secondary Color',
                             'body_font' => 'Body Font',
                             'heading_font' => 'Heading Font',
                             'header_logo_id' => 'Header Logo',
@@ -1538,7 +1580,7 @@ if (! class_exists('_360_Global_Settings')) {
                             'primary_treatment' => 'Schema: Primary Treatment',
                             'related_treatments' => 'Schema: Related Treatments'
                         ];
-                        
+
                         foreach ($setting_labels as $key => $label) {
                             if (!empty($current_settings[$key])) {
                                 if ($key === 'social_links' && is_array($current_settings[$key])) {
@@ -1556,7 +1598,7 @@ if (! class_exists('_360_Global_Settings')) {
                     ?>
                 </div>
             </div>
-        <?php
+<?php
         }
 
         /**
@@ -1580,14 +1622,14 @@ if (! class_exists('_360_Global_Settings')) {
                         '_360_export_version' => '1.0'
                     ]
                 ]);
-                
+
                 // Also add XML comments for backup
                 echo "\n" . '<!-- 360 Global Theme Settings -->' . "\n";
                 echo '<wp:360_global_settings>' . "\n";
                 echo '<![CDATA[' . json_encode($settings, JSON_PRETTY_PRINT) . ']]>' . "\n";
                 echo '</wp:360_global_settings>' . "\n";
                 echo '<!-- End 360 Global Theme Settings -->' . "\n";
-                
+
                 // Store the temp post ID so we can clean it up later
                 update_option('_360_temp_export_post_id', $temp_post_id);
             }
@@ -1601,12 +1643,12 @@ if (! class_exists('_360_Global_Settings')) {
         {
             // This hook runs after WordPress import is complete
             // We need to check if there are any 360 settings in the imported data
-            
+
             // Get the uploaded XML content (if available in global scope)
             if (isset($GLOBALS['wp_import']) && method_exists($GLOBALS['wp_import'], 'get_imported_data')) {
                 // Custom extraction logic would go here
                 // For now, we'll add a simple admin notice to remind users about settings
-                add_action('admin_notices', function() {
+                add_action('admin_notices', function () {
                     echo '<div class="notice notice-info is-dismissible">';
                     echo '<p><strong>WordPress Import Complete!</strong> ';
                     echo 'If you exported 360 theme settings, you may need to manually import them via ';
@@ -1626,21 +1668,21 @@ if (! class_exists('_360_Global_Settings')) {
             if (isset($raw_data['360_global_settings'])) {
                 $settings_json = $raw_data['360_global_settings'];
                 $settings = json_decode($settings_json, true);
-                
+
                 if ($settings && is_array($settings)) {
                     // Sanitize and import the settings
                     $sanitized_settings = $this->sanitize($settings);
                     update_option(self::OPTION_KEY, $sanitized_settings);
-                    
+
                     // Add success notice
-                    add_action('admin_notices', function() {
+                    add_action('admin_notices', function () {
                         echo '<div class="notice notice-success is-dismissible">';
                         echo '<p><strong>360 Theme Settings Imported Successfully!</strong> Your theme customizations have been restored.</p>';
                         echo '</div>';
                     });
                 }
             }
-            
+
             return $post_data;
         }
 
@@ -1653,19 +1695,19 @@ if (! class_exists('_360_Global_Settings')) {
             // This is a fallback method - we store settings info as a special post
             // and then extract it during import. This is a more reliable method
             // than trying to parse XML comments directly.
-            
+
             if (isset($postdata['post_title']) && $postdata['post_title'] === '360_THEME_SETTINGS_EXPORT') {
                 if (isset($postdata['post_content'])) {
                     $settings = json_decode($postdata['post_content'], true);
                     if ($settings && is_array($settings)) {
                         $sanitized_settings = $this->sanitize($settings);
                         update_option(self::OPTION_KEY, $sanitized_settings);
-                        
+
                         // Delete the temporary post since we don't need it
                         wp_delete_post($post_id, true);
-                        
+
                         // Add success notice
-                        add_action('admin_notices', function() {
+                        add_action('admin_notices', function () {
                             echo '<div class="notice notice-success is-dismissible">';
                             echo '<p><strong>360 Theme Settings Imported Successfully!</strong> Your theme customizations have been restored from the WordPress export.</p>';
                             echo '</div>';

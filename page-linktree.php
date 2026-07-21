@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Template Name: Linktree Landing
  * Template Post Type: page
@@ -88,11 +89,12 @@ $icon_map = [
 ?>
 
 <main id="primary" class="site-main linktree-main">
-    <div class="linktree-wrapper"<?php echo $inline_style ? ' style="' . esc_attr($inline_style) . '"' : ''; ?>>
+    <div class="linktree-wrapper" <?php echo $inline_style ? ' style="' . esc_attr($inline_style) . '"' : ''; ?>>
         <div class="linktree-card">
             <?php if ($linktree_logo) : ?>
                 <div class="linktree-logo">
-                    <?php echo $linktree_logo; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                    <?php echo $linktree_logo; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+                    ?>
                 </div>
             <?php endif; ?>
 
@@ -114,13 +116,13 @@ $icon_map = [
                         <li>
                             <?php $type = isset($cta['type']) ? $cta['type'] : 'link'; ?>
                             <?php if ('assessment' === $type && !empty($cta['site_id'])) : ?>
-                                <pr360-questionnaire
-                                    url="wss://app.patientreach360.com/socket"
-                                    site-id="<?php echo esc_attr($cta['site_id']); ?>">
-                                    <?php echo esc_html($cta['label']); ?>
-                                </pr360-questionnaire>
+                                <?php
+                                $assessment_site_id = $cta['site_id'];
+                                $assessment_label = $cta['label'];
+                                require get_template_directory() . '/clinic-partials/assessment-questionnaire.php';
+                                ?>
                             <?php else : ?>
-                                <a class="linktree-button" href="<?php echo esc_url($cta['url']); ?>"<?php echo !empty($cta['target']) ? ' target="' . esc_attr($cta['target']) . '"' : ''; ?><?php echo !empty($cta['rel']) ? ' rel="' . esc_attr($cta['rel']) . '"' : ''; ?>>
+                                <a class="linktree-button" href="<?php echo esc_url($cta['url']); ?>" <?php echo !empty($cta['target']) ? ' target="' . esc_attr($cta['target']) . '"' : ''; ?><?php echo !empty($cta['rel']) ? ' rel="' . esc_attr($cta['rel']) . '"' : ''; ?>>
                                     <?php echo esc_html($cta['label']); ?>
                                 </a>
                             <?php endif; ?>
@@ -138,10 +140,11 @@ $icon_map = [
                             continue;
                         }
                         $icon_id  = isset($icon_map[$platform]) ? $icon_map[$platform] : 'link';
-                        ?>
+                    ?>
                         <li>
                             <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener">
-                                <?php echo global_360_get_icon_svg($icon_id, 'linktree-social-icon'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                                <?php echo global_360_get_icon_svg($icon_id, 'linktree-social-icon'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+                                ?>
                                 <span class="screen-reader-text"><?php echo esc_html(ucwords($platform)); ?></span>
                             </a>
                         </li>
