@@ -337,24 +337,6 @@ if (! class_exists('_360_Global_Settings')) {
         }
 
         /**
-         * Render the Google Places API Key input.
-         */
-        public function field_google_places_api($args)
-        {
-            $opts = get_option(self::OPTION_KEY, []);
-            $val  = $opts[$args['label_for']] ?? '';
-            printf(
-                '<input type="text" id="%1$s" name="%2$s[%1$s]" value="%3$s" class="regular-text" placeholder="Enter your Google Places API key" />',
-                esc_attr($args['label_for']),
-                esc_attr(self::OPTION_KEY),
-                esc_attr($val)
-            );
-            echo '<p class="description">'
-                . esc_html__('Required for automatic Google reviews functionality. Can use the same key as Maps API if Places API is enabled.', 'cpt360')
-                . '</p>';
-        }
-
-        /**
          * Render the Contact Email input.
          */
         public function field_contact_email($args)
@@ -733,11 +715,6 @@ if (! class_exists('_360_Global_Settings')) {
                 $output['google_maps_api_key'] = sanitize_text_field($input['google_maps_api_key']);
             }
 
-            // Google Places API Key
-            if (isset($input['google_places_api_key'])) {
-                $output['google_places_api_key'] = sanitize_text_field($input['google_places_api_key']);
-            }
-
             // Contact Email
             if (isset($input['contact_email'])) {
                 $output['contact_email'] = sanitize_email($input['contact_email']);
@@ -1024,12 +1001,6 @@ if (! class_exists('_360_Global_Settings')) {
                                 <?php $this->field_google_maps_api(['label_for' => 'google_maps_api_key']); ?>
                             </div>
 
-                            <h2><?php esc_html_e('Google Places API (Server-side)', 'cpt360'); ?></h2>
-                            <div style="margin-bottom: 30px;">
-                                <?php $this->field_google_places_api(['label_for' => 'google_places_api_key']); ?>
-                                <p class="description"><?php esc_html_e('Use a separate key locked to your server IP for Place Details requests that power Google Reviews.', 'cpt360'); ?></p>
-                            </div>
-
                             <hr style="margin: 30px 0;" />
 
                             <div class="cpt360-api-info">
@@ -1042,19 +1013,17 @@ if (! class_exists('_360_Global_Settings')) {
                                             <li><?php esc_html_e('Maps JavaScript API', 'cpt360'); ?></li>
                                             <li><?php esc_html_e('Geocoding API', 'cpt360'); ?></li>
                                             <li><?php esc_html_e('Maps Embed API', 'cpt360'); ?></li>
-                                            <li><?php esc_html_e('Places API (including Place Details)', 'cpt360'); ?></li>
                                         </ul>
                                     </li>
                                     <li><?php esc_html_e('Create credentials (API key)', 'cpt360'); ?></li>
-                                    <li><?php esc_html_e('Restrict the Maps key to your domain, and the Places key to your server IP for security', 'cpt360'); ?></li>
-                                    <li><?php esc_html_e('Copy each API key into the fields above', 'cpt360'); ?></li>
+                                    <li><?php esc_html_e('Restrict the Maps key to your domain or other approved referrers for security', 'cpt360'); ?></li>
+                                    <li><?php esc_html_e('Copy the Maps API key into the field above', 'cpt360'); ?></li>
                                 </ol>
                                 <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 15px; margin-top: 20px;">
-                                    <p style="margin: 0;"><strong><?php esc_html_e('Security Note:', 'cpt360'); ?></strong> <?php esc_html_e('Use separate keys for browser and server requests to keep restrictions tight and billing under control.', 'cpt360'); ?></p>
+                                    <p style="margin: 0;"><strong><?php esc_html_e('Security Note:', 'cpt360'); ?></strong> <?php esc_html_e('Restrict your Maps key to approved referrers and only enable the APIs the site still uses.', 'cpt360'); ?></p>
                                 </div>
                                 <div style="background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; padding: 15px; margin-top: 15px;">
                                     <p style="margin: 0;"><strong><?php esc_html_e('Required for Maps:', 'cpt360'); ?></strong> <?php esc_html_e('Map functionality, clinic geocoding, location services, and embedded maps.', 'cpt360'); ?></p>
-                                    <p style="margin: 10px 0 0 0;"><strong><?php esc_html_e('Required for Reviews:', 'cpt360'); ?></strong> <?php esc_html_e('Places Details API powers the Google reviews block on clinic pages.', 'cpt360'); ?></p>
                                 </div>
                             </div>
                         </div>

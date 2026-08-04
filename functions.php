@@ -14,22 +14,79 @@ require_once get_template_directory() . '/inc/settings.php';
 require_once get_template_directory() . '/inc/schema-condition-treatment.php';
 require_once get_template_directory() . '/inc/disable-comments.php';
 
-if (! defined('_S_VERSION')) {
-	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260715002422' );
+if (! function_exists('global360_handle_places_data_purge')) {
+	/**
+	 * One-time admin-triggered purge for legacy Google Places review data.
+	 *
+	 * Trigger: /wp-admin/?global360_purge_places=1 while logged in as an admin.
+	 */
+	function global360_handle_places_data_purge()
+	{
+		if (! is_admin() || ! isset($_GET['global360_purge_places'])) {
+			return;
+		}
+
+		if (! current_user_can('manage_options')) {
+			wp_die('You are not allowed to run this purge.');
+		}
+
+		$already_completed = get_option('global360_places_purge_completed', '');
+		if (! empty($already_completed)) {
+			wp_die('Legacy Places purge already completed on this site at: ' . esc_html((string) $already_completed));
+		}
+
+		global $wpdb;
+
+		$deleted_place_meta = (int) $wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->postmeta} WHERE meta_key = %s",
+				'google_place_id'
+			)
+		);
+
+		$deleted_transients = 0;
+		$transient_patterns = array(
+			'_transient_google_reviews_%',
+			'_transient_timeout_google_reviews_%',
+			'_transient_google_reviews_v3_%',
+			'_transient_timeout_google_reviews_v3_%',
+		);
+
+		foreach ($transient_patterns as $pattern) {
+			$deleted_transients += (int) $wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+					$pattern
+				)
+			);
+		}
+
+		$settings = get_option('360_global_settings', array());
+		$removed_places_key = 0;
+		if (is_array($settings) && isset($settings['google_places_api_key'])) {
+			unset($settings['google_places_api_key']);
+			update_option('360_global_settings', $settings);
+			$removed_places_key = 1;
+		}
+
+		$completed_at = current_time('mysql');
+		update_option('global360_places_purge_completed', $completed_at, false);
+
+		$message  = 'Legacy Places purge complete.';
+		$message .= '<br />Deleted clinic Place ID meta rows: ' . esc_html((string) $deleted_place_meta);
+		$message .= '<br />Deleted Google review transient rows: ' . esc_html((string) $deleted_transients);
+		$message .= '<br />Removed google_places_api_key from settings: ' . esc_html($removed_places_key ? 'yes' : 'no');
+		$message .= '<br />Completed at: ' . esc_html((string) $completed_at);
+
+		wp_die($message);
+	}
+
+	add_action('admin_init', 'global360_handle_places_data_purge');
 }
 
-if (! function_exists('global_360_are_google_reviews_enabled')) {
-	/**
-	 * Temporary kill-switch for Google reviews API usage.
-	 *
-	 * Set default to false to stop Places API requests until a permanent
-	 * replacement is implemented.
-	 */
-	function global_360_are_google_reviews_enabled()
-	{
-		return (bool) apply_filters('global_360_enable_google_reviews', false);
-	}
+if (! defined('_S_VERSION')) {
+	// Replace the version number of the theme on each release.
+	define( '_S_VERSION', '1.0.20260721031802' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -801,9 +858,6 @@ function global_360_theme_scripts()
 		)
 	);
 
-	if (is_singular() && comments_open() && get_option('thread_comments')) {
-		wp_enqueue_script('comment-reply');
-	}
 }
 add_action('wp_enqueue_scripts', 'global_360_theme_scripts', 5); // Higher priority
 
@@ -2134,11 +2188,6 @@ function global_360_theme_collect_clinic_meta_for_yoast($post_id)
 	$assessment = cpt360_get_assessment_id($post_id);
 	if ($assessment) {
 		$pieces[] = '<p class="yoast-clinic-assessment"><strong>Clinic Assessment ID:</strong> ' . esc_html($assessment) . '</p>';
-	}
-
-	$google_place = get_post_meta($post_id, 'google_place_id', true);
-	if ($google_place) {
-		$pieces[] = '<p class="yoast-clinic-google"><strong>Google Place ID:</strong> ' . esc_html($google_place) . '</p>';
 	}
 
 	$associated_doctors = (array) get_posts(array(

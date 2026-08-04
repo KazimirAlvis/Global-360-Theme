@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20260714172339`)
+- Current version: matches `_S_VERSION` (currently `1.0.20260804125625`)
 
 ### Release Process
 
@@ -42,6 +42,13 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20260804125625 (2026-08-04)
+
+- Removed Google Places review feature end-to-end: deleted review partial, removed clinic-page include, removed Places admin field/save handler, and removed Places key UI/handling from 360 settings.
+- Added a one-time admin trigger to purge legacy Places review data per site (`/wp-admin/?global360_purge_places=1`) for multi-site WP Engine rollout cleanup.
+- Hardened comment lockdown in `inc/disable-comments.php` (REST, XML-RPC pingbacks, defaults, feeds, admin screen redirects) and removed `comment-reply` enqueue path.
+- Bumped theme version in `functions.php` and `style.css` for release tracking.
 
 #### v1.0.20260714172339 (2026-07-14)
 
