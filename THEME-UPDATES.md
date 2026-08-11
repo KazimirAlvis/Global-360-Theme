@@ -56,7 +56,6 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - Added and loaded inc/disable-comments.php from functions.php.
 - Bumped theme version in functions.php and style.css for release tracking.
 
-
 #### v1.0.20260324164151 (2026-03-24)
 
 - Release bump and deploy sync for latest Global 360 Theme updates.
