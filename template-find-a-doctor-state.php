@@ -33,6 +33,13 @@ if (empty($state_slug) || ! isset($state_slug_map[$state_slug])) {
 
 get_header();
 
+if (! function_exists('global360_render_leaflet_map')) {
+    $map_utils_path = get_template_directory() . '/inc/map-utils.php';
+    if (file_exists($map_utils_path)) {
+        require_once $map_utils_path;
+    }
+}
+
 $state_centers = [
     'AL' => ['lat' => 32.8067, 'lng' => -86.7911, 'zoom' => 7],
     'AK' => ['lat' => 61.2176, 'lng' => -149.8997, 'zoom' => 5],
@@ -116,6 +123,8 @@ $locations = function_exists('global360_get_state_locations')
                     'wrapper_class' => 'map-container',
                     'map_class'     => 'map',
                 ));
+            } else {
+                echo '<p>Map is temporarily unavailable.</p>';
             }
             ?>
         </div>
