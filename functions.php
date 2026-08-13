@@ -86,7 +86,7 @@ if (! function_exists('global360_handle_places_data_purge')) {
 
 if (! defined('_S_VERSION')) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260813235959' );
+	define( '_S_VERSION', '1.0.20260814000100' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {

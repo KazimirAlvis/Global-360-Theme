@@ -1,6 +1,6 @@
 # Global 360 Theme
 
-Current release: `1.0.20260813235959`
+Current release: `1.0.20260814000100`
 
 A comprehensive WordPress theme designed for Patient 360 medical websites, featuring dynamic clinic finder functionality, interactive maps, and complete practice management capabilities.
 

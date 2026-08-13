@@ -6,6 +6,13 @@
 
 defined('ABSPATH') || exit;
 
+if (! function_exists('global360_get_clinic_locations') || ! function_exists('global360_render_leaflet_map')) {
+    $map_utils_path = get_template_directory() . '/inc/map-utils.php';
+    if (file_exists($map_utils_path)) {
+        require_once $map_utils_path;
+    }
+}
+
 function cpt360_render_clinic_maps()
 {
     $clinic_id = get_the_ID();
@@ -20,7 +27,9 @@ function cpt360_render_clinic_maps()
         return;
     }
 
-    echo '<div class="clinic-maps-inner">';
+    $location_count = min(3, count($locations));
+
+    echo '<div class="clinic-maps-inner clinic-maps-count-' . esc_attr((string) $location_count) . '">';
 
     foreach ($locations as $location) {
         echo '<div class="clinic-map-item">';
@@ -38,6 +47,8 @@ function cpt360_render_clinic_maps()
                 'wrapper_class' => 'clinic-map-leaflet-wrap',
                 'map_class'     => 'clinic-map-leaflet',
             ));
+        } else {
+            echo '<p>Map is temporarily unavailable.</p>';
         }
         echo '</div>';
     }
