@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20260804125625`)
+- Current version: matches `_S_VERSION` (currently `1.0.20260813201756`)
 
 ### Release Process
 
@@ -42,6 +42,14 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - If you cut a manual release, keep the same structure for consistency (e.g., `1.0.20251009130545`)
 
 ### Release History
+
+#### v1.0.20260813201756 (2026-08-13)
+
+- Refactored clinic map rendering to output one Leaflet map per clinic address card (up to 3 addresses).
+- Updated clinic page map layout to be count-aware: 1 address = 1 column, 2 addresses = 2 columns, 3 addresses = 3 columns.
+- Added responsive fallback to stack clinic map cards on mobile breakpoints.
+- Reduced mobile black address-card visual weight by lowering heading padding/icon/title sizing.
+- Ensured map rendering fallback still outputs a map shell with safe default centering logic.
 
 #### v1.0.20260804125625 (2026-08-04)
 
