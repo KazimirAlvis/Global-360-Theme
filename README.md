@@ -1,6 +1,6 @@
 # Global 360 Theme
 
-Current release: `1.0.20260814000100`
+Current release: `1.0.20260814001500`
 
 A comprehensive WordPress theme designed for Patient 360 medical websites, featuring dynamic clinic finder functionality, interactive maps, and complete practice management capabilities.
 
@@ -8,38 +8,38 @@ A comprehensive WordPress theme designed for Patient 360 medical websites, featu
 
 ### Core Functionality
 
--   **Custom Post Types**: Clinics and Doctors with comprehensive meta fields
--   **Dynamic State Pages**: Interactive clinic finder with `/find-a-doctor/{state}` routing
--   **Interactive Maps**: Leaflet integration with Google Maps geocoding
--   **Global Settings**: Comprehensive admin interface for theme customization
--   **Favicon Bundle Manager**: Upload PNG/SVG/ICO/Apple-touch/manifest assets directly from the 360 Settings UI
--   **Social Media Integration**: Font Awesome icons with dynamic social links
--   **SASS Architecture**: Modular styling with automatic compilation
--   **Gutenberg Support**: Full block editor compatibility
+- **Custom Post Types**: Clinics and Doctors with comprehensive meta fields
+- **Dynamic State Pages**: Interactive clinic finder with `/find-a-doctor/{state}` routing
+- **Interactive Maps**: Leaflet integration with Google Maps geocoding
+- **Global Settings**: Comprehensive admin interface for theme customization
+- **Favicon Bundle Manager**: Upload PNG/SVG/ICO/Apple-touch/manifest assets directly from the 360 Settings UI
+- **Social Media Integration**: Font Awesome icons with dynamic social links
+- **SASS Architecture**: Modular styling with automatic compilation
+- **Gutenberg Support**: Full block editor compatibility
 
 ### Custom Post Types
 
 #### Clinics
 
--   Complete address information with geocoding
--   Custom logos and thumbnail images
--   Phone numbers and website links
--   Detailed clinic descriptions and bios
--   Associated doctors management
+- Complete address information with geocoding
+- Custom logos and thumbnail images
+- Phone numbers and website links
+- Detailed clinic descriptions and bios
+- Associated doctors management
 
 #### Doctors
 
--   Professional headshots and thumbnails
--   Detailed biographical information
--   Specialty and practice details
--   Clinic associations
+- Professional headshots and thumbnails
+- Detailed biographical information
+- Specialty and practice details
+- Clinic associations
 
 ### Dynamic Features
 
--   **State-based Clinic Finder**: Interactive US map with state-specific clinic listings
--   **Google Maps Integration**: Automatic geocoding for precise clinic locations
--   **Map Filtering**: Dynamic pin filtering by selected state
--   **Responsive Design**: Mobile-optimized interface for all devices
+- **State-based Clinic Finder**: Interactive US map with state-specific clinic listings
+- **Google Maps Integration**: Automatic geocoding for precise clinic locations
+- **Map Filtering**: Dynamic pin filtering by selected state
+- **Responsive Design**: Mobile-optimized interface for all devices
 
 ## 🚀 Installation
 
@@ -47,8 +47,8 @@ A comprehensive WordPress theme designed for Patient 360 medical websites, featu
 >
 > When developing on Patient‑360 infrastructure you will see **two copies** of the theme:
 >
-> -   `wp-content/themes/Global-360-Theme` – the copy WordPress actively runs.
-> -   `Global-360-Theme.repo/` – the Git checkout you commit and push to GitHub.
+> - `wp-content/themes/Global-360-Theme` – the copy WordPress actively runs.
+> - `Global-360-Theme.repo/` – the Git checkout you commit and push to GitHub.
 >
 > To keep version bumps painless:
 >
@@ -61,9 +61,9 @@ A comprehensive WordPress theme designed for Patient 360 medical websites, featu
 
 ### Requirements
 
--   WordPress 5.0 or higher
--   PHP 7.4 or higher
--   Google Maps API key (for geocoding)
+- WordPress 5.0 or higher
+- PHP 7.4 or higher
+- Google Maps API key (for geocoding)
 
 ### Quick Installation
 
@@ -75,7 +75,6 @@ A comprehensive WordPress theme designed for Patient 360 medical websites, featu
     ```
 
 2. **Upload to WordPress**:
-
     - Upload the theme folder to `/wp-content/themes/`
     - Activate via WordPress admin
 
@@ -91,18 +90,18 @@ Access comprehensive theme settings via **Appearance > Theme Settings**:
 
 #### Colors & Fonts Tab
 
--   Primary and secondary color schemes
--   Custom typography settings
--   Font family selections
+- Primary and secondary color schemes
+- Custom typography settings
+- Font family selections
 
 #### Header & Footer Tab
 
--   Custom logo upload
--   Header styling options
--   Footer content management
--   Social media links with Font Awesome icons
--   Favicon bundle manager with bulk upload for PNG, SVG, ICO, Apple touch icon, and web manifest files
--   Optional Apple web app title override for home screen installs
+- Custom logo upload
+- Header styling options
+- Footer content management
+- Social media links with Font Awesome icons
+- Favicon bundle manager with bulk upload for PNG, SVG, ICO, Apple touch icon, and web manifest files
+- Optional Apple web app title override for home screen installs
 
 #### Favicons & Web App Manifest
 
@@ -115,8 +114,8 @@ The 360 Settings header tab now includes a **Favicon & Manifest** panel:
 
 #### Assessment Tab
 
--   Google Maps API key configuration
--   Assessment tool integration settings
+- Google Maps API key configuration
+- Assessment tool integration settings
 
 ### Linktree Landing Page
 
@@ -176,11 +175,11 @@ The theme includes VS Code Live Sass Compiler configuration:
 
 ### SASS Architecture
 
--   **Base**: Variables, mixins, reset styles
--   **Components**: Buttons, cards, forms, modals
--   **Layout**: Grid, header, footer, global layout
--   **Pages**: Page-specific styling
--   **Themes**: Color schemes and typography
+- **Base**: Variables, mixins, reset styles
+- **Components**: Buttons, cards, forms, modals
+- **Layout**: Grid, header, footer, global layout
+- **Pages**: Page-specific styling
+- **Themes**: Color schemes and typography
 
 ## 🗺️ Dynamic Routing
 
@@ -188,9 +187,9 @@ The theme includes VS Code Live Sass Compiler configuration:
 
 The theme automatically creates dynamic routes for state-based clinic listings:
 
--   `/find-a-doctor/texas` - Texas clinics
--   `/find-a-doctor/california` - California clinics
--   `/find-a-doctor/florida` - Florida clinics
+- `/find-a-doctor/texas` - Texas clinics
+- `/find-a-doctor/california` - California clinics
+- `/find-a-doctor/florida` - Florida clinics
 
 ### Rewrite Rules
 
@@ -198,25 +197,25 @@ Custom rewrite rules handle state-based URLs and fallback to default clinic page
 
 ## 📱 Responsive Design
 
--   **Mobile-first approach** with responsive breakpoints
--   **Touch-friendly interfaces** for mobile devices
--   **Optimized map interactions** for all screen sizes
--   **Accessible navigation** with keyboard support
--   **Adaptive footer layout** that wraps gracefully on tablets and centers content on small screens
+- **Mobile-first approach** with responsive breakpoints
+- **Touch-friendly interfaces** for mobile devices
+- **Optimized map interactions** for all screen sizes
+- **Accessible navigation** with keyboard support
+- **Adaptive footer layout** that wraps gracefully on tablets and centers content on small screens
 
 ## 🔌 API Integration
 
 ### Google Maps Geocoding
 
--   Automatic address geocoding for clinic locations
--   Fallback handling for failed geocoding attempts
--   Optimized API usage with caching
+- Automatic address geocoding for clinic locations
+- Fallback handling for failed geocoding attempts
+- Optimized API usage with caching
 
 ### Social Media
 
--   Dynamic social link management
--   Font Awesome icon integration
--   Customizable social platforms
+- Dynamic social link management
+- Font Awesome icon integration
+- Customizable social platforms
 
 ## 🛠️ Development Commands
 
@@ -306,22 +305,22 @@ State pages are automatically generated based on clinic locations. No manual pag
 
 ### Custom Styling
 
--   Modify SASS files in the `sass/` directory
--   Use theme settings for colors and fonts
--   Override specific components in `sass/components/`
+- Modify SASS files in the `sass/` directory
+- Use theme settings for colors and fonts
+- Override specific components in `sass/components/`
 
 ### Template Customization
 
--   Override templates by copying to child theme
--   Modify clinic partials in `clinic-partials/` directory
--   Customize meta boxes in `inc/meta-boxes/`
+- Override templates by copying to child theme
+- Modify clinic partials in `clinic-partials/` directory
+- Customize meta boxes in `inc/meta-boxes/`
 
 ## 🔒 Security Features
 
--   **Nonce verification** for all form submissions
--   **Capability checks** for admin functions
--   **Input sanitization** for all user data
--   **SQL injection prevention** with prepared statements
+- **Nonce verification** for all form submissions
+- **Capability checks** for admin functions
+- **Input sanitization** for all user data
+- **SQL injection prevention** with prepared statements
 
 ## 📞 Support
 

@@ -1,19 +1,56 @@
 <?php
 $state_slug = sanitize_title(strtolower((string) get_query_var('find_a_doctor_state')));
 $states = [
-    'AL' => 'Alabama','AK' => 'Alaska','AZ' => 'Arizona','AR' => 'Arkansas',
-    'CA' => 'California','CO' => 'Colorado','CT' => 'Connecticut','DE' => 'Delaware',
-    'FL' => 'Florida','GA' => 'Georgia','HI' => 'Hawaii','ID' => 'Idaho',
-    'IL' => 'Illinois','IN' => 'Indiana','IA' => 'Iowa','KS' => 'Kansas',
-    'KY' => 'Kentucky','LA' => 'Louisiana','ME' => 'Maine','MD' => 'Maryland',
-    'MA' => 'Massachusetts','MI' => 'Michigan','MN' => 'Minnesota','MS' => 'Mississippi',
-    'MO' => 'Missouri','MT' => 'Montana','NE' => 'Nebraska','NV' => 'Nevada',
-    'NH' => 'New Hampshire','NJ' => 'New Jersey','NM' => 'New Mexico','NY' => 'New York',
-    'NC' => 'North Carolina','ND' => 'North Dakota','OH' => 'Ohio','OK' => 'Oklahoma',
-    'OR' => 'Oregon','PA' => 'Pennsylvania','RI' => 'Rhode Island','SC' => 'South Carolina',
-    'SD' => 'South Dakota','TN' => 'Tennessee','TX' => 'Texas','UT' => 'Utah',
-    'VT' => 'Vermont','VA' => 'Virginia','WA' => 'Washington','WV' => 'West Virginia',
-    'WI' => 'Wisconsin','WY' => 'Wyoming',
+    'AL' => 'Alabama',
+    'AK' => 'Alaska',
+    'AZ' => 'Arizona',
+    'AR' => 'Arkansas',
+    'CA' => 'California',
+    'CO' => 'Colorado',
+    'CT' => 'Connecticut',
+    'DE' => 'Delaware',
+    'FL' => 'Florida',
+    'GA' => 'Georgia',
+    'HI' => 'Hawaii',
+    'ID' => 'Idaho',
+    'IL' => 'Illinois',
+    'IN' => 'Indiana',
+    'IA' => 'Iowa',
+    'KS' => 'Kansas',
+    'KY' => 'Kentucky',
+    'LA' => 'Louisiana',
+    'ME' => 'Maine',
+    'MD' => 'Maryland',
+    'MA' => 'Massachusetts',
+    'MI' => 'Michigan',
+    'MN' => 'Minnesota',
+    'MS' => 'Mississippi',
+    'MO' => 'Missouri',
+    'MT' => 'Montana',
+    'NE' => 'Nebraska',
+    'NV' => 'Nevada',
+    'NH' => 'New Hampshire',
+    'NJ' => 'New Jersey',
+    'NM' => 'New Mexico',
+    'NY' => 'New York',
+    'NC' => 'North Carolina',
+    'ND' => 'North Dakota',
+    'OH' => 'Ohio',
+    'OK' => 'Oklahoma',
+    'OR' => 'Oregon',
+    'PA' => 'Pennsylvania',
+    'RI' => 'Rhode Island',
+    'SC' => 'South Carolina',
+    'SD' => 'South Dakota',
+    'TN' => 'Tennessee',
+    'TX' => 'Texas',
+    'UT' => 'Utah',
+    'VT' => 'Vermont',
+    'VA' => 'Virginia',
+    'WA' => 'Washington',
+    'WV' => 'West Virginia',
+    'WI' => 'Wisconsin',
+    'WY' => 'Wyoming',
 ];
 
 $state_slug_map = function_exists('global360_get_valid_state_slug_map')
@@ -107,8 +144,20 @@ $locations = function_exists('global360_get_state_locations')
     <div class="max_width_content_body">
         <div class="map_holder">
             <style>
-                .map-container { max-width: 2500px; margin: 0 auto; padding: 0; position: relative; z-index: 1; }
-                #map { height: 500px; width: 100%; border-radius: 10px; overflow: hidden; }
+                .map-container {
+                    max-width: 2500px;
+                    margin: 0 auto;
+                    padding: 0;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                #map {
+                    height: 500px;
+                    width: 100%;
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
             </style>
             <?php
             if (function_exists('global360_render_leaflet_map')) {

@@ -25,7 +25,7 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 - Version defined in `functions.php` as `_S_VERSION` constant
 - Must match version in `style.css` header
-- Current version: matches `_S_VERSION` (currently `1.0.20260814000100`)
+- Current version: matches `_S_VERSION` (currently `1.0.20260814001500`)
 
 ### Release Process
 
@@ -43,6 +43,13 @@ The Global 360 Theme now includes automatic update functionality that integrates
 
 ### Release History
 
+#### v1.0.20260814001500 (2026-08-14)
+
+- Updated documentation alignment and workflow references in README/docs.
+- Refined shared map helper behavior in `inc/map-utils.php`.
+- Updated Find a Doctor state template map handling.
+- Updated clinic-page map layout styles in `sass/pages/_single-clinic.scss`.
+
 #### v1.0.20260814000100 (2026-08-14)
 
 - Hardened clinic map rendering by defensively loading `inc/map-utils.php` inside `clinic-partials/clinic-maps.php` when helper functions are unavailable.
@@ -54,7 +61,6 @@ The Global 360 Theme now includes automatic update functionality that integrates
 - Hardened the Find a Doctor state template to defensively load `inc/map-utils.php` when helper functions are unavailable.
 - Added a user-facing fallback notice when state-map rendering helpers cannot be loaded.
 - Prevents empty state map blocks on environments that miss the standard map helper bootstrap.
-
 
 #### v1.0.20260813201756 (2026-08-13)
 

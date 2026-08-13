@@ -426,49 +426,49 @@ if (! function_exists('global360_render_leaflet_map')) {
             'locations' => $js_locations,
         );
 
-        ?>
+?>
         <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var config = <?php echo wp_json_encode($js_config); ?>;
-            var map = L.map(config.mapId).setView([config.lat, config.lng], config.zoom);
+            document.addEventListener("DOMContentLoaded", function() {
+                var config = <?php echo wp_json_encode($js_config); ?>;
+                var map = L.map(config.mapId).setView([config.lat, config.lng], config.zoom);
 
-            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
 
-            var group = new L.featureGroup();
+                var group = new L.featureGroup();
 
-            config.locations.forEach(function (location) {
-                var marker = L.marker(location.coords).addTo(map);
-                var popupParts = [];
+                config.locations.forEach(function(location) {
+                    var marker = L.marker(location.coords).addTo(map);
+                    var popupParts = [];
 
-                if (location.name) {
-                    popupParts.push("<strong>" + location.name + "</strong>");
+                    if (location.name) {
+                        popupParts.push("<strong>" + location.name + "</strong>");
+                    }
+
+                    if (location.address) {
+                        popupParts.push(location.address);
+                    }
+
+                    if (location.link) {
+                        popupParts.push("<a href='" + location.link + "' target='_blank' rel='noopener'>View Details</a>");
+                    }
+
+                    marker.bindPopup(popupParts.join("<br>"));
+                    group.addLayer(marker);
+                });
+
+                if (config.locations.length > 1) {
+                    var bounds = group.getBounds();
+                    if (bounds.isValid()) {
+                        map.fitBounds(bounds, {
+                            padding: [config.padding, config.padding],
+                            maxZoom: config.maxZoom
+                        });
+                    }
                 }
-
-                if (location.address) {
-                    popupParts.push(location.address);
-                }
-
-                if (location.link) {
-                    popupParts.push("<a href='" + location.link + "' target='_blank' rel='noopener'>View Details</a>");
-                }
-
-                marker.bindPopup(popupParts.join("<br>"));
-                group.addLayer(marker);
             });
-
-            if (config.locations.length > 1) {
-                var bounds = group.getBounds();
-                if (bounds.isValid()) {
-                    map.fitBounds(bounds, {
-                        padding: [config.padding, config.padding],
-                        maxZoom: config.maxZoom
-                    });
-                }
-            }
-        });
         </script>
-        <?php
+<?php
     }
 }
