@@ -154,21 +154,37 @@
 	grid-gap: 1rem;
 	/* two columns on desktop, one on mobile */
 	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-	margin-bottom: 2rem;
+	grid-gap: 1.5rem;
+
+.clinic-maps-inner.clinic-maps-count-2 {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.clinic-map-item {
+
+@media (max-width: 767px) {
+	.clinic-maps-inner,
+	.clinic-maps-inner.clinic-maps-count-2,
+	.clinic-maps-inner.clinic-maps-count-3 {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.clinic-maps-inner.clinic-maps-count-3 {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+	grid-template-columns: minmax(0, 1fr);
 	border: 1px solid #2b2b2b;
 }
 
 .map_heading {
-	padding: 40px;
-	text-align: center;
+	display: flex;
+	flex-direction: column;
+	gap: 0;
 	background-color: #2b2b2b;
 	/* background-image: linear-gradient(180deg, #282828 65%, #5f5f5f 100%); */
 }
 .map_heading .clinic-map-icon {
 	display: inline-flex;
-	align-items: center;
+	width: 100%;
 	justify-content: center;
 	width: 45px; /* any CSS unit you like */
 	height: 45px;
@@ -189,6 +205,26 @@
 	color: #fff;
 	font-size: 18px;
 	margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+	.map_heading {
+		padding: 20px;
+	}
+
+	.map_heading h4 {
+		font-size: 20px;
+		margin: 14px 0 8px 0;
+	}
+
+	.map_heading p {
+		font-size: 15px;
+	}
+
+	.map_heading .clinic-map-icon {
+		width: 32px;
+		height: 32px;
+	}
 }
 
 /*--------------------------------------------------------------

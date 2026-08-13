@@ -2344,14 +2344,38 @@ body.page-template-page-linktree #floating-assessment-button {
 
 .clinic-maps-inner {
 	display: grid;
-	grid-gap: 1rem;
-	/* two columns on desktop, one on mobile */
-	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	grid-gap: 1.5rem;
+	grid-template-columns: minmax(0, 1fr);
 	margin-bottom: 2rem;
+}
+
+.clinic-maps-inner.clinic-maps-count-2 {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.clinic-maps-inner.clinic-maps-count-3 {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 767px) {
+	.clinic-maps-inner,
+	.clinic-maps-inner.clinic-maps-count-2,
+	.clinic-maps-inner.clinic-maps-count-3 {
+		grid-template-columns: minmax(0, 1fr);
+	}
 }
 
 .clinic-map-item {
 	border: 1px solid #2b2b2b;
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+.clinic-map-leaflet-wrap {
+	position: relative;
+	z-index: 1;
+	width: 100%;
 }
 
 .map_heading {
@@ -2387,6 +2411,26 @@ body.page-template-page-linktree #floating-assessment-button {
 	color: #fff;
 	font-size: 18px;
 	margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+	.map_heading {
+		padding: 20px;
+	}
+
+	.map_heading h4 {
+		font-size: 20px;
+		margin: 14px 0 8px 0;
+	}
+
+	.map_heading p {
+		font-size: 15px;
+	}
+
+	.map_heading .clinic-map-icon {
+		width: 32px;
+		height: 32px;
+	}
 }
 
 /*--------------------------------------------------------------

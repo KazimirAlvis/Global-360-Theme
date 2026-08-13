@@ -380,10 +380,6 @@ if (! function_exists('global360_render_leaflet_map')) {
                 && is_numeric($location['coords'][1]);
         }));
 
-        if (empty($locations)) {
-            return;
-        }
-
         static $leaflet_assets_loaded = false;
         if (! $leaflet_assets_loaded) {
             $leaflet_assets_loaded = true;
@@ -397,6 +393,10 @@ if (! function_exists('global360_render_leaflet_map')) {
         $center_lat = (float) $args['center_lat'];
         $center_lng = (float) $args['center_lng'];
         if ($center_lat === 0.0 && $center_lng === 0.0) {
+            $center_lat = 39.8283;
+            $center_lng = -98.5795;
+        }
+        if (! empty($locations)) {
             $first_location = $locations[0];
             $center_lat = (float) $first_location['coords'][0];
             $center_lng = (float) $first_location['coords'][1];
@@ -458,12 +458,14 @@ if (! function_exists('global360_render_leaflet_map')) {
                 group.addLayer(marker);
             });
 
-            var bounds = group.getBounds();
-            if (bounds.isValid() && config.locations.length > 1) {
-                map.fitBounds(bounds, {
-                    padding: [config.padding, config.padding],
-                    maxZoom: config.maxZoom
-                });
+            if (config.locations.length > 1) {
+                var bounds = group.getBounds();
+                if (bounds.isValid()) {
+                    map.fitBounds(bounds, {
+                        padding: [config.padding, config.padding],
+                        maxZoom: config.maxZoom
+                    });
+                }
             }
         });
         </script>

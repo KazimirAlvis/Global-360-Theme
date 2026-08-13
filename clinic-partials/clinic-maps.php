@@ -29,18 +29,17 @@ function cpt360_render_clinic_maps()
         echo '<h4 class="clinic-title">' . esc_html(get_the_title($clinic_id)) . '</h4>';
         echo '<p>' . esc_html((string) ($location['address'] ?? '')) . '</p>';
         echo '</div>';
+        if (function_exists('global360_render_leaflet_map')) {
+            global360_render_leaflet_map(array($location), array(
+                'height'        => 250,
+                'zoom'          => 13,
+                'max_zoom'      => 15,
+                'padding'       => 20,
+                'wrapper_class' => 'clinic-map-leaflet-wrap',
+                'map_class'     => 'clinic-map-leaflet',
+            ));
+        }
         echo '</div>';
-    }
-
-    if (function_exists('global360_render_leaflet_map')) {
-        global360_render_leaflet_map($locations, array(
-            'height'        => 250,
-            'zoom'          => 13,
-            'max_zoom'      => 15,
-            'padding'       => 20,
-            'wrapper_class' => 'clinic-map-leaflet-wrap',
-            'map_class'     => 'clinic-map-leaflet',
-        ));
     }
 
     echo '</div>';
