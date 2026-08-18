@@ -43,21 +43,18 @@ A comprehensive WordPress theme designed for Patient 360 medical websites, featu
 
 ## 🚀 Installation
 
-> **Local workflow note**
+> **Local development workflow**
 >
-> When developing on Patient‑360 infrastructure you will see **two copies** of the theme:
+> The active WordPress theme directory is the Git checkout:
 >
-> - `wp-content/themes/Global-360-Theme` – the copy WordPress actively runs.
-> - `Global-360-Theme.repo/` – the Git checkout you commit and push to GitHub.
+> `wp-content/themes/Global-360-Theme/`
 >
-> To keep version bumps painless:
+> WordPress runs the same files that Git tracks. To develop locally:
 >
-> 1. Always start in `Global-360-Theme.repo/` and run `git pull` so the repo matches GitHub.
-> 2. Make and test your changes **inside the repo copy first**.
-> 3. Copy the updated files into `wp-content/themes/Global-360-Theme` when you need WordPress to use them.
-> 4. Bump versions / update `THEME-UPDATES.md`, commit, and push from the repo directory.
->
-> Skipping step 1 or editing the live copy first is what forces the long “rebase & conflict” cleanup at the end of the day.
+> 1. Pull the latest `main` before starting work.
+> 2. Edit and test directly in the active theme directory.
+> 3. Review `git status` and `git diff`.
+> 4. When shipping theme changes, follow [`docs/THEME-UPDATES.md`](docs/THEME-UPDATES.md) for the coordinated version bump, changelog, commit, push, and production update process.
 
 ### Requirements
 
@@ -249,25 +246,11 @@ npm run lint:js
 npm run lint:scss
 ```
 
-## � Theme Update Workflow (No GitHub Release Required)
+## Theme Updates and Deployment
 
-When you ship theme changes, keep the following lightweight flow so the WordPress updater notices the new build without creating a GitHub release:
+[`docs/THEME-UPDATES.md`](docs/THEME-UPDATES.md) is the authoritative versioning, changelog, and deployment guide.
 
-1. **Bump the version numbers**
-    - Update `_S_VERSION` in `functions.php`.
-    - Update the `Version:` header at the top of `style.css`.
-    - (Optional) add a bullet to `THEME-UPDATES.md` describing the change.
-2. **Commit and push to `main`**
-    ```bash
-    git add functions.php style.css THEME-UPDATES.md
-    git commit -m "Sync theme version to <new version>"
-    git push origin main
-    ```
-3. **Refresh WordPress**
-    - In the WordPress admin, open **Dashboard → Updates** and click **Check Again**.
-    - WordPress compares the version in GitHub to the installed theme and shows the familiar **Update Theme** button.
-
-You only need to create a GitHub release if you specifically want to distribute a packaged ZIP or trigger third-party tooling. Routine deployments can stay on the “push to GitHub → update from the WP admin” loop.
+For each release, edit and test in the active Git checkout, review the diff, coordinate the version in `functions.php` and `style.css`, update the changelog, commit, push `main`, and update production sites through the WordPress theme update mechanism. Routine deployments do not require a GitHub Release.
 
 ## �📝 Content Management
 

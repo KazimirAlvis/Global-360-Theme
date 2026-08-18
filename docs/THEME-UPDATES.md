@@ -1,0 +1,546 @@
+# Global 360 Theme Updates
+
+## Purpose
+
+This file is the **single source of truth** for Global 360 Theme versioning, changelog entries, Git commits, pushes, and WordPress deployments.
+
+If `README.md`, an old commit, a code comment, an editor/AI suggestion, or any other documentation conflicts with this file, **follow this file**.
+
+Do not improvise the deployment process.
+
+## Required Working Copy
+
+The active WordPress theme directory is also the Git checkout:
+
+`wp-content/themes/Global-360-Theme/`
+
+WordPress runs the exact files tracked by Git. There is no separate development copy and no manual file synchronization.
+
+### Rules
+
+1. Start in `wp-content/themes/Global-360-Theme/`.
+2. Run `git pull origin main` before making changes.
+3. Edit and test directly in the active theme.
+4. Before committing, run `git status` and review the diff.
+5. Commit and push from the active theme directory.
+6. Update production sites through the existing WordPress theme update mechanism.
+
+## Versioning
+
+The theme version uses:
+
+```text
+1.0.YYYYMMDDHHMMSS
+```
+
+The exact same version must appear in:
+
+- `functions.php` — `_S_VERSION`
+- `style.css` — `Version:` header
+- the new release-history heading in this file
+
+**Never bump only one version location. Never create different timestamps for the same deployment.**
+
+## Required Deployment Workflow
+
+Every deploy follows this sequence:
+
+1. Pull the latest `main` in the active theme directory.
+2. Make the code changes.
+3. Test the changes.
+4. If SASS/CSS changed, compile the required CSS assets and keep generated/minified assets in sync.
+5. Generate **one** new timestamp version for the deployment.
+6. Set that exact version in both `functions.php` and `style.css`.
+7. Add a release-history entry below describing the actual changes.
+8. Review `git status` and `git diff`.
+9. Commit **all files belonging to the deployment together**, including the version bump and this changelog entry.
+10. Push once to `main`.
+11. Verify the push succeeded.
+12. In WordPress, check for the theme update and verify the deployed version.
+
+### Do Not
+
+- Do not push the code and then make a separate version-bump commit.
+- Do not bump the version multiple times for the same deployment.
+- Do not create or maintain a second theme checkout for local development.
+- Do not manually synchronize theme files between directories.
+- Do not omit the changelog entry.
+- Do not create a GitHub Release for a routine deployment.
+- Do not overwrite unrelated local changes.
+- Do not use `git add -A` blindly when unrelated work is present.
+
+## Commit and Push
+
+Stage the files that actually belong to the deployment:
+
+```bash
+git status
+git diff
+
+git add functions.php style.css style-min.css docs/THEME-UPDATES.md path/to/changed-file.php
+git commit -m "Describe the actual theme change"
+git push origin main
+```
+
+The commit message should describe the feature/fix, not merely say "version bump."
+
+The version bump is part of the feature/fix deployment commit.
+
+## GitHub Releases
+
+A GitHub Release is **not required for routine theme deployments**.
+
+Create one only when there is a specific reason to publish a packaged/tagged release or another tool explicitly requires one.
+
+Normal workflow:
+
+```text
+change -> test -> one version bump -> changelog -> one commit -> push main -> WordPress update
+```
+
+## WordPress Update Check
+
+After pushing:
+
+1. Open **Dashboard → Updates** in WordPress.
+2. Click **Check Again** if the new version is not immediately visible.
+3. Confirm WordPress sees the same version that was pushed.
+4. Apply the update and verify the affected pages/features.
+
+## Troubleshooting
+
+If an update does not appear:
+
+- Confirm `_S_VERSION` and the `style.css` `Version:` header are identical.
+- Confirm the new version is greater than the installed version.
+- Confirm the version bump was actually pushed to `main`.
+- Confirm you committed from the active theme Git checkout.
+- Confirm the updater is reading the expected GitHub source.
+- Use WordPress **Check Again** to refresh update data.
+- Review the Git diff/history before creating another version bump.
+
+Do **not** respond to an update problem by repeatedly bumping the version. Find the mismatch first.
+
+### Release History
+
+#### v1.0.20260814001500 (2026-08-14)
+
+- Updated documentation alignment and workflow references in README/docs.
+- Refined shared map helper behavior in `inc/map-utils.php`.
+- Updated Find a Doctor state template map handling.
+- Updated clinic-page map layout styles in `sass/pages/_single-clinic.scss`.
+
+#### v1.0.20260814000100 (2026-08-14)
+
+- Hardened clinic map rendering by defensively loading `inc/map-utils.php` inside `clinic-partials/clinic-maps.php` when helper functions are unavailable.
+- Added a user-facing clinic-map fallback message when map rendering helpers cannot be loaded.
+- Synced clinic map wrapper class behavior so clinic map card layouts stay consistent across environments.
+
+#### v1.0.20260813235959 (2026-08-13)
+
+- Hardened the Find a Doctor state template to defensively load `inc/map-utils.php` when helper functions are unavailable.
+- Added a user-facing fallback notice when state-map rendering helpers cannot be loaded.
+- Prevents empty state map blocks on environments that miss the standard map helper bootstrap.
+
+#### v1.0.20260813201756 (2026-08-13)
+
+- Refactored clinic map rendering to output one Leaflet map per clinic address card (up to 3 addresses).
+- Updated clinic page map layout to be count-aware: 1 address = 1 column, 2 addresses = 2 columns, 3 addresses = 3 columns.
+- Added responsive fallback to stack clinic map cards on mobile breakpoints.
+- Reduced mobile black address-card visual weight by lowering heading padding/icon/title sizing.
+- Ensured map rendering fallback still outputs a map shell with safe default centering logic.
+
+#### v1.0.20260804125625 (2026-08-04)
+
+- Removed Google Places review feature end-to-end: deleted review partial, removed clinic-page include, removed Places admin field/save handler, and removed Places key UI/handling from 360 settings.
+- Added a one-time admin trigger to purge legacy Places review data per site (`/wp-admin/?global360_purge_places=1`) for multi-site WP Engine rollout cleanup.
+- Hardened comment lockdown in `inc/disable-comments.php` (REST, XML-RPC pingbacks, defaults, feeds, admin screen redirects) and removed `comment-reply` enqueue path.
+- Bumped theme version in `functions.php` and `style.css` for release tracking.
+
+#### v1.0.20260714172339 (2026-07-14)
+
+- Synced the latest theme updates into the GitHub repository.
+- Added and loaded inc/disable-comments.php from functions.php.
+- Bumped theme version in functions.php and style.css for release tracking.
+
+#### v1.0.20260324164151 (2026-03-24)
+
+- Release bump and deploy sync for latest Global 360 Theme updates.
+
+#### v1.0.20260311182453 (2026-03-11)
+
+- Added automatic Condition/Treatment page JSON-LD output via new module [inc/schema-condition-treatment.php](inc/schema-condition-treatment.php).
+- Outputs `MedicalCondition` schema on the selected Condition page and `MedicalProcedure` schema on the selected Treatment page.
+- Uses dynamic 360 settings values (`primary_condition`, `primary_treatment`) and page selectors with backward-compatible key support.
+
+#### v1.0.20260311182452 (2026-03-11)
+
+- Added SEO robots fallback to set archive pages to `noindex,follow` for category, tag, author, and date archives.
+- Helps reduce index bloat from archive pages while preserving crawl paths to posts.
+
+#### v1.0.20260311182451 (2026-03-11)
+
+- Updated post archive/category pages to use the same article card/grid layout as the Blog page.
+- Added matching hero/title and pagination styling behavior for category/tag/author/date post archives.
+- Preserved default archive rendering for non-post archive types.
+
+#### v1.0.20260311112409 (2026-03-11)
+
+- Added SEOPress-aware SEO fallback logic for page titles and meta descriptions using dynamic 360 Settings values (`primary_condition`, `primary_treatment`).
+- Implemented fallbacks for Doctor, Clinic, Find A Doctor, and Find A Doctor state-directory pages.
+- Preserved priority order: SEOPress custom fields → theme fallback → WordPress defaults.
+- Left existing JSON-LD schema output unchanged.
+
+#### v1.0.20260310175232 (2026-03-10)
+
+- Fixed Doctor page practice-location address parsing when street lines contain comma-separated suite/unit values (e.g., "..., Ste 107, City CA ZIP").
+- Prevents suite/unit segments from being misclassified as city headings and keeps city grouping accurate.
+
+#### v1.0.20260310173833 (2026-03-10)
+
+- Added Find A Doctor internal linking block (Condition, Treatment, FAQ, Blog) with dynamic URL resolution and conditional output.
+- Added Find A Doctor `ItemList` JSON-LD in `wp_head`, scoped to the Find A Doctor page only, populated from published Doctor CPT entries.
+- Adjusted Find A Doctor rendering order for block-authored hero/SEO content and placed Learn More below the dynamic state grid.
+- Updated Find A Doctor Learn More and state-link styling: no left indent on links list, visited links use Primary Color variable, removed state link underlines, and centered Learn More section layout.
+
+#### v1.0.20260310155821 (2026-03-10)
+
+- Updated Doctor page "Learn More" links to use the 360 Settings Primary Color CSS variable instead of a hardcoded color.
+- Kept visited link color consistent with Primary Color by styling the `:visited` state with the same variable.
+
+#### v1.0.20260310155124 (2026-03-10)
+
+- Included missing Schema Settings page selectors (`Condition Page` and `Treatment Page`) in the packaged update by syncing the latest `inc/settings.php` changes.
+- Ensures the dropdown fields for condition/treatment linking appear in **360 Settings → Schema Settings** after update.
+
+#### v1.0.20260310154325 (2026-03-10)
+
+- Styled Doctor page "Learn More" links and removed visited color shift to keep link color consistent.
+- Removed left-indent from Doctor practice location address lists for cleaner alignment.
+- Normalized Doctor practice location display to remove redundant state in city headings and uppercase state abbreviations in address lines (e.g., `CA`).
+
+#### v1.0.20260310142238 (2026-03-10)
+
+- Updated Doctor JSON-LD `@type` to include `Person` + `Physician` so `worksFor` validates cleanly in schema testing tools.
+
+#### v1.0.20260310141644 (2026-03-10)
+
+- Expanded Medical Specialty handling to support the full Schema.org `MedicalSpecialty` enum set in 360 Settings and schema validation.
+- Switched default Medical Specialty to `Neurologic` for FBSS-focused sites.
+- Added legacy value normalization (`PainManagement` and old `Orthopedic` URL mappings) to prevent invalid `medicalSpecialty` output.
+
+#### v1.0.20260310135226 (2026-03-10)
+
+- Corrected `medicalSpecialty` handling to output valid Schema.org enum URLs accepted by Google Rich Results.
+- Normalized legacy `http://schema.org/PainManagement` values to a valid value (`http://schema.org/Anesthesia`) in settings and schema output.
+- Restricted Medical Specialty save/output to a validated allowlist to prevent invalid enum values from being emitted.
+
+#### v1.0.20260310133711 (2026-03-10)
+
+- Fixed a theme updater bug where post-install package sync could rewrite `_S_VERSION` to a stale hardcoded value, causing repeated "update available" notices.
+- Updated updater sync logic to write the actual detected remote target version.
+
+#### v1.0.20260310131227 (2026-03-10)
+
+- Added a new Schema Settings section in 360 Settings for global medical schema metadata.
+- Extended Doctor JSON-LD to use global `medicalSpecialty` and `knowsAbout` values (including comma-separated related items).
+- Extended Clinic JSON-LD to include lightweight `knowsAbout` (primary condition + primary treatment).
+- Reused existing LinkedIn social setting and output `sameAs` on Clinic schema when present.
+
+#### v1.0.20260305143844 (2026-03-05)
+
+- Refined Doctor JSON-LD so `telephone` inherits from associated clinic phone data (no separate doctor phone field).
+- Improved PostalAddress generation to prefer structured fields and fall back to `streetAddress` string when only unstructured address is available.
+- Updated Clinic JSON-LD image selection to prioritize the dynamic clinic logo source used by the theme.
+
+#### v1.0.20260305135516 (2026-03-05)
+
+- Added automatic JSON-LD schema output in `wp_head` for single Doctor and Clinic pages.
+- Doctor pages now output `Physician` schema with linked `worksFor` MedicalClinic data and optional specialty/phone/address fields when available.
+- Clinic pages now output `MedicalClinic` schema with clean `PostalAddress` data when available.
+
+#### v1.0.20260224165920 (2026-02-24)
+
+- Added a proper `Version:` header to `style.css` so WordPress can read the theme version for update checks.
+
+#### v1.0.20260224161822 (2026-02-24)
+
+- Downscaled clinic and doctor image assets to a max width of 400px (including WebP and AVIF) to reduce page weight and improve load times.
+
+#### v1.0.20260224145139 (2026-02-23)
+
+- Lazy-load Contact Form 7 in the footer modal (loads only on click via AJAX), reducing initial JS/CSS on pages that do not use CF7.
+
+#### v1.0.20260219160027 (2026-02-19)
+
+- Synced updated header.php head loader markup for PR360 (single unpinned loader, header-only).
+
+#### v1.0.20260219153457 (2026-02-19)
+
+- Synced updated PR360 loader markup in header.php (single unpinned loader, header-only).
+
+#### v1.0.20260219152254 (2026-02-19)
+
+- Unpinned the PR360 questionnaire loader to use the bare unpkg URL in the theme header.
+- Verified only one PR360 loader script tag exists sitewide (header.php only).
+
+#### v1.0.20260219145652 (2026-02-19)
+
+- Disabled the Google Fonts CSS preload hint (kept preconnects) to avoid credentials-mode mismatch warnings during speed testing.
+- Ensured the PR360 questionnaire loader is pinned to the versioned build in the theme header for consistent caching.
+
+#### v1.0.20260217114847 (2026-02-17)
+
+- Added an HTML sitemap page template that lists public content types and pages.
+- Linked the footer Sitemap link to the actual Sitemap page permalink with a safe fallback.
+
+#### v1.0.20260216135639 (2026-02-16)
+
+- Updated Find-a-Doctor state tiles so states without clinics open the PR360 assessment using the global assessment ID instead of linking to the default clinic page.
+- Normalized the PR360 tile styling to avoid focus borders and prevent the state grid from overflowing its container.
+
+#### v1.0.20260204224500 (2026-02-04)
+
+- Updated the clinic logo assets with the latest branding so location pages display the new mark.
+
+#### v1.0.20260204223000 (2026-02-04)
+
+- Corrected the Vance Ansar provider asset name and refreshed the linked headshot in the theme bundle.
+
+#### v1.0.20260204221500 (2026-02-04)
+
+- Refreshed the clinic and doctor assets with the latest uploads so profiles stay current.
+
+#### v1.0.20260204220000 (2026-02-04)
+
+#### v1.0.20260204215000 (2026-02-04)
+
+- Refreshed clinic and doctor photo assets so provider profiles and location pages show the latest imagery.
+
+#### v1.0.20260204204821 (2026-02-04)
+
+- Synced version identifiers with the latest production deployment for the Google Fonts preload changes.
+
+#### v1.0.20260204204507 (2026-02-04)
+
+- Synced version identifiers with the latest production deployment for the Google Fonts preload changes.
+
+#### v1.0.20260204204236 (2026-02-04)
+
+- Synced the version metadata to match the live deployment of the Google Fonts preload improvements.
+
+#### v1.0.20260204203641 (2026-02-04)
+
+- Synced the version metadata to match the live deployment of the Google Fonts preload improvements.
+
+#### v1.0.20260204130000 (2026-02-04)
+
+- Replaced the JavaScript Google Fonts loader with a PHP-driven enqueue that adds preconnect and preload hints while keeping `display=swap` for improved LCP.
+
+#### v1.0.20260204120000 (2026-02-04)
+
+- Updated the header logo markup to load eagerly with async decoding while removing the `fetchpriority` attribute to let browsers manage priority.
+
+#### v1.0.20260203133000 (2026-02-03)
+
+- Renamed the North Star Vascular & Interventional logo asset to `north-star-vascular-interventional-logo.jpg` to match the CPT logo loader pattern.
+
+#### v1.0.20260203123000 (2026-02-03)
+
+- Added the North Star Vascular & Interventional clinic logo so the refreshed branding appears across listings and detail pages.
+- Uploaded new doctor headshots for Amin Astani, Andy Manos, Jafar Golzarian, and Kayla Halleron to keep provider bios current.
+- Let the Blog template render Gutenberg content ahead of the fallback hero while preserving the `.sm_hero` styles when no blocks are present.
+
+#### v1.0.20260128131500 (2026-01-28)
+
+- Updated clinic branding assets with the latest logo file so location pages and grid views show the refreshed mark.
+- Replaced the featured doctor headshots to match current photography, ensuring profile and listing layouts use the new images.
+
+#### v1.0.20251223134500 (2025-12-23)
+
+- Added a dedicated `footer-nav` menu class plus a depth limit so the footer navigation only renders top-level items and no longer exposes dropdowns.
+- Hid any leftover submenu indicators in the footer column so the layout stays compact and visually distinct from the main header navigation.
+
+#### v1.0.20251223120500 (2025-12-23)
+
+- Added a desktop-only hover buffer for submenu parents so dropdowns stay open while moving the cursor from the parent link into the submenu content.
+
+#### v1.0.20251211100955 (2025-12-11)
+
+- Pointed the "Site Name (for footer copyright)" default back to the active WordPress site title instead of the provider CTA URL so new installs inherit the correct label.
+- Added a fallback so the "Become a Provider" URL field repopulates with `https://www.patientreach360.com/get-started` whenever the saved value is empty.
+- Mirrored that behavior for the contact phone input, automatically restoring `513-587-6827` after users clear or whitespace the field.
+
+#### v1.0.20251208212958 (2025-12-08)
+
+- Prefilled the 360 Settings contact phone field with `(513) 587-6827` so new installs inherit the Patient Reach support line automatically.
+- Added `https://www.patientreach360.com/get-started` as the default "Become a provider" button URL, ensuring the CTA points to the standard onboarding form without manual setup.
+
+#### v1.0.20251208211305 (2025-12-08)
+
+- Added Playfair Display to the 360 Settings font dropdown so teams can select it for headings right from the admin UI.
+- Updated the Google Fonts loader, font stacks, and default heading weight so the new option renders consistently on the front end.
+
+#### v1.0.20251125181016 (2025-11-25)
+
+- Synced the Linktree landing page SCSS partial (`sass/pages/_linktree.scss`) into the repository, added the missing import, and rebuilt `style.css` so the live theme matches the local view.
+- Updated Linktree PHP and clinic partials to render inline SVG icons via `global_360_get_icon_svg` instead of Font Awesome placeholders, keeping assets self-contained.
+- Regenerated `style-min.css` from the freshly compiled stylesheet to keep minified assets in lockstep.
+
+#### v1.0.20251125175136 (2025-11-25)
+
+- Recompiled `style-min.css` from the latest `style.css` so the Linktree landing page polish ships to live sites using the minified bundle.
+- Bumped the theme version to trigger the WordPress updater and ensure hosted environments pick up the refreshed styling.
+
+#### v1.0.20251125172813 (2025-11-25)
+
+- Reviewed both `README.md` and `readme.txt` to ensure the deployment and distribution guidance is current before publishing this build.
+- Enabled the Claude Sonnet 4.5 assistant tier for all clients and documented the change so customer success teams can reference the update.
+
+#### v1.0.20251111221908 (2025-11-12)
+
+- Added a favicon bundle manager to 360 Settings with bulk media uploads for PNG, SVG, ICO, Apple touch, and manifest files.
+- Output the uploaded favicon links, manifest reference, and optional Apple web app title into the site `<head>` so browsers pick up the custom icons.
+- Allowed administrators to upload SVG, ICO, and `.webmanifest` files, ensured WordPress accepts and stores them without triggering image processing failures, and polished the settings UI preview styling.
+
+#### v1.0.20251111160000 (2025-11-11)
+
+- Styled the Linktree risk assessment button via the PR360 `begin-button` shadow part so it matches the other CTAs without adding extra host classes.
+- Unified all Linktree CTA heights at 52px and aligned spacing so anchors and the embedded PR360 button sit flush in the list.
+- Regenerated the minified stylesheet after polishing the Linktree layout.
+
+#### v1.0.20251111143000 (2025-11-11)
+
+- Cache-busted the admin media uploader script so the Linktree logo field immediately works after updates and ships with the new release version.
+- Added the missing `style-admin-meta.css` placeholder so the admin enqueue stops returning 404s and keeps both logo preview blocks styled.
+
+#### v1.0.20251111134500 (2025-11-11)
+
+- Added a Linktree landing page template that auto-builds primary CTAs from the global 360 settings (assessment ID, links, phone, and social profiles).
+- Introduced a Linktree-specific logo field in 360 Settings plus dedicated styling, including hiding the floating assessment button on that layout and polishing the social icons.
+
+#### v1.0.20251110121500 (2025-11-10)
+
+- Updated `style-min.css` to capture the latest design adjustments and bumped the theme version so WordPress sites pick up the refreshed minified assets.
+
+#### v1.0.20251104113000 (2025-11-04)
+
+- Version bump to trigger WordPress update checks after removing the legacy social meta tags in the previous release.
+
+#### v1.0.20251104104500 (2025-11-04)
+
+- Removed hardcoded Open Graph and Twitter meta tags from the theme header so Yoast SEO can manage social metadata without duplicates.
+
+#### v1.0.20251029012827 (2025-10-29)
+
+- Introduced a global `--heading-letter-spacing` variable sourced from theme settings so Anton headings default to 0.5px tracking.
+- Updated clinic, hero, CTA, state-card, and footer heading selectors to consume the shared letter-spacing value.
+- Ensured long URLs inside standard paragraph blocks wrap cleanly on mobile by applying `overflow-wrap` safeguards.
+
+#### v1.0.20251028154000 (2025-10-28)
+
+- Enhanced Yoast SEO integration so Clinics and Doctors custom meta content, internal links, and external links contribute to analysis.
+- Added child-theme override support for state SVG assets so per-site colors persist across parent theme updates.
+
+#### v1.0.20251027124500 (2025-10-27)
+
+- Applied the 360 Settings typography choices directly to headings and paragraph defaults while keeping the admin area untouched.
+- Locked Anton’s heading weight to 400 across the board, including footer callouts, by driving `--heading-font-weight` with dynamic defaults.
+
+#### v1.0.20251024164826 (2025-10-24)
+
+- Added 20px bottom margin to `.single-clinic pr360-questionnaire::part(begin-button)` to improve spacing beneath CTA buttons
+
+#### v1.0.20251024162841 (2025-10-24)
+
+- Restored dynamic font variables by outputting CSS both inline and in wp_head/login/admin contexts
+- Enqueued only the Google Fonts required by the current 360 settings selection
+
+#### v1.0.20251024160827 (2025-10-24)
+
+- Added text-transform: uppercase to #floating-assessment-button pr360-questionnaire::part(begin-button)
+- Reduced font-size from 18px to 16px for #floating-assessment-button pr360-questionnaire::part(begin-button)
+- Reordered divs on find-a-doctor page: moved .body_heading before .state_grid_wrapper
+
+#### v1.0.20251024031545 (2025-10-24)
+
+- Updated the shadow DOM animation to use the same charcoal glow, ensuring the floating CTA never falls back to the old green tint.
+
+#### v1.0.20251024023045 (2025-10-24)
+
+- Swapped the pulse glow to a neutral charcoal tint so the floating CTA effect matches the theme palette without the green highlight.
+
+#### v1.0.20251024014500 (2025-10-24)
+
+- Bundled the shadow DOM pulse bootstrap script so the floating assessment CTA animates immediately after WordPress updates from GitHub.
+
+#### v1.0.20251024002239 (2025-10-24)
+
+- Synced theme packaging version with the latest deployed build so the WordPress updater recognises the pulse animation enhancements without requiring a GitHub release.
+
+#### v1.0.20251023104512 (2025-10-23)
+
+- Supercharged the floating assessment CTA with a shadow-root-aware pulse animation, persistent drop shadow, and 0px margin footprint so the button hugs its container cleanly.
+
+#### v1.0.20251022143000 (2025-10-22)
+
+- Refined the footer layout for responsive breakpoints, keeping desktop columns compact while introducing tablet/mobile wrapping with consistent padding and horizontal social links.
+
+#### v1.0.20251022114500 (2025-10-22)
+
+- Rebuilt the mobile navigation with an accessible hamburger toggle, full-screen overlay menu, and scroll locking on open, plus improved hover/focus handling across breakpoints.
+
+#### v1.0.20251021241001 (2025-10-21)
+
+- Updated primary navigation hover/focus states to use the brand green while keeping the CTA button styling intact, and reset default `.post`/`.page` margins to zero for tighter layouts.
+
+#### v1.0.20251021234500 (2025-10-21)
+
+- Restrict Google review debug details to the WordPress admin area so public pages only show the friendly “No reviews yet” message and call-to-action.
+
+#### v1.0.20251021231500 (2025-10-21)
+
+- Added graceful handling when the Places API omits aggregate ratings, including computed fallbacks, improved admin debug messaging, and guidance for clinics with no published reviews yet.
+
+#### v1.0.20251021213045 (2025-10-21)
+
+- Added Google Places API key guidance, better admin error diagnostics, and explicit handling when Google returns partial review data.
+
+#### v1.0.20251021104500 (2025-10-21)
+
+- Added a dedicated Google Places API key field, updated admin guidance, and improved error reporting for clinic reviews so server-side Place Details requests succeed with restricted keys.
+
+#### v1.0.20251017114500 (2025-10-17)
+
+- Ensure the Anton typeface appears in the admin font dropdown and front-end critical CSS, and load it via Google Fonts.
+
+#### v1.0.20251017094500 (2025-10-17)
+
+- Integrated the Anton typeface across the theme font settings and front-end mapping so heading selections render immediately.
+
+## Update Sources
+
+- **Repository**: https://github.com/KazimirAlvis/Global-360-Theme
+- **Release API**: GitHub Releases API
+- **Download**: Main branch ZIP file
+
+## Features
+
+- ✅ Automatic update notifications in WordPress admin
+- ✅ Manual update checking
+- ✅ Version comparison and status display
+- ✅ Integration with WordPress themes page
+- ✅ Admin menu for update management
+- ✅ GitHub repository integration
+
+## Troubleshooting
+
+- If updates don't appear, try the manual update check
+- Ensure GitHub repository is public and accessible
+- Check that version numbers are properly formatted
+- WordPress checks for updates every 12 hours by default
+
+## Admin Access
+
+Access the theme update page via:
+**WordPress Admin → Appearance → Theme Updates**
