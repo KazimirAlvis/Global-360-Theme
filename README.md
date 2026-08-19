@@ -1,5 +1,9 @@
 # Global 360 Theme
 
+> Stage 2 responsibility note: when **360 Platform Core** is active, Core owns canonical `clinic` and `doctor` post-type registration and the shared state/data contracts. This theme retains a deprecated registration fallback for local transition safety and continues to own presentation and editing UI.
+
+API-sourced Clinic and Doctor identity/operational fields are presented as read-only in wp-admin. API Sync remains authoritative; any future manual override must use a separate field with explicit precedence.
+
 Current release: `1.0.20260814001500`
 
 A comprehensive WordPress theme designed for Patient 360 medical websites, featuring dynamic clinic finder functionality, interactive maps, and complete practice management capabilities.

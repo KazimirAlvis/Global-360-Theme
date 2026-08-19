@@ -40,6 +40,9 @@ add_filter( 'manage_edit-doctor_sortable_columns', function( $cols ) {
  * 2) Register clinic_id post_meta
  */
 add_action( 'init', function() {
+	if ( function_exists( 'global360_platform' ) ) {
+		return;
+	}
     register_post_meta( 'doctor', 'clinic_id', [
         'type'         => 'array',
         'single'       => false,

@@ -1157,9 +1157,14 @@ function cpt360_flag_ico_upload_non_image($upload, $context)
 add_filter('wp_handle_upload', 'cpt360_flag_ico_upload_non_image', 10, 2);
 
 /**
- * Register Clinics CPT (only if not already registered by plugin)
+ * Transitional Clinic CPT fallback.
+ *
+ * @deprecated Platform Core owns canonical registration when active.
  */
 add_action('init', function () {
+	if (defined('GLOBAL360_PLATFORM_CORE_OWNS_CONTENT_TYPES')) {
+		return;
+	}
 	if (!post_type_exists('clinic')) {
 		$labels = [
 			'name'               => 'Clinics',
@@ -1185,9 +1190,14 @@ add_action('init', function () {
 });
 
 /**
- * Register Doctors CPT (only if not already registered by plugin)
+ * Transitional Doctor CPT fallback.
+ *
+ * @deprecated Platform Core owns canonical registration when active.
  */
 add_action('init', function () {
+	if (defined('GLOBAL360_PLATFORM_CORE_OWNS_CONTENT_TYPES')) {
+		return;
+	}
 	if (!post_type_exists('doctor')) {
 		$labels = [
 			'name'               => 'Doctors',
@@ -1255,6 +1265,103 @@ add_action('add_meta_boxes', function () {
 		//     'default' 
 		// );
 	}
+});
+
+/**
+ * Determine whether the current Clinic/Doctor record is sourced from API Sync.
+ */
+function global360_is_api_managed_entity($post_id)
+{
+	$post_id   = absint($post_id);
+	$post_type = get_post_type($post_id);
+	if ('clinic' === $post_type) {
+		return metadata_exists('post', $post_id, '_360_organization_id')
+			|| metadata_exists('post', $post_id, 'organization_id');
+	}
+
+	if ('doctor' === $post_type) {
+		return metadata_exists('post', $post_id, '_360_doctor_id')
+			|| metadata_exists('post', $post_id, '_360_doctor_slug');
+	}
+
+	return false;
+}
+
+/**
+ * Make API-owned Clinic/Doctor fields visibly informational in wp-admin.
+ *
+ * The controls remain successful form controls so legacy save callbacks cannot
+ * interpret a missing field as a request to clear synchronized data.
+ */
+add_action('admin_head-post.php', function () {
+	global $post;
+	if (! $post instanceof WP_Post || ! global360_is_api_managed_entity($post->ID)) {
+		return;
+	}
+	?>
+	<style>
+		.global360-api-managed-box .inside { position: relative; pointer-events: none; opacity: .78; }
+		.global360-api-managed-box .hndle,
+		.global360-api-managed-box .handle-actions { pointer-events: auto; opacity: 1; }
+		#title.global360-api-readonly { background: #f6f7f7; color: #50575e; }
+		.global360-api-managed-label { display: inline-block; margin: 0 0 8px; padding: 4px 8px; background: #f0f6fc; border-left: 4px solid #2271b1; font-weight: 600; }
+	</style>
+	<?php
+});
+
+add_action('admin_notices', function () {
+	global $post;
+	if (! $post instanceof WP_Post || ! global360_is_api_managed_entity($post->ID)) {
+		return;
+	}
+	?>
+	<div class="notice notice-info global360-api-managed-notice">
+		<p><strong><?php esc_html_e('API-managed record', 'cpt360'); ?></strong> — <?php esc_html_e('Identity and operational fields are read-only here. 360 API Sync is the source of truth and will overwrite them from upstream.', 'cpt360'); ?></p>
+	</div>
+	<?php
+});
+
+add_action('admin_footer-post.php', function () {
+	global $post;
+	if (! $post instanceof WP_Post || ! global360_is_api_managed_entity($post->ID)) {
+		return;
+	}
+
+	$clinic_boxes = array('clinic_thumbnail_meta', 'cpt360_clinic_phone', 'clinic_addresses', 'cpt360_clinic_assessment_id', 'cpt360_clinic_bio', 'clinic_info_meta', 'clinic_reviews', 'clinic_website_meta', 'clinic_logo_meta', 'cpt360_clinic_state');
+	$doctor_boxes = array('doctor-clinic-selector', 'doctor_details');
+	$box_ids      = 'clinic' === $post->post_type ? $clinic_boxes : $doctor_boxes;
+	?>
+	<script>
+	(function () {
+		var boxIds = <?php echo wp_json_encode($box_ids); ?>;
+		var title = document.getElementById('title');
+		if (title) {
+			title.readOnly = true;
+			title.classList.add('global360-api-readonly');
+			title.setAttribute('aria-readonly', 'true');
+		}
+		boxIds.forEach(function (id) {
+			var box = document.getElementById(id);
+			if (!box) return;
+			box.classList.add('global360-api-managed-box');
+			var inside = box.querySelector('.inside');
+			if (!inside) return;
+			var label = document.createElement('p');
+			label.className = 'global360-api-managed-label';
+			label.textContent = 'Read-only — managed by 360 API Sync';
+			inside.insertBefore(label, inside.firstChild);
+			inside.querySelectorAll('input:not([type="hidden"]), textarea').forEach(function (field) {
+				field.readOnly = true;
+				field.setAttribute('aria-readonly', 'true');
+			});
+			inside.querySelectorAll('select, button, [contenteditable="true"]').forEach(function (field) {
+				field.tabIndex = -1;
+				field.setAttribute('aria-disabled', 'true');
+			});
+		});
+	})();
+	</script>
+	<?php
 });
 
 /**
@@ -1430,6 +1537,10 @@ if (! function_exists('global360_get_valid_state_slug_map')) {
 	 */
 	function global360_get_valid_state_slug_map()
 	{
+		if (function_exists('global360_platform')) {
+			return global360_platform()->states()->slug_map();
+		}
+
 		$states = array(
 			'AL' => 'Alabama',
 			'AK' => 'Alaska',
@@ -1525,14 +1636,19 @@ if (! function_exists('global360_get_state_sitemap_entries')) {
 		}
 
 		foreach ($clinic_ids as $clinic_id) {
-			$clinic_states = get_post_meta($clinic_id, 'clinic_states', true);
-			if (! is_array($clinic_states)) {
-				$clinic_states = array();
-			}
+			if (function_exists('global360_platform')) {
+				$clinic_view   = global360_platform()->clinics()->get((int) $clinic_id);
+				$clinic_states = is_array($clinic_view) ? (array) ($clinic_view['state_codes'] ?? array()) : array();
+			} else {
+				$clinic_states = get_post_meta($clinic_id, 'clinic_states', true);
+				if (! is_array($clinic_states)) {
+					$clinic_states = array();
+				}
 
-			$single_state = sanitize_text_field((string) get_post_meta($clinic_id, '_cpt360_clinic_state', true));
-			if ('' !== $single_state) {
-				$clinic_states[] = $single_state;
+				$single_state = sanitize_text_field((string) get_post_meta($clinic_id, '_cpt360_clinic_state', true));
+				if ('' !== $single_state) {
+					$clinic_states[] = $single_state;
+				}
 			}
 
 			$clinic_lastmod = get_post_modified_time('c', true, (int) $clinic_id);

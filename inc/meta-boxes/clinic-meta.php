@@ -9,6 +9,9 @@
  * 1) Register clinic state meta
  */
 add_action( 'init', function() {
+	if ( function_exists( 'global360_platform' ) ) {
+		return;
+	}
     register_post_meta( 'clinic', 'clinic_states', [
         'type'         => 'array',
         'single'       => false,
@@ -42,7 +45,7 @@ if (!function_exists('cpt360_render_clinic_state_metabox')) {
 		wp_nonce_field( 'cpt360_save_clinic_state', 'cpt360_clinic_state_nonce' );
 		$selected_states = (array) get_post_meta( $post->ID, 'clinic_states', true );
 
-		$states = [
+		$states = function_exists( 'global360_platform' ) ? global360_platform()->states()->all() : [
 			'AL'=>'Alabama','AK'=>'Alaska','AZ'=>'Arizona','AR'=>'Arkansas',
 			'CA'=>'California','CO'=>'Colorado','CT'=>'Connecticut','DE'=>'Delaware',
         'FL'=>'Florida','GA'=>'Georgia','HI'=>'Hawaii','ID'=>'Idaho',
@@ -55,7 +58,7 @@ if (!function_exists('cpt360_render_clinic_state_metabox')) {
         'OR'=>'Oregon','PA'=>'Pennsylvania','RI'=>'Rhode Island','SC'=>'South Carolina',
         'SD'=>'South Dakota','TN'=>'Tennessee','TX'=>'Texas','UT'=>'Utah',
         'VT'=>'Vermont','VA'=>'Virginia','WA'=>'Washington','WV'=>'West Virginia',
-        'WI'=>'Wisconsin','WY'=>'Wyoming',
+        'WI'=>'Wisconsin','WY'=>'Wyoming','DC'=>'District of Columbia',
     ];
 
     echo '<label for="cpt360_clinic_states">' . __( 'Select States (Hold Ctrl/Cmd for multiple):', 'cpt360' ) . '</label><br>';
@@ -1739,5 +1742,4 @@ add_shortcode('cpt360_all_doctors', function($atts) {
     echo '</div>';
     return ob_get_clean();
 });
-
 
