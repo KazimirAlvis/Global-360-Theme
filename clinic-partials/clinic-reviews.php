@@ -1,5 +1,6 @@
 <?php
-$reviews = get_post_meta( get_the_ID(), 'clinic_reviews', true );
+$clinic_view = global360_theme_clinic( get_the_ID() );
+$reviews = $clinic_view['reviews'] ?? array();
 if ( ! empty( $reviews ) && is_array( $reviews ) ): ?>
   <section class="clinic-reviews">
     <h2>Patient Reviews</h2>

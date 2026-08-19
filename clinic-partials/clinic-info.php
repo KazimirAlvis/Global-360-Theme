@@ -1,7 +1,8 @@
 <h2>For <?php the_title(); ?> Patients</h2>
 <?php
     // Clinic info repeater 
-    $clinic_info = get_post_meta(get_the_ID(), 'clinic_info', true);
+    $clinic_view = global360_theme_clinic(get_the_ID());
+    $clinic_info = $clinic_view['clinic_info'] ?? array();
     
 
     // Make sure it’s an array and not empty

@@ -8,27 +8,24 @@
 if (!function_exists('cpt360_render_clinic_doctors')) {
 	function cpt360_render_clinic_doctors()
 	{
-    echo '<!-- cpt360_render_clinic_doctors CALLED -->';
     // 1) Get the current clinic ID
     $clinic_id = get_the_ID();
     if (! $clinic_id) {
         return;
     }
 
-    $all_doctors = get_posts([
-        'post_type' => 'doctor',
-        'posts_per_page' => -1,
-    ]);
+    $clinic_view = function_exists('global360_theme_clinic') ? global360_theme_clinic($clinic_id) : null;
+    $doctor_ids = is_array($clinic_view) ? (array) ($clinic_view['doctor_ids'] ?? array()) : array();
 
-    $clinic_doctors = [];
-    foreach ($all_doctors as $doc) {
-        $meta = get_post_meta($doc->ID, 'clinic_id', true);
-        if (is_array($meta) && in_array($clinic_id, $meta)) {
-            $clinic_doctors[] = $doc;
-        } elseif ($meta == $clinic_id) {
-            $clinic_doctors[] = $doc;
-        }
-    }
+    $clinic_doctors = empty($doctor_ids) ? array() : get_posts([
+        'post_type'      => 'doctor',
+        'post_status'    => 'publish',
+        'post__in'       => array_map('absint', $doctor_ids),
+        'posts_per_page' => -1,
+        'orderby'        => 'title',
+        'order'          => 'ASC',
+        'no_found_rows'  => true,
+    ]);
 
     // Output doctors
     if ($clinic_doctors) {
@@ -37,10 +34,10 @@ if (!function_exists('cpt360_render_clinic_doctors')) {
         echo '<div class="doctors-grid">';
         foreach ($clinic_doctors as $doc) {
             $post_id  = $doc->ID;
-            $name     = get_post_meta($post_id, 'doctor_name',  true) ?: get_the_title($post_id);
-            $title    = get_post_meta($post_id, 'doctor_title', true);
-            $bio      = get_post_meta($post_id, 'doctor_bio',   true);
-            $photo_id = get_post_meta($post_id, '_doctor_photo_id', true);
+            $doctor_view = function_exists('global360_theme_doctor') ? global360_theme_doctor($post_id) : null;
+            $name     = is_array($doctor_view) ? ($doctor_view['name'] ?? get_the_title($post_id)) : get_the_title($post_id);
+            $title    = is_array($doctor_view) ? ($doctor_view['title'] ?? '') : '';
+            $photo_id = is_array($doctor_view) ? ($doctor_view['photo_attachment_id'] ?? 0) : 0;
             $doctor_url = get_permalink($post_id);
 
             if ($photo_id) {

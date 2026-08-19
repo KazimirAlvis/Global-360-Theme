@@ -31,7 +31,7 @@ $assessment_label = isset($assessment_label) && $assessment_label !== ''
 $assessment_inner_html = isset($assessment_inner_html) ? (string) $assessment_inner_html : '';
 
 if ($assessment_inner_html === '') {
-    $globals = get_option('360_global_settings', []);
+    $globals = function_exists('global360_theme_site_context') ? global360_theme_site_context() : array();
     $custom_label = isset($globals['assessment_button_text']) ? trim((string) $globals['assessment_button_text']) : '';
     if ($custom_label !== '') {
         $assessment_label = $custom_label;

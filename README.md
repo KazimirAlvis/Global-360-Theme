@@ -254,6 +254,9 @@ npm run lint:scss
 
 [`docs/THEME-UPDATES.md`](docs/THEME-UPDATES.md) is the authoritative versioning, changelog, and deployment guide.
 
+The unmerged Stage 2B refactor checkpoint and its production-blocking query
+regression are documented in [`docs/STAGE-2B-CHECKPOINT.md`](docs/STAGE-2B-CHECKPOINT.md).
+
 For each release, edit and test in the active Git checkout, review the diff, coordinate the version in `functions.php` and `style.css`, update the changelog, commit, push `main`, and update production sites through the WordPress theme update mechanism. Routine deployments do not require a GitHub Release.
 
 ## �📝 Content Management

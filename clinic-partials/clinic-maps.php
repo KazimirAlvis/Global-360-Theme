@@ -18,7 +18,7 @@ function cpt360_render_clinic_maps()
     $clinic_id = get_the_ID();
     $locations = function_exists('global360_get_clinic_locations')
         ? global360_get_clinic_locations($clinic_id, array(
-            'allow_geocode' => true,
+            'allow_geocode' => false,
             'limit'         => 3,
         ))
         : array();

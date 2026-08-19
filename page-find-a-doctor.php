@@ -6,58 +6,19 @@ Template Name: Find a Doctor
 get_header();
 ?>
 
-<style>
-    .doctor-directory-learn-more {
-        text-align: center;
-    }
-
-    .doctor-directory-links {
-        margin-left: 0;
-        padding-left: 0;
-        display: inline-block;
-        text-align: left;
-    }
-
-    .doctor-directory-links a,
-    .doctor-directory-links a:visited {
-        color: var(--cpt360-primary);
-    }
-
-    .state-grid li a,
-    .state-grid li a:visited,
-    .state-grid li a:hover,
-    .state-grid li a:focus {
-        text-decoration: none;
-    }
-</style>
-
 <main id="primary" class="site-main">
 
     <?php
     while (have_posts()) :
         the_post();
 
-        $globals = get_option('360_global_settings', []);
+        $globals = global360_theme_site_context();
         $global_assessment_id = isset($globals['assessment_id']) ? sanitize_text_field($globals['assessment_id']) : '';
 
         // Get the page content and inject the grid after the hero
         $content = apply_filters('the_content', get_the_content());
         // Build the grid markup
         ob_start();
-        if ($global_assessment_id) {
-            echo '<style>';
-            // Prevent any single item (including PR360) from expanding the grid tracks.
-            echo '.state-grid{grid-template-columns:repeat(8,minmax(0,1fr));}';
-            echo '@media (max-width: 1200px){.state-grid{grid-template-columns:repeat(4,minmax(0,1fr));}}';
-            echo '@media (max-width: 550px){.state-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}';
-            echo '.state-grid>li{min-width:0;}';
-            echo '.state-grid>li>a{display:flex;flex-direction:column;align-items:center;width:100%;min-width:0;}';
-
-            // Make the PR360 tile behave like the <a> tile (full-cell, no default button chrome).
-            echo '.state-grid li pr360-questionnaire{display:block;width:100%;height:100%;min-width:0;}';
-            echo '.state-grid pr360-questionnaire::part(begin-button){background:transparent !important;border:0 !important;box-shadow:none !important;outline:none !important;padding:0 !important;margin:0 !important;width:100% !important;height:100% !important;min-width:0 !important;max-width:100% !important;cursor:pointer !important;display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:flex-start !important;font:inherit !important;color:inherit !important;text-align:center !important;box-sizing:border-box !important;}';
-            echo '</style>';
-        }
         echo '<div class="body_heading">';
         echo '<h2>Click Your State Below</h2>';
         echo '</div>';

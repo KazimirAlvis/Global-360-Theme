@@ -230,7 +230,8 @@ if (! function_exists('global360_get_clinic_locations')) {
             return array();
         }
 
-        $addresses = get_post_meta($clinic_id, 'clinic_addresses', true);
+        $clinic_view = function_exists('global360_theme_clinic') ? global360_theme_clinic($clinic_id) : null;
+        $addresses = is_array($clinic_view) ? ($clinic_view['addresses'] ?? array()) : array();
         if (! is_array($addresses) || empty($addresses)) {
             return array();
         }
@@ -274,7 +275,7 @@ if (! function_exists('global360_get_state_locations')) {
     function global360_get_state_locations($state_abbr, $state_name = '', $args = array())
     {
         $defaults = array(
-            'allow_geocode' => true,
+            'allow_geocode' => false,
             'api_key'       => '',
         );
         $args = wp_parse_args($args, $defaults);
@@ -285,29 +286,28 @@ if (! function_exists('global360_get_state_locations')) {
             return array();
         }
 
-        $clinics = get_posts(array(
+        $clinic_ids = get_posts(array(
             'post_type'      => 'clinic',
             'posts_per_page' => -1,
             'post_status'    => 'publish',
-            'meta_query'     => array(
-                array(
-                    'key'     => '_cpt360_clinic_state',
-                    'value'   => $state_abbr,
-                    'compare' => '=',
-                ),
-            ),
+            'fields'         => 'ids',
+            'no_found_rows'  => true,
             'orderby'        => 'title',
             'order'          => 'ASC',
         ));
 
-        if (empty($clinics)) {
+        if (empty($clinic_ids)) {
             return array();
         }
 
         $locations = array();
 
-        foreach ($clinics as $clinic) {
-            $addresses = get_post_meta($clinic->ID, 'clinic_addresses', true);
+        foreach (array_map('absint', $clinic_ids) as $clinic_id) {
+            $clinic_view = function_exists('global360_theme_clinic') ? global360_theme_clinic($clinic_id) : null;
+            if (! is_array($clinic_view) || ! in_array($state_abbr, (array) ($clinic_view['state_codes'] ?? array()), true)) {
+                continue;
+            }
+            $addresses = $clinic_view['addresses'] ?? array();
             if (! is_array($addresses)) {
                 continue;
             }
@@ -332,12 +332,9 @@ if (! function_exists('global360_get_state_locations')) {
                     continue;
                 }
 
-                $coords = global360_get_address_coords(
-                    $addr,
-                    (bool) $args['allow_geocode'],
-                    (string) $args['api_key']
-                );
-                $item = global360_build_location_item((int) $clinic->ID, $addr, $coords);
+                // Visitor requests consume stored coordinates only.
+                $coords = global360_get_address_coords($addr, false, '');
+                $item = global360_build_location_item($clinic_id, $addr, $coords);
 
                 if ($item !== null) {
                     $locations[] = $item;

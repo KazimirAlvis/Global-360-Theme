@@ -16,7 +16,7 @@
 	<div class="footer_inner max_width_content">
 		<div class="column footer_logo">
 			<?php
-			$opts = get_option('360_global_settings', []);
+			$opts = global360_theme_site_context();
 			$logo_id = isset($opts['header_logo_id']) ? (int) $opts['header_logo_id'] : 0;
 			if ($logo_id) {
 				$logo_alt = get_post_meta($logo_id, '_wp_attachment_image_alt', true);
@@ -68,7 +68,7 @@
 			</ul>
 			<?php
 			// Get become provider URL from settings and display button here
-			$opts = get_option('360_global_settings', []);
+			$opts = global360_theme_site_context();
 			$become_provider_url = isset($opts['become_provider_url']) && !empty($opts['become_provider_url']) ? $opts['become_provider_url'] : '';
 			if ($become_provider_url): ?>
 				<div class="become-provider-button" style="margin-top: 25px;">
@@ -106,7 +106,7 @@
 			<ul>
 				<?php
 				// Get dynamic contact information from settings
-				$opts = get_option('360_global_settings', []);
+				$opts = global360_theme_site_context();
 				$contact_email = isset($opts['contact_email']) && !empty($opts['contact_email']) ? $opts['contact_email'] : 'info@myhemorrhoidclinic.com';
 				$contact_phone = isset($opts['contact_phone']) && !empty($opts['contact_phone']) ? $opts['contact_phone'] : '513-587-6827';
 				$email_label = isset($opts['contact_email_label']) && !empty($opts['contact_email_label']) ? $opts['contact_email_label'] : 'Customer Support';
@@ -121,7 +121,7 @@
 	<div class="lower_footer max_width_content">
 		<div class="legal">
 			<?php
-			$opts = get_option('360_global_settings', []);
+			$opts = global360_theme_site_context();
 			$site_name = isset($opts['site_name']) && !empty($opts['site_name']) ? $opts['site_name'] : get_bloginfo('name');
 			$current_year = date('Y');
 			$sitemap_page = get_page_by_path('sitemap');
@@ -131,13 +131,13 @@
 			<p><a href="https://www.patientreach360.com/privacy-policy/">Privacy Policy</a> | <a href="https://www.patientreach360.com/terms-of-use/">Terms of Use Agreement</a> | <a href="<?php echo esc_url($sitemap_url); ?>">Sitemap</a></p>
 		</div>
 		<div class="footer_form_pu">
-			<span id="do-not-sell-trigger" style="cursor: pointer;">Do Not Sell MY Info</span>
+			<span id="do-not-sell-trigger">Do Not Sell MY Info</span>
 		</div>
 	</div>
 
 	<!-- Do Not Sell Info Modal -->
 	<?php $do_not_sell_form_id = function_exists('global_360_theme_resolve_cf7_form_id') ? global_360_theme_resolve_cf7_form_id('98f6667') : '98f6667'; ?>
-	<div id="do-not-sell-modal" class="modal-overlay" style="display: none;">
+	<div id="do-not-sell-modal" class="modal-overlay">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h3>Do Not Sell My Information</h3>
@@ -229,27 +229,21 @@
 
 <?php
 // Floating assessment button - uses same logic as clinic buttons
-echo '<!-- DEBUG: Checking for floating button -->';
 if (function_exists('cpt360_get_assessment_id')) {
 	$assess_id = cpt360_get_assessment_id();
-	echo '<!-- DEBUG: Assessment ID found: "' . $assess_id . '" -->';
 	if (!empty($assess_id)) {
 		$assessment_site_id = $assess_id;
 		$assessment_label = 'Take risk assessment now';
 		$assessment_partial = get_template_directory() . '/clinic-partials/assessment-questionnaire.php';
 ?>
-		<div id="floating-assessment-button" class="pr360-pulse-enabled" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: block;">
+		<div id="floating-assessment-button" class="pr360-pulse-enabled">
 			<?php require $assessment_partial; ?>
 		</div>
 		<?php
-		echo '<!-- DEBUG: Button rendered -->';
 	} else {
-		echo '<!-- DEBUG: No assessment ID, not showing button -->';
-
 		// Fallback - try global settings directly
-		$settings = get_option('360_global_settings', []);
+		$settings = global360_theme_site_context();
 		$global_id = isset($settings['assessment_id']) ? $settings['assessment_id'] : '';
-		echo '<!-- DEBUG: Global settings assessment_id: "' . $global_id . '" -->';
 
 		if (!empty($global_id)) {
 			$assessment_site_id = $global_id;
@@ -260,20 +254,8 @@ if (function_exists('cpt360_get_assessment_id')) {
 				<?php require $assessment_partial; ?>
 			</div>
 	<?php
-			echo '<!-- DEBUG: Fallback button rendered -->';
 		}
 	}
-} else {
-	echo '<!-- DEBUG: cpt360_get_assessment_id function not available -->';
-	// Show button with test ID for now
-	$assessment_site_id = 'TEST-ID';
-	$assessment_label = 'Take risk assessment now';
-	$assessment_partial = get_template_directory() . '/clinic-partials/assessment-questionnaire.php';
-	?>
-	<div id="floating-assessment-button" class="pr360-pulse-enabled">
-		<?php require $assessment_partial; ?>
-	</div>
-<?php
 }
 ?>
 

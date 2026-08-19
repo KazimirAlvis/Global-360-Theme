@@ -113,13 +113,14 @@ if (!function_exists('parse_address_for_display')) {
     }
 }
 
-// Get doctor data
-$doctor_name = get_post_meta($doctor_id, 'doctor_name', true) ?: get_the_title();
-$doctor_title = get_post_meta($doctor_id, 'doctor_title', true);
-$doctor_bio = get_post_meta($doctor_id, 'doctor_bio', true);
+// Read API-managed doctor data through the shared contract.
+$doctor_view = global360_theme_doctor($doctor_id);
+$doctor_name = $doctor_view['name'] ?? get_the_title();
+$doctor_title = $doctor_view['title'] ?? '';
+$doctor_bio = $doctor_view['bio'] ?? '';
 
 // Get doctor photo
-$photo_id = get_post_meta($doctor_id, '_doctor_photo_id', true);
+$photo_id = $doctor_view['photo_attachment_id'] ?? 0;
 if ($photo_id) {
     $photo_url = wp_get_attachment_image_url($photo_id, 'medium');
 } else {
@@ -140,7 +141,7 @@ if ($photo_id) {
 }
 
 // Get associated clinics
-$clinic_ids = (array) get_post_meta($doctor_id, 'clinic_id', true);
+$clinic_ids = (array) ($doctor_view['clinic_ids'] ?? array());
 $clinics = [];
 if (!empty($clinic_ids)) {
     $clinics = get_posts([
@@ -152,7 +153,7 @@ if (!empty($clinic_ids)) {
     ]);
 }
 
-$opts = get_option('360_global_settings', []);
+$opts = global360_theme_site_context();
 $primary_condition = isset($opts['primary_condition']) ? trim((string) $opts['primary_condition']) : '';
 $related_conditions = isset($opts['related_conditions']) ? trim((string) $opts['related_conditions']) : '';
 $primary_treatment = isset($opts['primary_treatment']) ? trim((string) $opts['primary_treatment']) : '';
@@ -176,36 +177,6 @@ if ($related_conditions !== '') {
 }
 
 ?>
-
-<style>
-    .doctor-learn-more {
-        margin: 12px 0 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .doctor-learn-link {
-        display: inline-block;
-        color: var(--cpt360-primary);
-        text-decoration: none;
-        font-weight: 600;
-    }
-
-    .doctor-learn-link:visited {
-        color: var(--cpt360-primary);
-    }
-
-    .doctor-learn-link:hover,
-    .doctor-learn-link:focus {
-        text-decoration: underline;
-    }
-
-    .doctor-practice-locations .clinic-address-list {
-        margin-left: 0;
-        padding-left: 0;
-    }
-</style>
 
 <main id="primary" class="site-main">
     <div class="sm_hero">
@@ -277,7 +248,7 @@ if ($related_conditions !== '') {
                     <?php if (!empty($treatment_items)): ?>
                         <section class="doctor-treatments">
                             <h2>Treatments Offered</h2>
-                            <ul style="margin-left: 0;">
+                            <ul>
                                 <?php foreach ($treatment_items as $treatment): ?>
                                     <li><?php echo esc_html($treatment); ?></li>
                                 <?php endforeach; ?>
@@ -306,12 +277,12 @@ if ($related_conditions !== '') {
                             <h2>Practice Locations</h2>
                             <div class="practice-locations-list">
                                 <?php foreach ($clinics as $clinic): ?>
+                                    <?php $clinic_view = global360_theme_clinic($clinic->ID); ?>
                                     <div class="practice-location">
                                         <h3><a href="<?php echo esc_url(get_permalink($clinic->ID)); ?>"><?php echo esc_html($clinic->post_title); ?></a></h3>
                                         
                                         <?php
-                                        // Get clinic addresses
-                                        $addresses = get_post_meta($clinic->ID, 'clinic_addresses', true);
+                                        $addresses = $clinic_view['addresses'] ?? array();
                                         $cities = [];
 
                                         if (is_array($addresses) && !empty($addresses)) {
@@ -399,8 +370,7 @@ if ($related_conditions !== '') {
                                         <?php endif; ?>
 
                                         <?php
-                                        // Get clinic phone
-                                        $phone = get_post_meta($clinic->ID, 'clinic_phone', true);
+                                        $phone = $clinic_view['phone'] ?? '';
                                         if ($phone):
                                         ?>
                                             <div class="clinic-phone">
@@ -409,8 +379,7 @@ if ($related_conditions !== '') {
                                         <?php endif; ?>
 
                                         <?php
-                                        // Get clinic website
-                                        $website = get_post_meta($clinic->ID, 'clinic_website', true);
+                                        $website = $clinic_view['website'] ?? '';
                                         if ($website):
                                         ?>
                                             <div class="clinic-website">

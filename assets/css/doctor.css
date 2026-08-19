@@ -1,0 +1,7 @@
+.doctor-learn-more { display: flex; flex-direction: column; gap: 10px; margin: 12px 0 20px; }
+.doctor-learn-link,
+.doctor-learn-link:visited { display: inline-block; color: var(--cpt360-primary); font-weight: 600; text-decoration: none; }
+.doctor-learn-link:hover,
+.doctor-learn-link:focus { text-decoration: underline; }
+.doctor-practice-locations .clinic-address-list,
+.doctor-treatments ul { margin-left: 0; padding-left: 0; }

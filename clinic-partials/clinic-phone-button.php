@@ -1,7 +1,8 @@
 
             <?php
             // 3) Clinic phone
-            $phone = get_post_meta(get_the_ID(), '_cpt360_clinic_phone', true);
+            $clinic_view = global360_theme_clinic(get_the_ID());
+            $phone = $clinic_view['phone'] ?? '';
             if ($phone) {
                 // wrap in a tel: link
                 printf(
@@ -11,4 +12,3 @@
                 );
             }
             ?>
-      

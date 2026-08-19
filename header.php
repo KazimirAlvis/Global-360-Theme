@@ -39,7 +39,7 @@
 			<div class="header_inner max_width_content">
 			<div class="site-branding">
 				<?php
-				$opts = get_option('360_global_settings', []);
+				$opts = global360_theme_site_context();
 				$logo_id = isset($opts['header_logo_id']) ? (int) $opts['header_logo_id'] : 0;
 				if ($logo_id) {
 					$logo_alt = get_post_meta($logo_id, '_wp_attachment_image_alt', true);

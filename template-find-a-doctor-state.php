@@ -134,7 +134,7 @@ $state_abbr = $state_slug_map[$state_slug];
 $state_name = $states[$state_abbr];
 $map_config = isset($state_centers[$state_abbr]) ? $state_centers[$state_abbr] : $state_centers['TX'];
 $locations = function_exists('global360_get_state_locations')
-    ? global360_get_state_locations($state_abbr, $state_name, array('allow_geocode' => true))
+    ? global360_get_state_locations($state_abbr, $state_name, array('allow_geocode' => false))
     : array();
 ?>
 <main id="primary" class="site-main">
@@ -143,22 +143,6 @@ $locations = function_exists('global360_get_state_locations')
     </div>
     <div class="max_width_content_body">
         <div class="map_holder">
-            <style>
-                .map-container {
-                    max-width: 2500px;
-                    margin: 0 auto;
-                    padding: 0;
-                    position: relative;
-                    z-index: 1;
-                }
-
-                #map {
-                    height: 500px;
-                    width: 100%;
-                    border-radius: 10px;
-                    overflow: hidden;
-                }
-            </style>
             <?php
             if (function_exists('global360_render_leaflet_map')) {
                 global360_render_leaflet_map($locations, array(

@@ -10,7 +10,7 @@
 
 get_header();
 
-$opts = get_option('360_global_settings', []);
+$opts = global360_theme_site_context();
 
 $linktree_logo_id = isset($opts['linktree_logo_id']) ? (int) $opts['linktree_logo_id'] : 0;
 if (! $linktree_logo_id) {

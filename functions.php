@@ -8,6 +8,8 @@
  * @package Global-360-Theme
  */
 
+require_once get_template_directory() . '/inc/compatibility/platform-core.php';
+require_once get_template_directory() . '/inc/assets/contextual-assets.php';
 require_once get_template_directory() . '/inc/meta-boxes/clinic-meta.php';
 require_once get_template_directory() . '/inc/meta-boxes/doctors-meta.php';
 require_once get_template_directory() . '/inc/settings.php';
@@ -917,7 +919,7 @@ function global_360_theme_resolve_cf7_form_id($requested_form_id = '')
 		$candidates[] = $requested_form_id;
 	}
 
-	$opts = get_option('360_global_settings', array());
+	$opts = global360_theme_site_context();
 	if (is_array($opts) && ! empty($opts['do_not_sell_form_id'])) {
 		$candidates[] = trim((string) $opts['do_not_sell_form_id']);
 	}
@@ -1834,7 +1836,7 @@ add_action('template_include', function ($template) {
 if (! function_exists('global360_get_seo_settings_terms')) {
 	function global360_get_seo_settings_terms()
 	{
-		$settings = get_option('360_global_settings', array());
+		$settings = global360_theme_site_context();
 		if (! is_array($settings)) {
 			$settings = array();
 		}
@@ -2508,7 +2510,7 @@ if (! function_exists('global360_output_schema')) {
 		};
 
 		$get_global_schema_settings = static function () use ($clean_text) {
-			$opts = get_option('360_global_settings', array());
+			$opts = global360_theme_site_context();
 			if (! is_array($opts)) {
 				$opts = array();
 			}
@@ -3234,7 +3236,7 @@ if (! function_exists('global360_output_content_page_schema')) {
 			}
 		}
 
-		$global_settings = get_option('360_global_settings', array());
+		$global_settings = global360_theme_site_context();
 		$site_name_setting = '';
 		if (is_array($global_settings) && ! empty($global_settings['site_name'])) {
 			$site_name_setting = sanitize_text_field(wp_strip_all_tags((string) $global_settings['site_name']));
@@ -3315,7 +3317,7 @@ if (! function_exists('global360_output_breadcrumb_schema')) {
 			return;
 		}
 
-		$global_settings = get_option('360_global_settings', array());
+		$global_settings = global360_theme_site_context();
 		$site_name_setting = '';
 		if (is_array($global_settings) && ! empty($global_settings['site_name'])) {
 			$site_name_setting = sanitize_text_field(wp_strip_all_tags((string) $global_settings['site_name']));

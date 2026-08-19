@@ -1,6 +1,7 @@
    <?php
 
-    $addresses = get_post_meta(get_the_ID(), 'clinic_addresses', true);
+    $clinic_view = global360_theme_clinic(get_the_ID());
+    $addresses = $clinic_view['addresses'] ?? array();
     if (! empty($addresses)) {
         echo '<ul class="clinic-addresses">';
         foreach ($addresses as $addr) {
