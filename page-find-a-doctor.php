@@ -81,15 +81,24 @@ get_header();
         $svg_child_uri = trailingslashit(get_stylesheet_directory_uri()) . 'assets/state_svg/';
         $svg_parent_dir = trailingslashit(get_template_directory()) . 'assets/state_svg/';
         $svg_parent_uri = trailingslashit(get_template_directory_uri()) . 'assets/state_svg/';
+		$available_states = array();
+		$clinic_posts = get_posts(array(
+			'post_type'              => 'clinic',
+			'post_status'            => 'publish',
+			'posts_per_page'         => -1,
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => true,
+			'update_post_term_cache' => false,
+		));
+		foreach ($clinic_posts as $clinic_post) {
+			$clinic_view = global360_theme_clinic((int) $clinic_post->ID);
+			foreach ((array) ($clinic_view['state_codes'] ?? array()) as $clinic_state) {
+				$available_states[strtoupper((string) $clinic_state)] = true;
+			}
+		}
         echo '<ul class="state-grid">';
         foreach ($states as $abbr => $name) {
-            $clinics = get_posts([
-                'post_type' => 'clinic',
-                'posts_per_page' => 1,
-                'meta_key' => '_cpt360_clinic_state',
-                'meta_value' => $abbr,
-            ]);
-            $has_clinic = ! empty($clinics);
+			$has_clinic = isset($available_states[$abbr]);
             $svg_filename = str_replace(' ', '_', $name) . '.svg';
             $svg_path = $svg_child_dir . $svg_filename;
             if (! file_exists($svg_path)) {
