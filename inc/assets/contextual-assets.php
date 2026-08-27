@@ -15,6 +15,10 @@ add_action(
 			wp_enqueue_style( 'global360-doctor', $base_url . 'doctor.css', array( 'global-360-theme-style' ), filemtime( $base_path . 'doctor.css' ) );
 		}
 
+		if ( ! is_page_template( 'page-linktree.php' ) ) {
+			wp_enqueue_style( 'global360-floating-assessment', $base_url . 'floating-assessment.css', array( 'global-360-theme-style' ), filemtime( $base_path . 'floating-assessment.css' ) );
+		}
+
 		$uses_latest_article_cards = ( is_home() && ! get_query_var( 'find_a_doctor_state' ) )
 			|| is_page( 'blog' )
 			|| is_category()

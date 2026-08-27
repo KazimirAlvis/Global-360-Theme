@@ -1,0 +1,8 @@
+/* Site-wide footer assessment control. Mobile visibility remains in the main Theme stylesheet. */
+#floating-assessment-button {
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+	z-index: 99999;
+	display: block;
+}
