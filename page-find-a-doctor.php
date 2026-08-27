@@ -23,7 +23,7 @@ get_header();
         echo '<h2>Click Your State Below</h2>';
         echo '</div>';
         echo '<div class="state_grid_wrapper max_width_content_body">';
-        $states = function_exists('global360_platform') ? global360_platform()->states()->all() : [
+        $states = function_exists('global360_platform') ? global360_platform()->states()->states_only() : [
             'AL' => 'Alabama',
             'AK' => 'Alaska',
             'AZ' => 'Arizona',
@@ -74,7 +74,6 @@ get_header();
             'WV' => 'West Virginia',
             'WI' => 'Wisconsin',
             'WY' => 'Wyoming',
-            'DC' => 'District of Columbia',
         ];
         $default_clinic_url = '/clinics/interventional-radiology-institute/';
         $svg_child_dir = trailingslashit(get_stylesheet_directory()) . 'assets/state_svg/';

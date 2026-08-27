@@ -1452,7 +1452,12 @@ if (! function_exists('global360_get_valid_state_slug_map')) {
 	function global360_get_valid_state_slug_map()
 	{
 		if (function_exists('global360_platform')) {
-			return global360_platform()->states()->slug_map();
+			$slug_map = array();
+			foreach (global360_platform()->states()->states_only() as $abbr => $name) {
+				$slug_map[sanitize_title($name)] = $abbr;
+			}
+
+			return $slug_map;
 		}
 
 		$states = array(
