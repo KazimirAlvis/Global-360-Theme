@@ -17,6 +17,52 @@ if ( ! function_exists( 'global360_theme_site_context' ) ) {
 	}
 }
 
+if ( ! function_exists( 'global360_theme_public_states_from_registry' ) ) {
+	/**
+	 * Read the 50-state public collection from either the current or legacy Core API.
+	 *
+	 * @param object $registry Core StateRegistry-compatible object.
+	 * @return array<string,string>
+	 */
+	function global360_theme_public_states_from_registry( $registry ) {
+		if ( ! is_object( $registry ) ) {
+			return array();
+		}
+
+		if ( method_exists( $registry, 'states_only' ) ) {
+			$states = $registry->states_only();
+		} elseif ( method_exists( $registry, 'all' ) ) {
+			$states = $registry->all();
+		} else {
+			return array();
+		}
+
+		if ( ! is_array( $states ) ) {
+			return array();
+		}
+
+		unset( $states['DC'] );
+
+		return $states;
+	}
+}
+
+if ( ! function_exists( 'global360_theme_public_states' ) ) {
+	/** @return array<string,string> */
+	function global360_theme_public_states() {
+		if ( ! function_exists( 'global360_platform' ) ) {
+			return array();
+		}
+
+		$platform = global360_platform();
+		if ( ! is_object( $platform ) || ! method_exists( $platform, 'states' ) ) {
+			return array();
+		}
+
+		return global360_theme_public_states_from_registry( $platform->states() );
+	}
+}
+
 if ( ! function_exists( 'global360_theme_clinic' ) ) {
 	/** @return array<string,mixed>|null */
 	function global360_theme_clinic( $post_id ) {

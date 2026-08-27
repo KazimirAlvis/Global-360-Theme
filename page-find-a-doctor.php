@@ -23,7 +23,8 @@ get_header();
         echo '<h2>Click Your State Below</h2>';
         echo '</div>';
         echo '<div class="state_grid_wrapper max_width_content_body">';
-        $states = function_exists('global360_platform') ? global360_platform()->states()->states_only() : [
+        $core_states = global360_theme_public_states();
+        $states = ! empty($core_states) ? $core_states : [
             'AL' => 'Alabama',
             'AK' => 'Alaska',
             'AZ' => 'Arizona',
