@@ -17,7 +17,6 @@
 		<div class="entry-meta">
 			<?php
 			global_360_theme_posted_on();
-			global_360_theme_posted_by();
 			?>
 		</div><!-- .entry-meta -->
 		<?php endif; ?>

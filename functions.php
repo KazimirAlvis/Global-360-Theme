@@ -14,6 +14,7 @@ require_once get_template_directory() . '/inc/meta-boxes/clinic-meta.php';
 require_once get_template_directory() . '/inc/meta-boxes/doctors-meta.php';
 require_once get_template_directory() . '/inc/settings.php';
 require_once get_template_directory() . '/inc/schema-condition-treatment.php';
+require_once get_template_directory() . '/inc/privacy/public-author.php';
 require_once get_template_directory() . '/inc/disable-comments.php';
 
 if (! function_exists('global360_handle_places_data_purge')) {

@@ -1,8 +1,3 @@
-<?php
-  // debug
-  $v2 = __DIR__ . '/clinic-button-v2.php';
-  echo "<!-- looking for V2 button in: {$v2} (exists? " . ( file_exists($v2) ? 'yes' : 'no' ) . ") -->";
-?>
 <?php 
 $bg = get_template_directory_uri() . '/images/cta-background.jpg';
 ?>
