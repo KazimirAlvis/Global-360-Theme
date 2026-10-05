@@ -7,6 +7,10 @@ add_action(
 		$base_path = get_template_directory() . '/assets/css/';
 		$base_url  = get_template_directory_uri() . '/assets/css/';
 
+		if ( is_page( array( 'patient-reviews', 'leave-a-review' ) ) ) {
+			wp_enqueue_style( 'global360-patient-reviews', $base_url . 'patient-reviews.css', array( 'global-360-theme-style' ), filemtime( $base_path . 'patient-reviews.css' ) );
+		}
+
 		if ( is_page_template( 'page-find-a-doctor.php' ) || get_query_var( 'find_a_doctor_state' ) ) {
 			wp_enqueue_style( 'global360-directory', $base_url . 'directory.css', array( 'global-360-theme-style' ), filemtime( $base_path . 'directory.css' ) );
 		}

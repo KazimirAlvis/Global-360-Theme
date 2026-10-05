@@ -1,0 +1,67 @@
+/* Review features only. Editor blocks retain the theme's normal full-width layout. */
+.patient-reviews-listing,
+.global360-patient-review-form {
+ --review-accent: var(--cpt360-primary, currentColor);
+ --review-border: color-mix(in srgb, currentColor 25%, transparent);
+ --review-surface: color-mix(in srgb, var(--review-accent) 5%, white);
+ font-family: var(--body-font, inherit);
+ box-sizing: border-box;
+}
+.patient-reviews-listing { max-width: 1200px; margin: 0 auto; padding: clamp(24px, 5vw, 64px) 20px; }
+.patient-reviews-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.patient-review-card { display: flex; flex-direction: column; padding: clamp(20px, 3vw, 28px); border: 1px solid var(--review-border); border-radius: 8px; background: var(--review-surface); overflow-wrap: anywhere; }
+.patient-review-card h2 { font-size: 1.4rem; line-height: 1.35; margin: 0 0 8px; }
+.patient-review-card :is(h2, .patient-review-doctor) a { color: inherit; font: inherit; text-decoration: underline; text-underline-offset: .15em; }
+.patient-review-card a:focus-visible { outline: 3px solid var(--review-accent); outline-offset: 3px; }
+.patient-review-card .patient-review-doctor { margin: 0 0 16px; }
+.patient-review-card .patient-review-rating { font-weight: 700; margin: 0 0 20px; }
+.patient-review-card blockquote { margin: 0 0 24px; padding: 0; border: 0; font-size: 1rem; line-height: 1.7; }
+.patient-review-card blockquote p { margin: 0; }
+.patient-review-card footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--review-border); }
+.patient-review-card time { display: block; margin-top: 6px; font-size: .9rem; }
+.patient-reviews-pagination { margin-top: 32px; }
+.patient-reviews-pagination ul { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.patient-reviews-pagination a, .patient-reviews-pagination span.page-numbers { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 6px 12px; border: 1px solid var(--review-border); border-radius: 4px; color: inherit; }
+.patient-reviews-pagination .current { font-weight: 700; background: var(--review-surface); border-color: var(--review-accent); }
+.patient-reviews-pagination a:hover { background: var(--review-surface); }
+.patient-reviews-empty { padding: 24px; background: var(--review-surface); border-radius: 8px; }
+.global360-patient-review-form { width: 100%; max-width: 800px; margin: clamp(24px, 5vw, 64px) auto; padding: 0 20px; line-height: 1.6; }
+.global360-patient-review-form p { margin: 0 0 24px; }
+.global360-patient-review-form label { display: block; font-weight: 600; }
+.global360-patient-review-form label > br { display: none; }
+.global360-patient-review-form p:has(select[name="review-doctor"]) { margin-bottom: 0; }
+.global360-patient-review-form .wpcf7-form-control-wrap { display: block; margin-top: 8px; }
+.global360-patient-review-form :is(input[type="text"],input[type="email"],input[type="number"],input[type="tel"],select,textarea) {
+ display: block; width: 100%; max-width: 100%; min-height: 48px; box-sizing: border-box; padding: 12px 14px;
+ border: 1px solid var(--review-border); border-radius: 4px; background: white; color: inherit; font: inherit; font-weight: 400;
+}
+.global360-patient-review-form textarea { min-height: 180px; resize: vertical; }
+.global360-patient-review-form fieldset { margin: 0 0 24px; padding: 16px; border: 1px solid var(--review-border); border-radius: 4px; min-width: 0; }
+.global360-patient-review-form legend { padding: 0 8px; font-weight: 600; }
+.global360-patient-review-form fieldset p { margin-bottom: 0; }
+.global360-patient-review-form .wpcf7-radio { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+.global360-patient-review-form .wpcf7-list-item { margin: 0; }
+.global360-patient-review-form .wpcf7-list-item label { display: flex; align-items: baseline; gap: 8px; font-weight: 400; }
+.global360-patient-review-form :is(input[type="radio"],input[type="checkbox"]) { flex: 0 0 auto; width: 18px; height: 18px; accent-color: var(--review-accent); }
+.global360-patient-review-form .wpcf7-acceptance .wpcf7-list-item label { align-items: flex-start; }
+.global360-patient-review-form .wpcf7-acceptance input { margin-top: .3em; }
+.global360-patient-review-form :is(input[type="submit"],[data-review-doctor-retry]) { padding: 12px 24px; min-height: 48px; border: 1px solid var(--review-accent); border-radius: 4px; background: var(--review-accent); color: white; font: inherit; font-weight: 600; cursor: pointer; }
+.global360-patient-review-form :is(input[type="submit"],[data-review-doctor-retry]):hover:not(:disabled) { background: transparent; color: inherit; }
+.global360-patient-review-form :disabled { cursor: not-allowed; background: var(--review-surface); opacity: .7; }
+.global360-patient-review-form input[type="submit"]:disabled { color: inherit; }
+.global360-patient-review-form [aria-busy="true"] { cursor: progress; }
+.global360-patient-review-form [data-review-doctor-status] { margin: 8px 0 20px; font-size: .9rem; font-weight: 400; }
+.global360-patient-review-form [data-review-doctor-retry] { margin-bottom: 24px; }
+.global360-patient-review-form [hidden] { display: none !important; }
+.global360-patient-review-form .wpcf7-not-valid-tip { margin-top: 6px; font-size: .95rem; font-weight: 600; }
+.global360-patient-review-form [aria-invalid="true"] { border-width: 2px; border-color: currentColor; }
+.global360-patient-review-form .wpcf7-response-output { margin: 24px 0; padding: 16px 20px; border-radius: 4px; }
+.global360-patient-review-form.sent .wpcf7-response-output { border-color: var(--review-accent); background: var(--review-surface); }
+.global360-patient-review-form :is(input,select,textarea,button):focus-visible,
+.patient-reviews-pagination a:focus-visible { outline: 3px solid var(--review-accent); outline-offset: 3px; }
+@media (max-width: 960px) { .patient-reviews-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+ .patient-reviews-grid { grid-template-columns: minmax(0, 1fr); }
+ .global360-patient-review-form input[type="submit"] { width: 100%; }
+ .global360-patient-review-form .wpcf7-radio { flex-direction: column; }
+}
