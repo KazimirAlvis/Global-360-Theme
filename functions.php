@@ -89,7 +89,7 @@ if (! function_exists('global360_handle_places_data_purge')) {
 
 if (! defined('_S_VERSION')) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20260814001500' );
+	define( '_S_VERSION', '1.0.20261005185256' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -601,7 +601,7 @@ function global_360_theme_updates_page()
 	echo '<h2>Update Information</h2>';
 	echo '<p><strong>Repository:</strong> <a href="https://github.com/KazimirAlvis/Global-360-Theme" target="_blank">GitHub Repository</a></p>';
 	echo '<p><strong>Automatic Updates:</strong> Enabled - WordPress will automatically check for and install theme updates.</p>';
-	echo '<p><strong>Update Source:</strong> GitHub Releases</p>';
+	echo '<p><strong>Update Source:</strong> GitHub main branch (commit timestamp)</p>';
 	echo '</div>';
 
 	echo '</div>';
