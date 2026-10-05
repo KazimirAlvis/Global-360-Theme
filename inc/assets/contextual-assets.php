@@ -7,7 +7,7 @@ add_action(
 		$base_path = get_template_directory() . '/assets/css/';
 		$base_url  = get_template_directory_uri() . '/assets/css/';
 
-		if ( is_page( array( 'patient-reviews', 'leave-a-review' ) ) ) {
+		if ( is_page( 'patient-reviews' ) ) {
 			wp_enqueue_style( 'global360-patient-reviews', $base_url . 'patient-reviews.css', array( 'global-360-theme-style' ), filemtime( $base_path . 'patient-reviews.css' ) );
 		}
 
@@ -37,3 +37,9 @@ add_action(
 	},
 	20
 );
+
+// Core emits this only for forms matching its complete review field signature.
+add_action( 'global360_review_form_rendering', static function () {
+	$path = get_template_directory() . '/assets/css/patient-reviews.css';
+	wp_enqueue_style( 'global360-patient-reviews', get_template_directory_uri() . '/assets/css/patient-reviews.css', array( 'global-360-theme-style' ), filemtime( $path ) );
+} );
