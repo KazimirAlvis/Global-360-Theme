@@ -1,0 +1,48 @@
+#global360-linktree-v2-fields.global360-linktree-v2-template-hidden {
+	display: none;
+}
+
+#global360-linktree-v2-slides {
+	display: grid;
+	gap: 12px;
+}
+
+.global360-linktree-slide {
+	display: grid;
+	grid-template-columns: 36px 150px minmax(0, 1fr);
+	gap: 12px;
+	align-items: start;
+	margin: 0;
+	padding: 12px;
+	border: 1px solid #c3c4c7;
+	background: #fff;
+}
+
+.global360-linktree-slide__handle {
+	padding-top: 8px;
+	cursor: move;
+}
+
+.global360-linktree-slide__preview {
+	min-height: 80px;
+	background: #f0f0f1;
+}
+
+.global360-linktree-slide__preview img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.global360-linktree-slide__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+@media (max-width: 782px) {
+	.global360-linktree-slide {
+		grid-template-columns: 32px minmax(90px, 120px) minmax(0, 1fr);
+	}
+}

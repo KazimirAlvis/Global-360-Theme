@@ -1,0 +1,383 @@
+/* Linktree v2 only. Enqueued solely for the Linktree Landing v2 template. */
+body.page-template-page-linktree-v2 {
+	background: #fff;
+}
+
+body.page-template-page-linktree-v2 #masthead,
+body.page-template-page-linktree-v2 .site-footer,
+body.page-template-page-linktree-v2 #floating-assessment-button {
+	display: none !important;
+}
+
+body.page-template-page-linktree-v2 #page,
+.page-template-page-linktree-v2 .linktree-v2 {
+	min-height: 100vh;
+}
+
+.page-template-page-linktree-v2 .linktree-v2-main {
+	padding: 0;
+}
+
+.linktree-v2,
+.linktree-v2 * {
+	box-sizing: border-box;
+}
+
+.linktree-v2 {
+	--linktree-v2-primary: var(--cpt360-primary, #6441a5);
+	--linktree-v2-panel: #fff8e8;
+	padding: clamp(20px, 5vw, 50px) 20px;
+	background: #fff;
+	color: #292626;
+	font-family: var(--body-font, inherit);
+}
+
+.linktree-v2__inner {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 30px;
+	border-radius: 25px;
+	background-color: #edeadf;
+}
+
+.linktree-v2-carousel,
+.linktree-v2-actions {
+	min-width: 0;
+	border-radius: 12px;
+	background: var(--linktree-v2-panel);
+	overflow: hidden;
+}
+
+.linktree-v2-carousel {
+	flex: 0 1 641px;
+	position: relative;
+	touch-action: pan-y;
+}
+
+.linktree-v2-carousel:focus-visible {
+	outline: 3px solid var(--linktree-v2-primary);
+	outline-offset: 4px;
+}
+
+.linktree-v2-carousel__slide[hidden] {
+	display: none;
+}
+
+.linktree-v2-carousel__slides {
+	display: flex;
+	width: 100%;
+	transform: translate3d(0, 0, 0);
+}
+
+.linktree-v2-carousel.is-ready .linktree-v2-carousel__slides {
+	transition: transform .4s ease;
+}
+
+.linktree-v2-carousel__slide {
+	flex: 0 0 100%;
+	min-width: 0;
+}
+
+.linktree-v2-carousel__image {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-width: none;
+}
+
+.linktree-v2-carousel__controls {
+	position: static;
+	pointer-events: none;
+}
+
+.linktree-v2-carousel__arrow,
+.linktree-v2-carousel__dots button {
+	pointer-events: auto;
+}
+
+.linktree-v2-carousel__arrow {
+	position: absolute;
+	top: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: rgba(41, 38, 38, .42);
+	color: #fff;
+	font: inherit;
+	font-size: 36px;
+	line-height: 1;
+	transform: translateY(-50%);
+	cursor: pointer;
+}
+
+.linktree-v2-carousel__arrow:hover,
+.linktree-v2-carousel__arrow:focus-visible {
+	background: #292626;
+}
+
+.linktree-v2-carousel__arrow:focus-visible,
+.linktree-v2-carousel__dots button:focus-visible,
+.linktree-v2-button:focus-visible,
+.linktree-v2-socials a:focus-visible {
+	outline: 3px solid #fff;
+	outline-offset: 2px;
+}
+
+.linktree-v2-carousel__arrow--previous {
+	left: 12px;
+}
+
+.linktree-v2-carousel__arrow--next {
+	right: 12px;
+}
+
+.linktree-v2-carousel__dots {
+	position: static;
+	display: flex;
+	justify-content: center;
+	gap: 0;
+	padding: 4px 0 6px;
+}
+
+.linktree-v2-carousel__dots button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: auto;
+	height: auto;
+	padding: 10px 5px;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+}
+
+.linktree-v2-carousel__dots span {
+	display: block;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .65);
+	box-shadow: 0 0 0 1px rgba(41, 38, 38, .25);
+}
+
+.linktree-v2-carousel__dots [aria-current="true"] span {
+	width: 10px;
+	background: var(--linktree-v2-primary);
+}
+
+.linktree-v2-actions {
+	flex: 0 1 489px;
+	align-self: flex-end;
+	margin-top: 0;
+	padding: 16px 12px 14px;
+	background: #fff;
+}
+
+.linktree-v2-identity {
+	display: inline-flex;
+	align-self: center;
+	align-items: center;
+	max-width: 100%;
+	margin: 0 auto 16px;
+	padding: 10px 24px 10px 16px;
+	border-radius: 999px;
+	background: #edeadf;
+	text-align: left;
+}
+
+.linktree-v2-identity__logo {
+	flex: 0 0 auto;
+	margin-right: 12px;
+}
+
+.linktree-v2-identity__logo-image {
+	display: block;
+	width: 50px;
+	max-width: 50px;
+	height: 50px;
+	margin: 0;
+	object-fit: contain;
+}
+
+.linktree-v2-identity__text {
+	min-width: 0;
+}
+
+.linktree-v2-identity__name {
+	margin: 0;
+	color: #292626;
+	font-family: var(--body-font, inherit);
+	font-size: 20px;
+	font-weight: 400;
+	line-height: 1.2;
+	overflow-wrap: anywhere;
+}
+
+.linktree-v2-identity__instagram {
+	display: inline-block;
+	margin-top: 2px;
+	color: #555;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.2;
+	text-decoration: none;
+	overflow-wrap: anywhere;
+}
+
+.linktree-v2-identity__instagram:visited {
+	color: #555;
+}
+
+.linktree-v2-identity__instagram:hover,
+.linktree-v2-identity__instagram:focus-visible {
+	color: #292626;
+	text-decoration: underline;
+}
+
+.linktree-v2-actions__buttons,
+.linktree-v2-socials {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.linktree-v2-actions__buttons {
+	display: grid;
+	gap: 6px;
+}
+
+.linktree-v2-actions__buttons li,
+.linktree-v2-actions__buttons pr360-questionnaire {
+	display: block;
+	width: 100%;
+}
+
+.linktree-v2-button,
+.linktree-v2-actions pr360-questionnaire::part(begin-button) {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 42px;
+	padding: 8px 18px;
+	border: 0;
+	border-radius: 999px;
+	background: var(--linktree-v2-primary);
+	box-shadow: none;
+	color: #fff;
+	font: inherit;
+	font-size: 15px;
+	font-weight: 500;
+	line-height: 1.25;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color .2s ease, transform .2s ease;
+}
+
+.linktree-v2 .button--begin,
+.linktree-v2-actions pr360-questionnaire::part(begin-button) {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.linktree-v2-button:visited {
+	color: #fff;
+}
+
+.linktree-v2-button:hover,
+.linktree-v2-button:focus-visible,
+.linktree-v2-actions pr360-questionnaire::part(begin-button):hover,
+.linktree-v2-actions pr360-questionnaire::part(begin-button):focus {
+	background: #292626;
+	color: #fff;
+	text-decoration: none;
+	transform: translateY(-1px);
+}
+
+.linktree-v2-socials {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 7px;
+	margin-top: 10px;
+}
+
+.linktree-v2-socials a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	border: 0;
+	border-radius: 50%;
+	color: var(--linktree-v2-primary);
+	text-decoration: none;
+}
+
+.linktree-v2-socials a:hover {
+	color: #292626;
+}
+
+.linktree-v2-socials__icon {
+	width: 23px;
+	height: 23px;
+}
+
+@media (max-width: 760px) {
+	.linktree-v2__inner {
+		flex-direction: column;
+		gap: 10px;
+		padding: 20px;
+	}
+
+	.linktree-v2-carousel,
+	.linktree-v2-actions {
+		flex: none;
+		width: 100%;
+	}
+
+	.linktree-v2-actions {
+		align-self: stretch;
+	}
+}
+
+@media (max-width: 560px) {
+	.linktree-v2 {
+		padding: 18px 20px 28px;
+	}
+
+	.linktree-v2-carousel__arrow {
+		width: 36px;
+		height: 36px;
+		font-size: 30px;
+	}
+
+	.linktree-v2-carousel__arrow--previous {
+		left: 8px;
+	}
+
+	.linktree-v2-carousel__arrow--next {
+		right: 8px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.linktree-v2-carousel.is-ready .linktree-v2-carousel__slides {
+		transition: none;
+	}
+
+	.linktree-v2-button,
+	.linktree-v2-actions pr360-questionnaire::part(begin-button) {
+		transition: none;
+	}
+}

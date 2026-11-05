@@ -19,7 +19,12 @@ add_action(
 			wp_enqueue_style( 'global360-doctor', $base_url . 'doctor.css', array( 'global-360-theme-style' ), filemtime( $base_path . 'doctor.css' ) );
 		}
 
-		if ( ! is_page_template( 'page-linktree.php' ) ) {
+		if ( is_page_template( 'page-linktree-v2.php' ) ) {
+			wp_enqueue_style( 'global360-linktree-v2', $base_url . 'linktree-v2.css', array( 'global-360-theme-style' ), filemtime( $base_path . 'linktree-v2.css' ) );
+			wp_enqueue_script( 'global360-linktree-v2', get_template_directory_uri() . '/js/linktree-v2.js', array(), filemtime( get_template_directory() . '/js/linktree-v2.js' ), true );
+		}
+
+		if ( ! is_page_template( array( 'page-linktree.php', 'page-linktree-v2.php' ) ) ) {
 			wp_enqueue_style( 'global360-floating-assessment', $base_url . 'floating-assessment.css', array( 'global-360-theme-style' ), filemtime( $base_path . 'floating-assessment.css' ) );
 		}
 
