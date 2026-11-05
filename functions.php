@@ -12,6 +12,7 @@ require_once get_template_directory() . '/inc/compatibility/platform-core.php';
 require_once get_template_directory() . '/inc/assets/contextual-assets.php';
 require_once get_template_directory() . '/inc/meta-boxes/clinic-meta.php';
 require_once get_template_directory() . '/inc/meta-boxes/doctors-meta.php';
+require_once get_template_directory() . '/inc/meta-boxes/linktree-v2-meta.php';
 require_once get_template_directory() . '/inc/settings.php';
 require_once get_template_directory() . '/inc/schema-condition-treatment.php';
 require_once get_template_directory() . '/inc/privacy/public-author.php';
