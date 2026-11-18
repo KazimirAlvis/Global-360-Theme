@@ -1911,10 +1911,36 @@ if (! function_exists('global360_filter_document_title_fallback')) {
 }
 add_filter('pre_get_document_title', 'global360_filter_document_title_fallback', 9999);
 
+if (! function_exists('global360_filter_seopress_description_fallback')) {
+	/**
+	 * Supply the Theme fallback through SEOPress when SEOPress has no description.
+	 *
+	 * SEOPress may generate a description without storing a per-post
+	 * `_seopress_titles_desc` value. Filtering its resolved value prevents the
+	 * Theme from printing a second meta tag alongside that generated output.
+	 *
+	 * @param string $description Description resolved by SEOPress.
+	 * @return string
+	 */
+	function global360_filter_seopress_description_fallback($description)
+	{
+		if (is_admin() || '' !== trim((string) $description)) {
+			return $description;
+		}
+
+		$fallback = global360_build_fallback_description();
+		return '' !== $fallback ? $fallback : $description;
+	}
+}
+add_filter('seopress_titles_desc', 'global360_filter_seopress_description_fallback', 9999);
+
 if (! function_exists('global360_output_meta_description_fallback')) {
 	function global360_output_meta_description_fallback()
 	{
-		if (is_admin() || global360_has_seopress_custom_description()) {
+		// SEOPress owns the meta tag when active; the filter above supplies any
+		// dynamic Theme fallback it needs. Direct output is only for sites where
+		// SEOPress is unavailable.
+		if (is_admin() || defined('SEOPRESS_VERSION') || global360_has_seopress_custom_description()) {
 			return;
 		}
 
