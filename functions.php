@@ -90,7 +90,7 @@ if (! function_exists('global360_handle_places_data_purge')) {
 
 if (! defined('_S_VERSION')) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20261119121429' );
+	define( '_S_VERSION', '1.0.20261119130029' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -2060,6 +2060,195 @@ if (! function_exists('global360_filter_seopress_description_fallback')) {
 	}
 }
 add_filter('seopress_titles_desc', 'global360_filter_seopress_description_fallback', 9999);
+
+if (! function_exists('global360_is_valid_state_route')) {
+	/**
+	 * Whether the current request is a supported Find a Doctor state route.
+	 *
+	 * @return bool
+	 */
+	function global360_is_valid_state_route()
+	{
+		$state_slug = sanitize_title((string) get_query_var('find_a_doctor_state'));
+		if ('' === $state_slug) {
+			return false;
+		}
+
+		$valid_states = global360_get_valid_state_slug_map();
+		return isset($valid_states[$state_slug]);
+	}
+}
+
+if (! function_exists('global360_build_state_social_meta_tag')) {
+	/**
+	 * Replace a SEOPress social meta tag for the virtual state route.
+	 *
+	 * SEOPress 10.x passes complete tag markup through these filters. The
+	 * scalar fallback keeps the callback compatible with value-only callers.
+	 *
+	 * @param string $value Existing tag markup or scalar value.
+	 * @param string $attribute Meta property/name.
+	 * @param string $content Dynamic state value.
+	 * @return string
+	 */
+	function global360_build_state_social_meta_tag($value, $attribute, $content)
+	{
+		if (! global360_is_valid_state_route() || '' === trim((string) $content)) {
+			return $value;
+		}
+
+		if ('' !== trim((string) $value) && false === strpos((string) $value, '<meta')) {
+			return $content;
+		}
+
+		$key = 0 === strpos($attribute, 'og:') ? 'property' : 'name';
+		return '<meta ' . $key . '="' . esc_attr($attribute) . '" content="' . esc_attr($content) . '">';
+	}
+}
+
+if (! function_exists('global360_filter_state_og_title')) {
+	function global360_filter_state_og_title($value)
+	{
+		return global360_build_state_social_meta_tag($value, 'og:title', global360_build_fallback_title());
+	}
+}
+add_filter('seopress_social_og_title', 'global360_filter_state_og_title', 9999);
+
+if (! function_exists('global360_filter_state_og_description')) {
+	function global360_filter_state_og_description($value)
+	{
+		return global360_build_state_social_meta_tag($value, 'og:description', global360_build_fallback_description());
+	}
+}
+add_filter('seopress_social_og_desc', 'global360_filter_state_og_description', 9999);
+
+if (! function_exists('global360_filter_state_twitter_title')) {
+	function global360_filter_state_twitter_title($value)
+	{
+		return global360_build_state_social_meta_tag($value, 'twitter:title', global360_build_fallback_title());
+	}
+}
+add_filter('seopress_social_twitter_card_title', 'global360_filter_state_twitter_title', 9999);
+
+if (! function_exists('global360_filter_state_twitter_description')) {
+	function global360_filter_state_twitter_description($value)
+	{
+		return global360_build_state_social_meta_tag($value, 'twitter:description', global360_build_fallback_description());
+	}
+}
+add_filter('seopress_social_twitter_card_desc', 'global360_filter_state_twitter_description', 9999);
+
+if (! function_exists('global360_get_state_social_image')) {
+	/**
+	 * Resolve an existing site-owned image for state-route sharing cards.
+	 *
+	 * @param string $network facebook or twitter.
+	 * @return array{url:string,id:int}
+	 */
+	function global360_get_state_social_image($network = 'facebook')
+	{
+		if (! global360_is_valid_state_route()) {
+			return array('url' => '', 'id' => 0);
+		}
+
+		$directory_page = get_page_by_path('find-a-doctor');
+		if ($directory_page instanceof WP_Post) {
+			$meta_key = 'twitter' === $network ? '_seopress_social_twitter_img' : '_seopress_social_fb_img';
+			$image_url = esc_url_raw((string) get_post_meta($directory_page->ID, $meta_key, true));
+			if ('' !== $image_url) {
+				return array('url' => $image_url, 'id' => attachment_url_to_postid($image_url));
+			}
+			if ('twitter' === $network) {
+				$image_url = esc_url_raw((string) get_post_meta($directory_page->ID, '_seopress_social_fb_img', true));
+				if ('' !== $image_url) {
+					return array('url' => $image_url, 'id' => attachment_url_to_postid($image_url));
+				}
+			}
+
+			$thumbnail_id = (int) get_post_thumbnail_id($directory_page->ID);
+			if ($thumbnail_id) {
+				$image_url = wp_get_attachment_image_url($thumbnail_id, 'full');
+				if ($image_url) {
+					return array('url' => esc_url_raw($image_url), 'id' => $thumbnail_id);
+				}
+			}
+		}
+
+		$settings = global360_theme_site_context();
+		$header_logo_id = is_array($settings) ? (int) ($settings['header_logo_id'] ?? 0) : 0;
+		if ($header_logo_id) {
+			$image_url = wp_get_attachment_image_url($header_logo_id, 'full');
+			if ($image_url) {
+				return array('url' => esc_url_raw($image_url), 'id' => $header_logo_id);
+			}
+		}
+
+		$custom_logo_id = (int) get_theme_mod('custom_logo');
+		if ($custom_logo_id) {
+			$image_url = wp_get_attachment_image_url($custom_logo_id, 'full');
+			if ($image_url) {
+				return array('url' => esc_url_raw($image_url), 'id' => $custom_logo_id);
+			}
+		}
+
+		$site_icon_id = (int) get_option('site_icon');
+		$image_url = $site_icon_id ? wp_get_attachment_image_url($site_icon_id, 'full') : '';
+		return array(
+			'url' => $image_url ? esc_url_raw($image_url) : '',
+			'id'  => $image_url ? $site_icon_id : 0,
+		);
+	}
+}
+
+if (! function_exists('global360_filter_state_og_image')) {
+	function global360_filter_state_og_image($value)
+	{
+		if (! global360_is_valid_state_route()) {
+			return $value;
+		}
+
+		$existing_value = trim((string) $value);
+		if ('' !== $existing_value) {
+			if (false === strpos($existing_value, '<meta')) {
+				return $value;
+			}
+			if (preg_match('/content=["\']([^"\']+)["\']/', $existing_value, $matches) && '' !== trim($matches[1])) {
+				return $value;
+			}
+		}
+
+		$image = global360_get_state_social_image('facebook');
+		if ('' === $image['url']) {
+			return $value;
+		}
+
+		if (function_exists('seopress_social_fb_img_size_from_url')) {
+			return seopress_social_fb_img_size_from_url($image['url']);
+		}
+
+		return '<meta property="og:image" content="' . esc_url($image['url']) . '">';
+	}
+}
+add_filter('seopress_social_og_thumb', 'global360_filter_state_og_image', 9999);
+
+if (! function_exists('global360_filter_state_twitter_image')) {
+	function global360_filter_state_twitter_image($value)
+	{
+		if (! global360_is_valid_state_route() || '' !== trim((string) $value)) {
+			return $value;
+		}
+
+		$image = global360_get_state_social_image('twitter');
+		if ('' === $image['url']) {
+			$image = global360_get_state_social_image('facebook');
+		}
+
+		return '' !== $image['url']
+			? '<meta name="twitter:image" content="' . esc_url($image['url']) . '">'
+			: $value;
+	}
+}
+add_filter('seopress_social_twitter_card_thumb', 'global360_filter_state_twitter_image', 9999);
 
 if (! function_exists('global360_output_meta_description_fallback')) {
 	function global360_output_meta_description_fallback()
