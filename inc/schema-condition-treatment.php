@@ -19,8 +19,12 @@ if ( ! function_exists( 'global360_condition_treatment_schema' ) ) {
 			$settings = array();
 		}
 
-		$condition_name = sanitize_text_field( $settings['primary_condition'] ?? '' );
-		$treatment_name = sanitize_text_field( $settings['primary_treatment'] ?? '' );
+		$condition_name = function_exists( 'global360_schema_text' )
+			? global360_schema_text( $settings['primary_condition'] ?? '' )
+			: sanitize_text_field( html_entity_decode( (string) ( $settings['primary_condition'] ?? '' ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
+		$treatment_name = function_exists( 'global360_schema_text' )
+			? global360_schema_text( $settings['primary_treatment'] ?? '' )
+			: sanitize_text_field( html_entity_decode( (string) ( $settings['primary_treatment'] ?? '' ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ) );
 
 		$condition_page_id = isset( $settings['primary_condition_page'] ) ? (int) $settings['primary_condition_page'] : 0;
 		$treatment_page_id = isset( $settings['primary_treatment_page'] ) ? (int) $settings['primary_treatment_page'] : 0;

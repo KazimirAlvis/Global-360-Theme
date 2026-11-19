@@ -90,7 +90,7 @@ if (! function_exists('global360_handle_places_data_purge')) {
 
 if (! defined('_S_VERSION')) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20261118165030' );
+	define( '_S_VERSION', '1.0.20261119114210' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -2318,6 +2318,34 @@ function global_360_theme_collect_doctor_meta_for_yoast($post_id)
 	return $pieces;
 }
 
+if (! function_exists('global360_schema_text')) {
+	/**
+	 * Normalize human-readable text before placing it in JSON-LD.
+	 *
+	 * WordPress title functions may return encoded entities such as &#038;.
+	 * JSON encoding does not decode those values, so normalize them first.
+	 *
+	 * @param mixed $value Candidate schema text.
+	 * @return string
+	 */
+	function global360_schema_text($value)
+	{
+		if (is_array($value) || is_object($value)) {
+			return '';
+		}
+
+		$charset = get_bloginfo('charset');
+		if (! is_string($charset) || '' === trim($charset)) {
+			$charset = 'UTF-8';
+		}
+
+		$value = wp_strip_all_tags((string) $value);
+		$value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, $charset);
+
+		return sanitize_text_field($value);
+	}
+}
+
 if (! function_exists('global360_output_schema')) {
 	/**
 	 * Output JSON-LD structured data for single Clinic and Doctor pages.
@@ -2350,10 +2378,7 @@ if (! function_exists('global360_output_schema')) {
 		};
 
 		$clean_text = static function ($value) {
-			if (is_array($value) || is_object($value)) {
-				return '';
-			}
-			return sanitize_text_field(wp_strip_all_tags((string) $value));
+			return global360_schema_text($value);
 		};
 
 		$clean_phone = static function ($value) use ($clean_text) {
@@ -3076,7 +3101,7 @@ if (! function_exists('global360_output_find_a_doctor_state_schema')) {
 					continue;
 				}
 
-				$clinic_name = get_the_title((int) $clinic_id);
+				$clinic_name = global360_schema_text(get_the_title((int) $clinic_id));
 				if ('' === $clinic_name) {
 					$clinic_name = 'Clinic';
 				}
@@ -3149,7 +3174,7 @@ if (! function_exists('global360_output_content_page_schema')) {
 			return;
 		}
 
-		$title = sanitize_text_field(wp_strip_all_tags((string) get_the_title($post_id)));
+		$title = global360_schema_text(get_the_title($post_id));
 		if ('' === $title) {
 			return;
 		}
@@ -3159,10 +3184,10 @@ if (! function_exists('global360_output_content_page_schema')) {
 
 		$description = '';
 		if (has_excerpt($post_id)) {
-			$description = sanitize_text_field(wp_strip_all_tags((string) get_the_excerpt($post_id)));
+			$description = global360_schema_text(get_the_excerpt($post_id));
 		}
 		if ('' === $description && '' !== $content_text) {
-			$description = sanitize_text_field(wp_trim_words($content_text, 40, ''));
+			$description = global360_schema_text(wp_trim_words($content_text, 40, ''));
 		}
 
 		$post_url = get_permalink($post_id);
@@ -3204,12 +3229,12 @@ if (! function_exists('global360_output_content_page_schema')) {
 		$global_settings = global360_theme_site_context();
 		$site_name_setting = '';
 		if (is_array($global_settings) && ! empty($global_settings['site_name'])) {
-			$site_name_setting = sanitize_text_field(wp_strip_all_tags((string) $global_settings['site_name']));
+			$site_name_setting = global360_schema_text($global_settings['site_name']);
 		}
 
 		$publisher_name = '' !== $site_name_setting
 			? $site_name_setting
-			: sanitize_text_field(wp_strip_all_tags((string) get_bloginfo('name')));
+			: global360_schema_text(get_bloginfo('name'));
 		if ('' !== $publisher_name) {
 			$schema['author'] = array(
 				'@type' => 'Organization',
@@ -3277,7 +3302,7 @@ if (! function_exists('global360_output_breadcrumb_schema')) {
 		}
 
 		$current_url = get_permalink($post_id);
-		$current_name = sanitize_text_field(wp_strip_all_tags((string) get_the_title($post_id)));
+		$current_name = global360_schema_text(get_the_title($post_id));
 		if (! $current_url || '' === $current_name) {
 			return;
 		}
@@ -3285,12 +3310,12 @@ if (! function_exists('global360_output_breadcrumb_schema')) {
 		$global_settings = global360_theme_site_context();
 		$site_name_setting = '';
 		if (is_array($global_settings) && ! empty($global_settings['site_name'])) {
-			$site_name_setting = sanitize_text_field(wp_strip_all_tags((string) $global_settings['site_name']));
+			$site_name_setting = global360_schema_text($global_settings['site_name']);
 		}
 
 		$root_name = '' !== $site_name_setting
 			? $site_name_setting
-			: sanitize_text_field(wp_strip_all_tags((string) get_bloginfo('name')));
+			: global360_schema_text(get_bloginfo('name'));
 
 		$items = array();
 		$items[] = array(
@@ -3302,7 +3327,7 @@ if (! function_exists('global360_output_breadcrumb_schema')) {
 			$ancestors = array_reverse(get_post_ancestors($post_id));
 			foreach ($ancestors as $ancestor_id) {
 				$ancestor_url = get_permalink((int) $ancestor_id);
-				$ancestor_name = sanitize_text_field(wp_strip_all_tags((string) get_the_title((int) $ancestor_id)));
+				$ancestor_name = global360_schema_text(get_the_title((int) $ancestor_id));
 				if ($ancestor_url && '' !== $ancestor_name) {
 					$items[] = array(
 						'name' => $ancestor_name,
@@ -3314,7 +3339,7 @@ if (! function_exists('global360_output_breadcrumb_schema')) {
 			$posts_page_id = (int) get_option('page_for_posts');
 			if ($posts_page_id > 0) {
 				$posts_page_url = get_permalink($posts_page_id);
-				$posts_page_name = sanitize_text_field(wp_strip_all_tags((string) get_the_title($posts_page_id)));
+				$posts_page_name = global360_schema_text(get_the_title($posts_page_id));
 				if ($posts_page_url && '' !== $posts_page_name) {
 					$items[] = array(
 						'name' => $posts_page_name,
@@ -3326,7 +3351,7 @@ if (! function_exists('global360_output_breadcrumb_schema')) {
 			$post_type = get_post_type_object(get_post_type($post_id));
 			if ($post_type && ! empty($post_type->has_archive)) {
 				$archive_url = get_post_type_archive_link($post_type->name);
-				$archive_name = sanitize_text_field(wp_strip_all_tags((string) $post_type->labels->name));
+				$archive_name = global360_schema_text($post_type->labels->name);
 				if ($archive_url && '' !== $archive_name) {
 					$items[] = array(
 						'name' => $archive_name,
@@ -3359,7 +3384,7 @@ if (! function_exists('global360_output_breadcrumb_schema')) {
 			$list_items[] = array(
 				'@type'    => 'ListItem',
 				'position' => $position,
-				'name'     => sanitize_text_field($name),
+				'name'     => global360_schema_text($name),
 				'item'     => $url_key,
 			);
 			$position++;
