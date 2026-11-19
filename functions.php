@@ -90,7 +90,7 @@ if (! function_exists('global360_handle_places_data_purge')) {
 
 if (! defined('_S_VERSION')) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20261105092433' );
+	define( '_S_VERSION', '1.0.20261118165030' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -2471,20 +2471,6 @@ if (! function_exists('global360_output_schema')) {
 			);
 		};
 
-		$get_linkedin_url = static function (array $global_schema) use ($clean_text) {
-			if (! empty($global_schema['social_links']) && is_array($global_schema['social_links'])) {
-				foreach ($global_schema['social_links'] as $row) {
-					$platform = strtolower($clean_text($row['platform'] ?? ''));
-					$url = isset($row['url']) ? esc_url_raw($row['url']) : '';
-					if ('linkedin' === $platform && ! empty($url)) {
-						return $url;
-					}
-				}
-			}
-
-			return '';
-		};
-
 		$normalize_country = static function ($country, $state = '', $city = '', $postal = '') use ($clean_text) {
 			$country = strtoupper($clean_text($country));
 			if (in_array($country, array('USA', 'U.S.A', 'UNITED STATES', 'UNITED STATES OF AMERICA'), true)) {
@@ -2613,6 +2599,38 @@ if (! function_exists('global360_output_schema')) {
 
 		$get_clinic_address_objects = static function ($clinic_id) use ($get_acf_or_meta, $first_non_empty, $clean_text, $parse_address_string, $build_postal_address) {
 			$addresses = array();
+			$clinic = function_exists('global360_theme_clinic') ? global360_theme_clinic($clinic_id) : null;
+
+			if (is_array($clinic) && ! empty($clinic['addresses']) && is_array($clinic['addresses'])) {
+				foreach ($clinic['addresses'] as $row) {
+					if (! is_array($row)) {
+						continue;
+					}
+
+					$street = $clean_text($row['street'] ?? ($row['address'] ?? ''));
+					$line_2 = $clean_text($row['line2'] ?? '');
+					if ('' !== $line_2) {
+						$street = '' !== $street ? $street . ', ' . $line_2 : $line_2;
+					}
+
+					$parts = array(
+						'streetAddress'   => $street,
+						'addressLocality' => $row['city'] ?? '',
+						'addressRegion'   => $row['state'] ?? '',
+						'postalCode'      => $row['zip'] ?? ($row['postal_code'] ?? ''),
+						'addressCountry'  => $row['country'] ?? '',
+					);
+
+					if (empty($parts['streetAddress']) && ! empty($row['full_address'])) {
+						$parts = $parse_address_string($row['full_address']);
+					}
+
+					$address_obj = $build_postal_address($parts);
+					if ($address_obj) {
+						$addresses[] = $address_obj;
+					}
+				}
+			}
 
 			$structured_parts = array(
 				'streetAddress'   => $first_non_empty(array(
@@ -2691,7 +2709,6 @@ if (! function_exists('global360_output_schema')) {
 		};
 
 		$global_schema = $get_global_schema_settings();
-		$linkedin_url = $get_linkedin_url($global_schema);
 
 		$schema = array(
 			'@context' => 'https://schema.org',
@@ -2701,11 +2718,13 @@ if (! function_exists('global360_output_schema')) {
 		$post_url = $post_url ? esc_url_raw($post_url) : '';
 
 		if ($is_clinic) {
+			$clinic = function_exists('global360_theme_clinic') ? global360_theme_clinic($post_id) : null;
 			$name = $clean_text(get_the_title($post_id));
 			$phone = $get_clinic_phone($post_id);
 			$image = $get_clinic_image($post_id);
 			$addresses = $get_clinic_address_objects($post_id);
 			$primary_address = ! empty($addresses) ? $addresses[0] : array();
+			$clinic_identity_url = is_array($clinic) ? esc_url_raw($clinic['website'] ?? '') : '';
 
 			$schema['@type'] = 'MedicalClinic';
 			if ($post_url) {
@@ -2721,8 +2740,8 @@ if (! function_exists('global360_output_schema')) {
 			if ($image) {
 				$schema['image'] = $image;
 			}
-			if ($linkedin_url) {
-				$schema['sameAs'] = array($linkedin_url);
+			if ($clinic_identity_url) {
+				$schema['sameAs'] = array($clinic_identity_url);
 			}
 			if ($primary_address) {
 				$schema['address'] = $primary_address;
