@@ -17,6 +17,7 @@ require_once get_template_directory() . '/inc/settings.php';
 require_once get_template_directory() . '/inc/schema-condition-treatment.php';
 require_once get_template_directory() . '/inc/privacy/public-author.php';
 require_once get_template_directory() . '/inc/disable-comments.php';
+require_once get_template_directory() . '/inc/seo-utility-indexing.php';
 
 if (! function_exists('global360_handle_places_data_purge')) {
 	/**
@@ -90,7 +91,7 @@ if (! function_exists('global360_handle_places_data_purge')) {
 
 if (! defined('_S_VERSION')) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20261119130029' );
+	define( '_S_VERSION', '1.0.20261119150147' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
