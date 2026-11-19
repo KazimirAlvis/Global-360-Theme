@@ -90,7 +90,7 @@ if (! function_exists('global360_handle_places_data_purge')) {
 
 if (! defined('_S_VERSION')) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20261119114210' );
+	define( '_S_VERSION', '1.0.20261119121429' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -1808,31 +1808,111 @@ if (! function_exists('global360_has_seopress_custom_description')) {
 	}
 }
 
+if (! function_exists('global360_limit_seo_text')) {
+	/**
+	 * Keep generated search metadata within a character ceiling without
+	 * cutting through a word.
+	 *
+	 * @param string $text Candidate metadata.
+	 * @param int    $maximum Maximum characters, including the ellipsis.
+	 * @return string
+	 */
+	function global360_limit_seo_text($text, $maximum)
+	{
+		$text = html_entity_decode(wp_strip_all_tags((string) $text), ENT_QUOTES | ENT_HTML5, get_bloginfo('charset') ?: 'UTF-8');
+		$text = trim((string) preg_replace('/\s+/u', ' ', $text));
+		$maximum = max(1, (int) $maximum);
+
+		if (function_exists('mb_strlen') && mb_strlen($text, 'UTF-8') <= $maximum) {
+			return $text;
+		}
+		if (! function_exists('mb_strlen') && strlen($text) <= $maximum) {
+			return $text;
+		}
+
+		$available = max(1, $maximum - 1);
+		$trimmed = function_exists('mb_substr')
+			? mb_substr($text, 0, $available, 'UTF-8')
+			: substr($text, 0, $available);
+		$word_boundary = preg_replace('/\s+\S*$/u', '', $trimmed);
+		if (is_string($word_boundary) && '' !== trim($word_boundary)) {
+			$trimmed = $word_boundary;
+		}
+
+		return rtrim($trimmed, " \t\n\r\0\x0B,.;:-") . '…';
+	}
+}
+
+if (! function_exists('global360_choose_bounded_seo_title')) {
+	/**
+	 * Return the first complete title candidate that fits the search target.
+	 *
+	 * @param array<int,string> $candidates Ordered title candidates.
+	 * @param int               $maximum Maximum characters.
+	 * @return string
+	 */
+	function global360_choose_bounded_seo_title($candidates, $maximum = 60)
+	{
+		foreach ((array) $candidates as $candidate) {
+			$candidate = global360_limit_seo_text($candidate, 500);
+			$length = function_exists('mb_strlen') ? mb_strlen($candidate, 'UTF-8') : strlen($candidate);
+			if ('' !== $candidate && $length <= $maximum) {
+				return $candidate;
+			}
+		}
+
+		$last_candidate = end($candidates);
+		return global360_limit_seo_text(is_string($last_candidate) ? $last_candidate : '', $maximum);
+	}
+}
+
+if (! function_exists('global360_choose_bounded_seo_description')) {
+	/**
+	 * Prefer a complete description variant before using a word-safe ceiling.
+	 *
+	 * @param array<int,string> $candidates Ordered description candidates.
+	 * @param int               $maximum Maximum characters.
+	 * @return string
+	 */
+	function global360_choose_bounded_seo_description($candidates, $maximum = 160)
+	{
+		foreach ((array) $candidates as $candidate) {
+			$candidate = global360_limit_seo_text($candidate, 500);
+			$length = function_exists('mb_strlen') ? mb_strlen($candidate, 'UTF-8') : strlen($candidate);
+			if ('' !== $candidate && $length <= $maximum) {
+				return $candidate;
+			}
+		}
+
+		$last_candidate = end($candidates);
+		return global360_limit_seo_text(is_string($last_candidate) ? $last_candidate : '', $maximum);
+	}
+}
+
 if (! function_exists('global360_build_fallback_title')) {
 	function global360_build_fallback_title()
 	{
 		$terms = global360_get_seo_settings_terms();
 		$condition = $terms['condition'];
 		$site_name = $terms['site_name'];
+		$entity_name = global360_limit_seo_text(get_the_title(), 500);
 
 		if (is_singular('doctor') || is_singular('doctors')) {
-			$parts = array(
-				get_the_title(),
-				$condition ? $condition . ' Specialist' : '',
-				$site_name,
-			);
-			$parts = array_values(array_filter(array_map('trim', $parts)));
-			return ! empty($parts) ? implode(' | ', $parts) : '';
+			return global360_choose_bounded_seo_title(array(
+				$condition ? $entity_name . ' | ' . $condition . ' Specialist' : '',
+				$entity_name . ' | Medical Specialist',
+				$site_name ? $entity_name . ' | ' . $site_name : '',
+				$entity_name,
+			));
 		}
 
 		if (is_singular('clinic') || is_singular('clinics')) {
-			$parts = array(
-				get_the_title(),
-				$condition ? $condition . ' Treatment Clinic' : '',
-				$site_name,
-			);
-			$parts = array_values(array_filter(array_map('trim', $parts)));
-			return ! empty($parts) ? implode(' | ', $parts) : '';
+			return global360_choose_bounded_seo_title(array(
+				$condition ? $entity_name . ' | ' . $condition . ' Clinic' : '',
+				$entity_name . ' | Treatment Clinic',
+				$site_name ? $entity_name . ' | ' . $site_name : '',
+				$entity_name,
+			));
 		}
 
 		if (is_page('find-a-doctor')) {
@@ -1865,17 +1945,36 @@ if (! function_exists('global360_build_fallback_description')) {
 		$terms = global360_get_seo_settings_terms();
 		$condition = $terms['condition'];
 		$treatment = $terms['treatment'];
+		$entity_name = global360_limit_seo_text(get_the_title(), 500);
 
 		if (is_singular('doctor') || is_singular('doctors')) {
 			if ($condition && $treatment) {
-				return get_the_title() . ' specializes in treating ' . $condition . ' using advanced therapies including ' . $treatment . '. Learn more about available treatment options and clinic locations.';
+				return global360_choose_bounded_seo_description(array(
+					'Learn about ' . $entity_name . ', a ' . $condition . ' specialist offering ' . $treatment . '. View treatment options and clinic locations.',
+					'Learn about ' . $entity_name . ', a ' . $condition . ' specialist. View treatment options and clinic locations.',
+				));
+			}
+			if ($condition) {
+				return global360_choose_bounded_seo_description(array(
+					'Learn about ' . $entity_name . ', a specialist treating ' . $condition . '. View available treatment options and clinic locations.',
+					'Learn about ' . $entity_name . ' and available ' . $condition . ' treatment options and clinic locations.',
+				));
 			}
 			return '';
 		}
 
 		if (is_singular('clinic') || is_singular('clinics')) {
 			if ($condition) {
-				return get_the_title() . ' offers treatment for ' . $condition . '. View doctors, clinic locations, and treatment options available at this clinic.';
+				$full_description = 'Explore ' . $entity_name . ' for ' . $condition . ' care.';
+				if ($treatment) {
+					$full_description .= ' Treatment options include ' . $treatment . '.';
+				}
+				$full_description .= ' View doctors and clinic details.';
+
+				return global360_choose_bounded_seo_description(array(
+					$full_description,
+					'Explore ' . $entity_name . ' for ' . $condition . ' care. View doctors, locations, clinic details, and treatment options.',
+				));
 			}
 			return '';
 		}
@@ -1911,6 +2010,30 @@ if (! function_exists('global360_filter_document_title_fallback')) {
 }
 add_filter('pre_get_document_title', 'global360_filter_document_title_fallback', 9999);
 
+if (! function_exists('global360_filter_seopress_title_fallback')) {
+	/**
+	 * Use the bounded dynamic entity title unless an editor supplied a
+	 * per-post SEOPress title.
+	 *
+	 * @param string $title Title resolved by SEOPress.
+	 * @return string
+	 */
+	function global360_filter_seopress_title_fallback($title)
+	{
+		if (is_admin() || global360_has_seopress_custom_title()) {
+			return $title;
+		}
+
+		$fallback = global360_build_fallback_title();
+		if (is_singular(array('clinic', 'clinics', 'doctor', 'doctors'))) {
+			return '' !== $fallback ? $fallback : $title;
+		}
+
+		return '' === trim((string) $title) && '' !== $fallback ? $fallback : $title;
+	}
+}
+add_filter('seopress_titles_title', 'global360_filter_seopress_title_fallback', 9999);
+
 if (! function_exists('global360_filter_seopress_description_fallback')) {
 	/**
 	 * Supply the Theme fallback through SEOPress when SEOPress has no description.
@@ -1924,12 +2047,16 @@ if (! function_exists('global360_filter_seopress_description_fallback')) {
 	 */
 	function global360_filter_seopress_description_fallback($description)
 	{
-		if (is_admin() || '' !== trim((string) $description)) {
+		if (is_admin() || global360_has_seopress_custom_description()) {
 			return $description;
 		}
 
 		$fallback = global360_build_fallback_description();
-		return '' !== $fallback ? $fallback : $description;
+		if (is_singular(array('clinic', 'clinics', 'doctor', 'doctors'))) {
+			return '' !== $fallback ? $fallback : $description;
+		}
+
+		return '' === trim((string) $description) && '' !== $fallback ? $fallback : $description;
 	}
 }
 add_filter('seopress_titles_desc', 'global360_filter_seopress_description_fallback', 9999);
