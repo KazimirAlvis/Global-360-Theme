@@ -91,7 +91,7 @@ if (! function_exists('global360_handle_places_data_purge')) {
 
 if (! defined('_S_VERSION')) {
 	// Replace the version number of the theme on each release.
-	define( '_S_VERSION', '1.0.20261119150147' );
+	define( '_S_VERSION', '1.0.20261119170429' );
 }
 
 if (!function_exists('global_360_get_icon_svg')) {
@@ -3473,6 +3473,10 @@ if (! function_exists('global360_output_content_page_schema')) {
 			return;
 		}
 
+		if (function_exists('global360_is_search_utility_page') && global360_is_search_utility_page()) {
+			return;
+		}
+
 		if (is_singular('clinic') || is_singular('clinics') || is_singular('doctor') || is_singular('doctors')) {
 			return;
 		}
@@ -3597,6 +3601,10 @@ if (! function_exists('global360_output_breadcrumb_schema')) {
 	function global360_output_breadcrumb_schema()
 	{
 		if (is_admin() || ! is_singular()) {
+			return;
+		}
+
+		if (function_exists('global360_is_search_utility_page') && global360_is_search_utility_page()) {
 			return;
 		}
 
