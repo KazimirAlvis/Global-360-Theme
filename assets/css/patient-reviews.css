@@ -8,6 +8,13 @@
  box-sizing: border-box;
 }
 .patient-reviews-listing { max-width: 1200px; margin: 0 auto; padding: clamp(24px, 5vw, 64px) 20px; }
+.patient-reviews-action { margin: 0 0 24px; text-align: center; }
+.patient-reviews-button,
+.patient-reviews-button:visited { display: inline-flex; align-items: center; justify-content: center; width: 100%; max-width: 312px; min-height: 54px; box-sizing: border-box; padding: 15px 30px; border: 1px solid var(--review-accent); border-radius: 27px; background: var(--review-accent); color: #fff; font-family: var(--body-font, inherit); font-size: 18px; font-weight: var(--body-font-weight, 400); line-height: 22px; text-align: center; text-decoration: none; transition: transform .2s ease, background-color .2s ease; }
+.patient-reviews-button:hover,
+.patient-reviews-button:focus,
+.patient-reviews-button:visited:hover { background: #292626; border-color: #292626; color: #fff; }
+.patient-reviews-button:focus-visible { outline: 3px solid var(--review-accent); outline-offset: 3px; }
 .patient-reviews-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .patient-review-card { display: flex; flex-direction: column; padding: clamp(20px, 3vw, 28px); border: 1px solid var(--review-border); border-radius: 8px; background: var(--review-surface); overflow-wrap: anywhere; }
 .patient-review-card h2 { font-size: 1.4rem; line-height: 1.35; margin: 0 0 8px; }

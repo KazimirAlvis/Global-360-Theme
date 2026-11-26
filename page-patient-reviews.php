@@ -5,6 +5,8 @@ $page_number = isset( $_GET['review_page'] ) && is_scalar( $_GET['review_page'] 
 $reviews = function_exists( 'global360_platform' ) && method_exists( global360_platform(), 'patient_reviews' )
 	? global360_platform()->patient_reviews()->query( array( 'page' => $page_number, 'per_page' => 9 ) )
 	: array( 'items' => array(), 'total' => 0, 'pages' => 0, 'page' => 1 );
+$leave_review_page = get_page_by_path( 'leave-a-review' );
+$leave_review_url  = $leave_review_page instanceof WP_Post ? get_permalink( $leave_review_page ) : '';
 ?>
 <main id="primary" class="site-main patient-reviews-page">
 	<?php while ( have_posts() ) : the_post(); ?>
@@ -14,6 +16,9 @@ $reviews = function_exists( 'global360_platform' ) && method_exists( global360_p
 	<?php if ( ! $reviews['items'] ) : ?>
 		<p class="patient-reviews-empty"><?php esc_html_e( 'No patient reviews have been published yet.', 'global-360-theme' ); ?></p>
 	<?php else : ?>
+		<?php if ( (int) $reviews['total'] > 0 && $leave_review_url ) : ?>
+			<p class="patient-reviews-action"><a class="patient-reviews-button" href="<?php echo esc_url( $leave_review_url ); ?>"><?php esc_html_e( 'Leave a Review', 'global-360-theme' ); ?></a></p>
+		<?php endif; ?>
 		<div class="patient-reviews-grid">
 		<?php foreach ( $reviews['items'] as $review ) : ?>
 			<article class="patient-review-card">
